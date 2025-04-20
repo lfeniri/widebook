@@ -6,6 +6,7 @@ import { Blog } from '@/types/blog';
 export default function AdminBlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(false);
+  const [blogToEdit, setBlogToEdit] = useState<Blog | null>(null);
 
   const fetchBlogs = async () => {
     setLoading(true);
@@ -22,7 +23,7 @@ export default function AdminBlogsPage() {
   return (
     <div className="max-w-4xl mx-auto py-8">
       <h2 className="text-xl font-bold mb-4">Blogs</h2>
-      <BlogForm onCreated={fetchBlogs} />
+      <BlogForm onCreated={() => { fetchBlogs(); setBlogToEdit(null); }} blog={blogToEdit} />
       {loading ? (
         <div>Chargement...</div>
       ) : (
@@ -36,7 +37,7 @@ export default function AdminBlogsPage() {
                   <div className="text-gray-400 text-xs">Auteur : {blog.author?.email}</div>
                 </div>
                 <div className="flex gap-2">
-                  {/* Boutons d'édition/suppression à ajouter ici */}
+                  <button onClick={() => setBlogToEdit(blog)} className="text-blue-600 hover:underline">Éditer</button>
                 </div>
               </div>
               <div className="mt-2 text-gray-700 line-clamp-2" dangerouslySetInnerHTML={{ __html: blog.content }} />

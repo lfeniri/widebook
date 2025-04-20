@@ -1,15 +1,9 @@
-import { supabase } from '@/lib/supabaseClient';
-import { redirect } from 'next/navigation';
+import React from "react";
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  // Vérification de la session côté serveur (Next.js App Router)
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  /*if (!session) {
-    redirect('/admin/login');
-  }*/
-
-  return <>{children}</>;
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <main className="pt-8 pb-16 min-h-screen bg-gray-50">
+      {children}
+    </main>
+  );
 }

@@ -4,20 +4,22 @@ import { supabase } from '@/lib/supabaseClient';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function AdminLoginPage() {
+export default function AdminRegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setSuccess("");
+    const { error } = await supabase.auth.signUp({ email, password });
     if (error) setError(error.message);
-    else router.push('/client');
+    else setSuccess("Un email de confirmation a été envoyé. Merci de valider le lien dans votre boîte email.");
     setLoading(false);
   };
 
@@ -31,8 +33,8 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-300">
-      <form onSubmit={handleLogin} className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md flex flex-col gap-4">
-        <h1 className="text-2xl font-bold mb-2 text-center">Connexion Admin</h1>
+      <form onSubmit={handleRegister} className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md flex flex-col gap-4">
+        <h1 className="text-2xl font-bold mb-2 text-center">Créer un compte</h1>
         <input
           type="email"
           placeholder="Email"
@@ -50,12 +52,13 @@ export default function AdminLoginPage() {
           required
         />
         {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+        {success && <div className="text-green-600 text-sm text-center">{success}</div>}
         <button
           type="submit"
           className="bg-primary text-white rounded px-4 py-2 font-semibold hover:bg-primary/90 transition-colors w-full"
           disabled={loading}
         >
-          {loading ? 'Connexion...' : 'Se connecter'}
+          {loading ? 'Inscription...' : "S'inscrire"}
         </button>
         <div className="flex flex-col gap-2 mt-2">
           <button
@@ -64,7 +67,7 @@ export default function AdminLoginPage() {
             className="bg-white border border-gray-300 rounded px-4 py-2 font-semibold flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
             disabled={loading}
           >
-            <img src="/google.svg" alt="Google" className="h-5 w-5" /> Se connecter avec Google
+            <img src="/google.svg" alt="Google" className="h-5 w-5" /> S'inscrire avec Google
           </button>
           <button
             type="button"
@@ -72,13 +75,11 @@ export default function AdminLoginPage() {
             className="bg-white border border-gray-300 rounded px-4 py-2 font-semibold flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
             disabled={loading}
           >
-            <img src="/facebook.svg" alt="Facebook" className="h-5 w-5" /> Se connecter avec Facebook
+            <img src="/facebook.svg" alt="Facebook" className="h-5 w-5" /> S'inscrire avec Facebook
           </button>
         </div>
         <div className="text-center mt-2">
-          <a href="/admin/register" className="text-primary hover:underline">S'inscrire</a>
-          <span className="mx-2">|</span>
-          <a href="/admin/forgot-password" className="text-primary hover:underline">Mot de passe oublié ?</a>
+          <a href="/admin/login" className="text-primary hover:underline">Déjà inscrit ? Se connecter</a>
         </div>
       </form>
     </div>

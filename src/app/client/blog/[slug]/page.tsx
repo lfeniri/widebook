@@ -23,20 +23,20 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function BlogPage({ params }: { params: { slug: string } }) {
   const blog = await prisma.blog.findUnique({
     where: { slug: params.slug },
-    include: { category: true },
+    include: { category: true, author: true, comments: { include: { author: true } } },
   });
   if (!blog) return notFound();
 
   return (
-    <article className="max-w-3xl mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-2">{blog.title}</h1>
-      <div className="text-gray-500 mb-4 flex gap-4 text-sm">
+    <article className="max-w-7xl mx-auto py-12 px-4 md:px-12 bg-white rounded-xl shadow-lg">
+      <h1 className="text-4xl font-extrabold mb-4 text-gray-900">{blog.title}</h1>
+      <div className="text-gray-500 mb-6 flex flex-wrap gap-6 text-base">
         <span>Catégorie : {blog.category?.name}</span>
         <span>Auteur : {blog.author?.email}</span>
         <span>Publié le {new Date(blog.createdAt).toLocaleDateString()}</span>
       </div>
-      {blog.image && <img src={blog.image} alt="" className="rounded-lg mb-6 w-full max-h-96 object-cover" />}
-      <div className="prose prose-lg max-w-none mb-8" dangerouslySetInnerHTML={{ __html: blog.content }} />
+      {blog.image && <img src={blog.image} alt="" className="rounded-lg mb-8 w-full max-h-[480px] object-cover" />}
+      <div className="prose prose-lg max-w-none mb-10" dangerouslySetInnerHTML={{ __html: blog.content }} />
       <BlogComments blogId={blog.id} comments={blog.comments} />
     </article>
   );

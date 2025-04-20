@@ -1,15 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Category } from '@/types/blog';
+import { Category, Blog } from '@/types/blog';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
-export default function BlogForm({ onCreated }: { onCreated: () => void }) {
+export default function BlogForm({ onCreated, blog }: { onCreated: () => void; blog?: Blog | null }) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [slug, setSlug] = useState("");
   const [image, setImage] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [categoryId, setCategoryId] = useState("");
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDesc, setSeoDesc] = useState("");
@@ -22,13 +23,49 @@ export default function BlogForm({ onCreated }: { onCreated: () => void }) {
       .then(data => setCategories(data));
   }, []);
 
+  useEffect(() => {
+    if (blog) {
+      setTitle(blog.title || "");
+      setContent(blog.content || "");
+      setSlug(blog.slug || "");
+      setImage(blog.image || "");
+      setCategoryId(blog.categoryId || "");
+      setSeoTitle(blog.seoTitle || "");
+      setSeoDesc(blog.seoDesc || "");
+      setImageFile(null);
+    } else {
+      setTitle(""); setContent(""); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
+    }
+  }, [blog]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
-    try{
+    try {
       e.preventDefault();
       setLoading(true);
       setError(null);
-      const res = await fetchWithAuth("/admin/api/blogs", {
-        method: "POST",
+      let imageUrl = image;
+      if (imageFile) {
+        // Upload image to S3 via API route
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        const uploadRes = await fetch('/admin/api/upload-image', {
+          method: 'POST',
+          body: formData,
+        });
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) throw new Error(uploadData.error || 'Erreur upload image');
+        imageUrl = uploadData.url;
+      }
+      const method = blog ? "PUT" : "POST";
+      const url = blog ? `/admin/api/blogs?id=${blog.id}` : "/admin/api/blogs";
+      const res = await fetchWithAuth(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -36,23 +73,23 @@ export default function BlogForm({ onCreated }: { onCreated: () => void }) {
           title,
           content,
           slug,
-          image,
+          image: imageUrl,
           categoryId,
           seoTitle,
           seoDesc,
         }),
       });
       if (res.ok) {
-        setTitle(""); setContent(""); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc("");
+        setTitle(""); setContent(""); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
         onCreated();
       } else {
         const data = await res.json();
-        setError(data.error || "Erreur lors de la création du blog.");
+        setError(data.error || `Erreur lors de la ${blog ? 'modification' : 'création'} du blog.`);
       }
       setLoading(false);
-    } catch (err) {
+    } catch (err: any) {
       setLoading(false);
-      setError("Erreur lors de la création du blog.");
+      setError(err?.message || `Erreur lors de la ${blog ? 'modification' : 'création'} du blog.`);
     }
   };
 
@@ -67,13 +104,14 @@ export default function BlogForm({ onCreated }: { onCreated: () => void }) {
           <option key={cat.id} value={cat.id}>{cat.name}</option>
         ))}
       </select>
-      <input type="text" placeholder="Image (URL)" value={image} onChange={e => setImage(e.target.value)} className="border rounded px-3 py-2" />
+      <input type="file" accept="image/*" onChange={handleImageChange} className="border rounded px-3 py-2" />
+      {imageFile && <div className="text-xs text-gray-500">Image sélectionnée : {imageFile.name}</div>}
       <textarea placeholder="Contenu HTML" value={content} onChange={e => setContent(e.target.value)} className="border rounded px-3 py-2 min-h-[120px] font-mono" required />
       <input type="text" placeholder="SEO Title" value={seoTitle} onChange={e => setSeoTitle(e.target.value)} className="border rounded px-3 py-2" />
       <input type="text" placeholder="SEO Description" value={seoDesc} onChange={e => setSeoDesc(e.target.value)} className="border rounded px-3 py-2" />
       {error && <div className="text-red-500 text-sm">{error}</div>}
       <button type="submit" className="bg-primary text-white rounded px-4 py-2 font-semibold hover:bg-primary/90 transition-colors" disabled={loading}>
-        {loading ? "Création..." : "Créer le blog"}
+        {loading ? (blog ? "Modification..." : "Création...") : (blog ? "Modifier le blog" : "Créer le blog")}
       </button>
     </form>
   );

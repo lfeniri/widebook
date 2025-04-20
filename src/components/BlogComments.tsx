@@ -1,11 +1,21 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CommentForm from '@/components/CommentForm';
 import { Comment } from '@/types/blog';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function BlogComments({ blogId, comments: initialComments }: { blogId: string, comments: Comment[] }) {
   const [comments, setComments] = useState(initialComments);
   const [refresh, setRefresh] = useState(0);
+
+  useEffect(() => {
+    async function fetchUser() {
+      const { data: { session } } = await supabase.auth.getSession();
+    }
+    fetchUser();
+    const { data: listener } = supabase.auth.onAuthStateChange(() => fetchUser());
+    return () => { listener?.subscription.unsubscribe(); };
+  }, []);
 
   const fetchComments = async () => {
     const res = await fetch(`/client/api/comments?blogId=${blogId}`);
@@ -31,7 +41,7 @@ export default function BlogComments({ blogId, comments: initialComments }: { bl
           </li>
         ))}
       </ul>
-      <CommentForm blogId={blogId} onCommented={() => setRefresh(r => r + 1)} />
+      { <CommentForm blogId={blogId} onCommented={() => setRefresh(r => r + 1)} />}
     </section>
   );
 }
