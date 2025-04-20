@@ -1,0 +1,39 @@
+export interface Blog {
+  id: string;
+  title: string;
+  content: string;
+  slug: string;
+  image?: string;
+  createdAt: string;
+  updatedAt: string;
+  seoTitle?: string;
+  seoDesc?: string;
+  authorId: string;
+  categoryId: string;
+  category?: Category;
+  author?: User;
+  comments?: Comment[];
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  blogs?: Blog[];
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  image?: string;
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  createdAt: string;
+  authorId: string;
+  blogId: string;
+  author?: User;
+}

@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                          String            @id @db.Uuid
+  role                        String?           @db.VarChar(255)
+  email                       String?           @map("email") @db.VarChar(255)
+  name                        Json?             @map("raw_user_meta_data")
+  is_super_admin              Boolean?
+  phone                       String?           @unique
+
+  blogs                       Blog[]            @relation("UserBlogs")
+  comments                    Comment[]         @relation("UserToComments")
+}
+
+model Category {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  blogs       Blog[]
+}
+
+model Blog {
+  id          String    @id @default(uuid())
+  title       String
+  content     String    // HTML content
+  slug        String    @unique
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  seoTitle    String?
+  seoDesc     String?
+  authorId    String   @db.Uuid 
+  author      User     @relation("UserBlogs", fields: [authorId], references: [id])
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  comments    Comment[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  authorId  String   @db.Uuid  
+  author    User     @relation("UserToComments", fields: [authorId], references: [id])
+  blogId    String
+  blog      Blog     @relation(fields: [blogId], references: [id])
+}
