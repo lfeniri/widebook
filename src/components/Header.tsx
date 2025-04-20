@@ -37,28 +37,37 @@ export default function Header() {
   const isAuth = !!user;
 
   return (
-    <header className="w-full border-b bg-white/80 backdrop-blur sticky top-0 z-30 transition-shadow shadow-md">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-8 py-4">
+    <header className="sticky-header animate-fadeInUp">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
-          <img src="/logo.svg" alt="Logo" className="h-9 w-9" />
+          <img src="/logo.svg" alt="Logo" className="h-10 w-10 drop-shadow-md" />
           <span className="font-bold text-2xl tracking-tight text-primary">SoluMind</span>
         </div>
-        <nav className="flex gap-8 text-gray-700 text-base font-semibold">
-          <a href="/client" className="hover:text-primary transition-colors">Accueil</a>
+        <nav className="hidden md:flex gap-8 text-gray-700 text-base font-semibold">
+          <a href="/client" className="relative group transition-colors">
+            Accueil
+            <span className="block h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+          </a>
           {isAdmin && (
             <>
-              <a href="/admin/categories" className="hover:text-primary transition-colors">Catégories</a>
-              <a href="/admin/blogs" className="hover:text-primary transition-colors">Blog</a>
+              <a href="/admin/categories" className="relative group transition-colors">
+                Catégories
+                <span className="block h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+              </a>
+              <a href="/admin/blogs" className="relative group transition-colors">
+                Blog
+                <span className="block h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+              </a>
             </>
           )}
         </nav>
         <div className="flex items-center gap-2">
           {isAuth ? (
-            <a href="/profile" title={user?.email} className="rounded-full w-8 h-8 flex items-center justify-center bg-green-500 text-white font-bold border-2 border-green-600 cursor-pointer">
+            <a href="/profile" title={user?.email} className="rounded-full w-9 h-9 flex items-center justify-center bg-green-500 text-white font-bold border-2 border-green-600 shadow hover:scale-105 transition-transform">
               <span>{user?.email?.[0]?.toUpperCase()}</span>
             </a>
           ) : (
-            <a href="/admin/login" className="bg-primary text-white px-4 py-2 rounded font-semibold hover:bg-primary/90 transition-colors">Connecter</a>
+            <a href="/admin/login" className="btn">Connecter</a>
           )}
         </div>
       </div>

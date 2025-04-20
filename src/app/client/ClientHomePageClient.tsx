@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import BlogCategoryFilter from '@/components/BlogCategoryFilter';
 import Link from 'next/link';
 import { Blog } from '@/types/blog';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function ClientHomePageClient() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -25,24 +27,80 @@ export default function ClientHomePageClient() {
   }, [categoryId]);
 
   return (
-    <div className="max-w-5xl mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-6">Tous les blogs</h1>
-      <BlogCategoryFilter onChange={setCategoryId} />
-      {loading ? <div>Chargement...</div> : (
-        <ul className="grid md:grid-cols-2 gap-6">
-          {blogs.map(blog => (
-            <li key={blog.id} className="bg-white rounded shadow p-4 flex flex-col gap-2">
-              <Link href={`/client/blog/${blog.slug}`} className="text-xl font-semibold hover:text-primary transition-colors">
-                {blog.title}
-              </Link>
-              <div className="text-gray-500 text-sm">Catégorie : {blog.category?.name}</div>
-              <div className="text-xs text-gray-400">Publié le {new Date(blog.createdAt).toLocaleDateString()}</div>
-              {blog.image && <img src={blog.image} alt="" className="rounded w-full h-40 object-cover" />}
-              <div className="line-clamp-3 text-gray-700" dangerouslySetInnerHTML={{ __html: blog.content }} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <main className="min-h-screen bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2] pb-20">
+      {/* Hero Section améliorée */}
+      <section className="relative w-full flex flex-col md:flex-row items-center gap-12 mb-16 px-4 pt-16 md:pt-24 animate-fadeInUp">
+        <div className="flex-1 flex flex-col gap-6 z-10">
+          <h1 className="text-5xl md:text-6xl font-black text-primary drop-shadow-xl leading-tight mb-4">
+            Bienvenue sur <span className="text-[#ff385c]">SoluMind</span><br />
+            <span className="text-gray-800">Le blog qui inspire et connecte</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mb-6">
+            Explorez des articles exclusifs, conseils d’experts et retours d’expérience pour progresser chaque jour.
+          </p>
+          <Button asChild size="lg" className="w-fit bg-[#ff385c] hover:bg-[#e11d48] text-white shadow-lg animate-fadeIn delay-200">
+            <a href="#blogs">Découvrir les blogs</a>
+          </Button>
+        </div>
+        <div className="flex-1 flex justify-center relative z-0">
+          <div className="absolute -top-8 -right-8 w-80 h-80 bg-[#ff385c]/10 rounded-full blur-3xl" />
+          <img src="/globe.svg" alt="Inspiration" className="w-80 h-80 object-contain drop-shadow-2xl relative z-10" />
+        </div>
+      </section>
+      {/* Section Blogs */}
+      <section className="max-w-7xl mx-auto px-4" id="blogs">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-3xl font-bold text-gray-900 animate-fadeInUp">Tous les blogs</h2>
+          <BlogCategoryFilter onChange={setCategoryId} />
+        </div>
+        {loading ? (
+          <div className="text-center py-12 text-lg text-gray-500 animate-pulse">Chargement...</div>
+        ) : blogs.length === 0 ? (
+          <div className="text-center py-12 text-gray-400">Aucun blog trouvé.</div>
+        ) : (
+          <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10 animate-fadeInUp">
+            {blogs.map((blog, i) => (
+              <li
+                key={blog.id}
+                className="group bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col overflow-hidden border border-gray-100 hover:border-[#ff385c]/40 animate-fadeInUp"
+                style={{ animationDelay: `${i * 80}ms` }}
+              >
+                {blog.image && (
+                  <Link href={`/client/blog/${blog.slug}`}
+                    className="block overflow-hidden h-48 bg-gray-100">
+                    <img
+                      src={blog.image}
+                      alt={blog.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </Link>
+                )}
+                <div className="flex-1 flex flex-col p-6 gap-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    {blog.category?.name && (
+                      <Badge className="bg-[#ff385c]/10 text-[#ff385c] font-semibold px-3 py-1 text-xs rounded-full">
+                        {blog.category.name}
+                      </Badge>
+                    )}
+                    <span className="text-xs text-gray-400 ml-auto">{new Date(blog.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <Link href={`/client/blog/${blog.slug}`}
+                    className="text-lg font-bold text-gray-900 group-hover:text-[#ff385c] transition-colors line-clamp-2">
+                    {blog.title}
+                  </Link>
+                  <div className="line-clamp-3 text-gray-600 text-base" dangerouslySetInnerHTML={{ __html: blog.content }} />
+                  <div className="mt-auto flex items-center gap-2 pt-4">
+                    <span className="text-xs text-gray-500">Par {blog.author?.email || 'Auteur inconnu'}</span>
+                    <Button asChild size="sm" variant="outline" className="ml-auto group-hover:border-[#ff385c] group-hover:text-[#ff385c] transition-colors">
+                      <Link href={`/client/blog/${blog.slug}`}>Lire</Link>
+                    </Button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </main>
   );
 }

@@ -41,9 +41,9 @@ export default function AdminCategoriesPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-8">
-      <h2 className="text-xl font-bold mb-4">Catégories</h2>
-      <form onSubmit={handleAddCategory} className="flex gap-2 mb-6">
+    <div className="max-w-2xl mx-auto py-8 animate-fadeInUp">
+      <h2 className="text-2xl font-bold mb-4">Catégories</h2>
+      <form onSubmit={handleAddCategory} className="flex flex-col md:flex-row gap-2 mb-6">
         <input
           type="text"
           placeholder="Nom de la catégorie"
@@ -61,18 +61,18 @@ export default function AdminCategoriesPage() {
         />
         <button
           type="submit"
-          className="bg-primary text-white rounded px-4 py-2 font-semibold hover:bg-primary/90 transition-colors"
+          className="btn min-w-[120px]"
           disabled={loading}
         >
           Ajouter
         </button>
       </form>
       {error && <div className="text-red-500 mb-2">{error}</div>}
-      <ul className="space-y-2">
-        {categories.map(cat => (
-          <li key={cat.id} className="bg-white rounded shadow p-3 flex justify-between items-center">
+      <ul className="grid gap-4 mt-4">
+        {categories.map((cat, i) => (
+          <li key={cat.id} className="card flex justify-between items-center animate-fadeInUp" style={{ animationDelay: `${i * 80}ms` }}>
             <div>
-              <div className="font-semibold">{cat.name}</div>
+              <div className="font-semibold text-lg">{cat.name}</div>
               <div className="text-gray-500 text-sm">{cat.description}</div>
             </div>
             <span className="text-xs text-gray-400">{cat.blogs.length} blogs</span>

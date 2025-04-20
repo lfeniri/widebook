@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import { Category, Blog } from '@/types/blog';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import { useRouter } from 'next/navigation';
 
-export default function BlogForm({ onCreated, blog }: { onCreated: () => void; blog?: Blog | null }) {
+export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; blog?: Blog | null }) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -16,6 +17,8 @@ export default function BlogForm({ onCreated, blog }: { onCreated: () => void; b
   const [seoDesc, setSeoDesc] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/admin/api/categories")
@@ -49,6 +52,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated: () => void; b
       e.preventDefault();
       setLoading(true);
       setError(null);
+      setSuccess(null);
       let imageUrl = image;
       if (imageFile) {
         // Upload image to S3 via API route
@@ -80,8 +84,15 @@ export default function BlogForm({ onCreated, blog }: { onCreated: () => void; b
         }),
       });
       if (res.ok) {
-        setTitle(""); setContent(""); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
-        onCreated();
+        setSuccess(blog ? 'Blog modifié avec succès !' : 'Blog créé avec succès !');
+        setTimeout(() => {
+          setSuccess(null);
+          router.push('/admin/blogs');
+        }, 1200);
+        if (!blog) {
+          setTitle(""); setContent(""); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
+        }
+        onCreated && onCreated();
       } else {
         const data = await res.json();
         setError(data.error || `Erreur lors de la ${blog ? 'modification' : 'création'} du blog.`);
@@ -94,8 +105,8 @@ export default function BlogForm({ onCreated, blog }: { onCreated: () => void; b
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded shadow p-4 mb-8 flex flex-col gap-3">
-      <h3 className="font-semibold text-lg mb-2">Créer un nouveau blog</h3>
+    <form onSubmit={handleSubmit} className="bg-white rounded shadow p-4 mb-8 flex flex-col gap-3 card animate-fadeInUp">
+      <h3 className="font-semibold text-lg mb-2">{blog ? 'Modifier le blog' : 'Créer un nouveau blog'}</h3>
       <input type="text" placeholder="Titre" value={title} onChange={e => setTitle(e.target.value)} className="border rounded px-3 py-2" required />
       <input type="text" placeholder="Slug (url)" value={slug} onChange={e => setSlug(e.target.value)} className="border rounded px-3 py-2" required />
       <select value={categoryId} onChange={e => setCategoryId(e.target.value)} className="border rounded px-3 py-2" required>
@@ -109,8 +120,9 @@ export default function BlogForm({ onCreated, blog }: { onCreated: () => void; b
       <textarea placeholder="Contenu HTML" value={content} onChange={e => setContent(e.target.value)} className="border rounded px-3 py-2 min-h-[120px] font-mono" required />
       <input type="text" placeholder="SEO Title" value={seoTitle} onChange={e => setSeoTitle(e.target.value)} className="border rounded px-3 py-2" />
       <input type="text" placeholder="SEO Description" value={seoDesc} onChange={e => setSeoDesc(e.target.value)} className="border rounded px-3 py-2" />
+      {success && <div className="text-green-600 text-sm">{success}</div>}
       {error && <div className="text-red-500 text-sm">{error}</div>}
-      <button type="submit" className="bg-primary text-white rounded px-4 py-2 font-semibold hover:bg-primary/90 transition-colors" disabled={loading}>
+      <button type="submit" className="btn" disabled={loading}>
         {loading ? (blog ? "Modification..." : "Création...") : (blog ? "Modifier le blog" : "Créer le blog")}
       </button>
     </form>

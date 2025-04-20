@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -21,10 +22,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}>
+    <html lang="fr">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-[#f8fafc] to-[#e0e7ef] min-h-screen flex flex-col`}> 
         <Header />
-        {children}
+        <main className="flex-1 w-full max-w-6xl mx-auto px-4 animate-fadeInUp">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );

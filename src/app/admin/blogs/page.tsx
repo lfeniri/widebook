@@ -1,51 +1,43 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import BlogForm from '@/components/BlogForm';
+import BlogTable from '@/components/BlogTable';
 import { Blog } from '@/types/blog';
+
+const PAGE_SIZE = 10;
 
 export default function AdminBlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(false);
-  const [blogToEdit, setBlogToEdit] = useState<Blog | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageCount, setPageCount] = useState(1);
+  const [search, setSearch] = useState("");
 
-  const fetchBlogs = async () => {
+  const fetchBlogs = async (page = 1, search = "") => {
     setLoading(true);
-    const res = await fetch("/admin/api/blogs");
+    const params = new URLSearchParams({ page: String(page), pageSize: String(PAGE_SIZE), search });
+    const res = await fetch(`/admin/api/blogs?${params.toString()}`);
     const data = await res.json();
-    setBlogs(data);
+    setBlogs(data.blogs);
+    setPageCount(data.pageCount);
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchBlogs();
-  }, []);
+    fetchBlogs(page, search);
+  }, [page, search]);
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
-      <h2 className="text-xl font-bold mb-4">Blogs</h2>
-      <BlogForm onCreated={() => { fetchBlogs(); setBlogToEdit(null); }} blog={blogToEdit} />
-      {loading ? (
-        <div>Chargement...</div>
-      ) : (
-        <ul className="space-y-4">
-          {blogs.map(blog => (
-            <li key={blog.id} className="bg-white rounded shadow p-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="font-semibold text-lg">{blog.title}</div>
-                  <div className="text-gray-500 text-sm">Catégorie : {blog.category?.name}</div>
-                  <div className="text-gray-400 text-xs">Auteur : {blog.author?.email}</div>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={() => setBlogToEdit(blog)} className="text-blue-600 hover:underline">Éditer</button>
-                </div>
-              </div>
-              <div className="mt-2 text-gray-700 line-clamp-2" dangerouslySetInnerHTML={{ __html: blog.content }} />
-              <div className="text-xs text-gray-400 mt-1">{blog.comments?.length ?? 0} commentaires</div>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="max-w-6xl mx-auto py-8 animate-fadeInUp">
+      <h2 className="text-2xl font-bold mb-6">Gestion des blogs</h2>
+      <BlogTable
+        blogs={blogs}
+        loading={loading}
+        page={page}
+        pageCount={pageCount}
+        onPageChange={setPage}
+        onSearch={q => { setPage(1); setSearch(q); }}
+        search={search}
+      />
     </div>
   );
 }

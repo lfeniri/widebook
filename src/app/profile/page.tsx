@@ -24,8 +24,8 @@ export default function ProfilePage() {
         return;
       }
       // Fetch additional profile info from a custom table if needed
-      let name = session.user.user_metadata?.name || "";
-      let phone = session.user.user_metadata?.phone || "";
+      let name = `${session.user?.user_metadata?.first_name} ${session.user?.user_metadata?.last_name}` || "";
+      let phone = session.user.phone || "";
       let role = session.user.role || "";
       setUser({
         email: session.user.email ?? "",
@@ -45,7 +45,7 @@ export default function ProfilePage() {
 
   if (loading) return <div className="p-8">Chargement…</div>;
   if (!user) return null;
-
+  console.log(user);
   return (
     <main className="max-w-lg mx-auto mt-12 bg-white rounded shadow p-8 flex flex-col gap-6">
       <h1 className="text-2xl font-bold mb-4">Profil utilisateur</h1>

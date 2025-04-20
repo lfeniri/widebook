@@ -1,20 +1,32 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse, NextRequest } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { getUserFromRequest } from '@/lib/utils';
 
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
+  const search = searchParams.get('search')?.trim() || '';
 
-export async function GET() {
-  // Récupère tous les blogs avec leur catégorie et auteur
+  const where = search
+    ? {
+        OR: [
+          { title: { contains: search, mode: 'insensitive' } },
+          { content: { contains: search, mode: 'insensitive' } },
+        ],
+      }
+    : {};
+
+  const total = await prisma.blog.count({ where });
+  const pageCount = Math.ceil(total / pageSize);
   const blogs = await prisma.blog.findMany({
-    include: {
-      category: true,
-      author: true,
-      comments: true,
-    },
+    where,
+    include: { category: true, author: true, comments: true },
     orderBy: { createdAt: 'desc' },
+    skip: (page - 1) * pageSize,
+    take: pageSize,
   });
-  return NextResponse.json(blogs);
+  return NextResponse.json({ blogs, pageCount, total });
 }
 
 export async function POST(request: Request) {

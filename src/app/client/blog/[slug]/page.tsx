@@ -28,15 +28,15 @@ export default async function BlogPage({ params }: { params: { slug: string } })
   if (!blog) return notFound();
 
   return (
-    <article className="max-w-7xl mx-auto py-12 px-4 md:px-12 bg-white rounded-xl shadow-lg">
-      <h1 className="text-4xl font-extrabold mb-4 text-gray-900">{blog.title}</h1>
-      <div className="text-gray-500 mb-6 flex flex-wrap gap-6 text-base">
+    <article className="max-w-4xl mx-auto py-12 px-4 md:px-12 card animate-fadeInUp">
+      <h1 className="text-4xl font-extrabold mb-4 text-primary drop-shadow-sm animate-fadeInUp">{blog.title}</h1>
+      <div className="text-gray-500 mb-6 flex flex-wrap gap-6 text-base animate-fadeInUp">
         <span>Catégorie : {blog.category?.name}</span>
         <span>Auteur : {blog.author?.email}</span>
         <span>Publié le {new Date(blog.createdAt).toLocaleDateString()}</span>
       </div>
-      {blog.image && <img src={blog.image} alt="" className="rounded-lg mb-8 w-full max-h-[480px] object-cover" />}
-      <div className="prose prose-lg max-w-none mb-10" dangerouslySetInnerHTML={{ __html: blog.content }} />
+      {blog.image && <img src={blog.image} alt="" className="rounded-lg mb-8 w-full max-h-[420px] object-cover animate-fadeIn" />}
+      <div className="prose prose-lg max-w-none mb-10 animate-fadeIn" dangerouslySetInnerHTML={{ __html: blog.content }} />
       <BlogComments blogId={blog.id} comments={blog.comments} />
     </article>
   );
