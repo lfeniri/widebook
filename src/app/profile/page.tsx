@@ -39,12 +39,20 @@ export default function ProfilePage() {
   }, [router]);
 
   const handleLogout = async () => {
+    console.log("Début de la déconnexion...");
     await supabase.auth.signOut();
-    router.replace("/admin/login");
+    console.log("Déconnexion réussie");
+    router.replace("/");
   };
 
-  if (loading) return <div className="p-8">Chargement…</div>;
-  if (!user) return null;
+  if (loading || !user) {
+    return (
+      <main className="max-w-lg mx-auto mt-12 bg-white rounded shadow p-8 flex flex-col gap-6">
+        <h1 className="text-2xl font-bold mb-4">Profil utilisateur</h1>
+        <div className="text-gray-500">Chargement…</div>
+      </main>
+    );
+  }
   console.log(user);
   return (
     <main className="max-w-lg mx-auto mt-12 bg-white rounded shadow p-8 flex flex-col gap-6">

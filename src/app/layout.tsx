@@ -23,7 +23,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
   return (
     <html lang="fr">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-[#f8fafc] to-[#e0e7ef] min-h-screen flex flex-col`}> 
+      <head>
+        <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-[#f8fafc] to-[#e0e7ef] min-h-screen flex flex-col`}>
         <Header />
         <main className="flex-1 w-full max-w-6xl mx-auto px-4 animate-fadeInUp">
           {children}

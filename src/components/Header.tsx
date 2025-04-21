@@ -40,7 +40,7 @@ export default function Header() {
     <header className="sticky-header animate-fadeInUp">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
-          <img src="/logo.svg" alt="Logo" className="h-10 w-10 drop-shadow-md" />
+          <img src="/logo.svg" alt="Logo" className="h-10 w-10 drop-shadow-md" style={{ width: 'auto' }} />
           <span className="font-bold text-2xl tracking-tight text-primary">SoluMind</span>
         </div>
         <nav className="hidden md:flex gap-8 text-gray-700 text-base font-semibold">

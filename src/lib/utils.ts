@@ -12,3 +12,6 @@ export async function getUserFromRequest(request: Request) {
   if (error || !user) return null;
   return user;
 }
+export function cn(...inputs: (string | undefined | false | null)[]) {
+  return inputs.filter(Boolean).join(" ");
+}

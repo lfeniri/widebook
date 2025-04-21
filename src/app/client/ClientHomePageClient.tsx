@@ -38,8 +38,8 @@ export default function ClientHomePageClient() {
           <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mb-6">
             Explorez des articles exclusifs, conseils d’experts et retours d’expérience pour progresser chaque jour.
           </p>
-          <Button asChild size="lg" className="w-fit bg-[#ff385c] hover:bg-[#e11d48] text-white shadow-lg animate-fadeIn delay-200">
-            <a href="#blogs">Découvrir les blogs</a>
+          <Button size="lg" className="w-fit bg-[#ff385c] hover:bg-[#e11d48] text-white shadow-lg animate-fadeIn delay-200">
+          <span>Découvrir les blogs</span>
           </Button>
         </div>
         <div className="flex-1 flex justify-center relative z-0">
@@ -82,7 +82,7 @@ export default function ClientHomePageClient() {
                         {blog.category.name}
                       </Badge>
                     )}
-                    <span className="text-xs text-gray-400 ml-auto">{new Date(blog.createdAt).toLocaleDateString()}</span>
+                    <span className="text-xs text-gray-400 ml-auto">{new Date(blog.createdAt).toLocaleDateString("fr-FR")}</span>
                   </div>
                   <Link href={`/client/blog/${blog.slug}`}
                     className="text-lg font-bold text-gray-900 group-hover:text-[#ff385c] transition-colors line-clamp-2">
@@ -91,9 +91,11 @@ export default function ClientHomePageClient() {
                   <div className="line-clamp-3 text-gray-600 text-base" dangerouslySetInnerHTML={{ __html: blog.content }} />
                   <div className="mt-auto flex items-center gap-2 pt-4">
                     <span className="text-xs text-gray-500">Par {blog.author?.email || 'Auteur inconnu'}</span>
-                    <Button asChild size="sm" variant="outline" className="ml-auto group-hover:border-[#ff385c] group-hover:text-[#ff385c] transition-colors">
-                      <Link href={`/client/blog/${blog.slug}`}>Lire</Link>
-                    </Button>
+                    <Link href={`/client/blog/${blog.slug}`}>
+                      <Button size="sm" variant="outline" className="ml-auto group-hover:border-[#ff385c] group-hover:text-[#ff385c] transition-colors">
+                        Lire
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </li>

@@ -3,9 +3,10 @@ import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import BlogComments from '@/components/BlogComments';
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const blog = await prisma.blog.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     select: { title: true, seoTitle: true, seoDesc: true, image: true },
   });
   if (!blog) return {};
@@ -20,9 +21,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function BlogPage({ params }: { params: { slug: string } }) {
+export default async function BlogPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const blog = await prisma.blog.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: { category: true, author: true, comments: { include: { author: true } } },
   });
   if (!blog) return notFound();

@@ -6,15 +6,21 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Blog } from '@/types/blog';
 
-export default function EditBlogPage({ params }: { params: { id: string } }) {
+export default function EditBlogPage({ params }: { params: Promise<{ id: string }> }) {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
+  const [id, setId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
+    params.then(p => setId(p.id));
+  }, [params]);
+
+  useEffect(() => {
+    if (!id) return;
     async function fetchBlog() {
       setLoading(true);
-      const res = await fetch(`/admin/api/blogs/${params.id}`);
+      const res = await fetch(`/admin/api/blogs/${id}`);
       if (res.ok) {
         const data = await res.json();
         setBlog(data);
@@ -24,7 +30,7 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
       setLoading(false);
     }
     fetchBlog();
-  }, [params.id, router]);
+  }, [id, router]);
 
   if (loading) return <div className="py-10 text-center">Chargement...</div>;
   if (!blog) return <div className="py-10 text-center text-red-500">Blog introuvable.</div>;
