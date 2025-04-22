@@ -1,1 +1,3 @@
-// Dossier pour les pages et composants côté client (affichage des blogs, commentaires, etc.)
+# Deprecated
+
+Ce dossier n'est plus utilisé pour la page publique des blogs. Utilisez désormais `/blogs` pour la liste des articles.

@@ -1,13 +1,4 @@
-import React from "react";
-import SearchBar from "@/components/SearchBar";
-
+// Ce layout est déprécié. Il ne doit plus être utilisé pour la page publique des blogs.
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <main className="pt-8 pb-16 min-h-screen bg-gray-50">
-      <div className="mb-8">
-        <SearchBar />
-      </div>
-      {children}
-    </main>
-  );
+  return <>{children}</>;
 }

@@ -6,11 +6,14 @@ import Link from 'next/link';
 import { Blog } from '@/types/blog';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from 'next/navigation';
 
 export default function ClientHomePageClient() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(false);
   const [categoryId, setCategoryId] = useState("");
+  const router = useRouter();
+  const [loadingBlogId, setLoadingBlogId] = useState<string | null>(null);
 
   const fetchBlogs = async (catId = "") => {
     setLoading(true);
@@ -25,6 +28,12 @@ export default function ClientHomePageClient() {
   useEffect(() => {
     fetchBlogs(categoryId);
   }, [categoryId]);
+
+  useEffect(() => {
+    const handleRouteChange = () => setLoadingBlogId(null);
+    router.events?.on?.('routeChangeComplete', handleRouteChange);
+    return () => router.events?.off?.('routeChangeComplete', handleRouteChange);
+  }, [router]);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2] pb-20">
@@ -91,11 +100,24 @@ export default function ClientHomePageClient() {
                   <div className="line-clamp-3 text-gray-600 text-base" dangerouslySetInnerHTML={{ __html: blog.content }} />
                   <div className="mt-auto flex items-center gap-2 pt-4">
                     <span className="text-xs text-gray-500">Par {blog.author?.email || 'Auteur inconnu'}</span>
-                    <Link href={`/client/blog/${blog.slug}`}>
-                      <Button size="sm" variant="outline" className="ml-auto group-hover:border-[#ff385c] group-hover:text-[#ff385c] transition-colors">
-                        Lire
-                      </Button>
-                    </Link>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="ml-auto group-hover:border-[#ff385c] group-hover:text-[#ff385c] transition-colors flex items-center justify-center min-w-[70px]"
+                      disabled={loadingBlogId === blog.id}
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        setLoadingBlogId(blog.id);
+                        router.push(`/client/blog/${blog.slug}`);
+                      }}
+                    >
+                      {loadingBlogId === blog.id ? (
+                        <svg className="animate-spin h-4 w-4 mr-1 text-[#ff385c]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                        </svg>
+                      ) : 'Lire'}
+                    </Button>
                   </div>
                 </div>
               </li>

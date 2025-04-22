@@ -12,7 +12,7 @@ export default function Home() {
           <p className="text-xl md:text-2xl text-gray-600 mb-4 max-w-xl">
             Plateforme collaborative de partage d’articles, conseils et retours d’expérience pour tous les passionnés d’apprentissage et de développement personnel.
           </p>
-          <a href="/client" className="btn w-fit animate-fadeIn delay-200">Découvrir les blogs</a>
+          <a href="/blogs" className="btn w-fit animate-fadeIn delay-200">Découvrir les blogs</a>
         </div>
         <div className="flex-1 flex justify-center">
           <Image src="/globe.svg" alt="Inspiration" width={320} height={320} className="w-80 h-80 object-contain drop-shadow-lg animate-fadeIn" />

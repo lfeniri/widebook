@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import Head from 'next/head';
+import { useAuth } from '@/components/AuthContext';
 
 export default function AdminLoginPage() {
+  const { refreshUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +30,7 @@ export default function AdminLoginPage() {
       setError(error.message);
     } else if (data?.user || data?.session) {
       setSuccess('Connexion réussie, redirection...');
+      await refreshUser();
       setTimeout(() => router.replace('/client'), 800);
     } else {
       setError("Une erreur inconnue est survenue.");
@@ -47,6 +50,7 @@ export default function AdminLoginPage() {
     });
     if (error) setError(error.message);
     setLoading(false);
+    await refreshUser();
   };
 
   useEffect(() => {

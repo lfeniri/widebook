@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/components/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,11 +28,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-[#f8fafc] to-[#e0e7ef] min-h-screen flex flex-col`}>
-        <Header />
-        <main className="flex-1 w-full max-w-6xl mx-auto px-4 animate-fadeInUp">
-          {children}
-        </main>
-        <Footer />
+        <AuthProvider>
+          <Header />
+          <main className="flex-1 w-full max-w-6xl mx-auto px-4 animate-fadeInUp">
+            {children}
+          </main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
