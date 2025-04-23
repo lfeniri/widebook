@@ -1,14 +1,37 @@
 "use client";
 import React from "react";
 import { useAuth } from "@/components/AuthContext";
+import AdminLogoutButton from "@/components/AdminLogoutButton";
+import ProfileMenu from "@/components/ProfileMenu";
+import { useState, useRef, useEffect } from "react";
 
 export default function Header() {
   const { user, loading } = useAuth();
 
   const isAdmin = user && user.role === "admin";
   const isAuth = !!user;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuOpen]);
 
   // Affiche le header même pendant le chargement, mais grise les boutons si loading
+  const userName = user?.name || user?.email || "Utilisateur";
+
   return (
     <header className="sticky-header animate-fadeInUp">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
@@ -40,9 +63,16 @@ export default function Header() {
         </nav>
         <div className="flex items-center gap-2">
           {isAuth ? (
-            <a href="/profile" title={user?.email} className="rounded-full w-9 h-9 flex items-center justify-center bg-green-500 text-white font-bold border-2 border-green-600 shadow hover:scale-105 transition-transform opacity-100">
-              <span>{user?.email?.[0]?.toUpperCase()}</span>
-            </a>
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen((v) => !v)}
+                className="rounded-full w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 shadow hover:ring-2 hover:ring-primary/40 transition-all focus:outline-none"
+                title={user?.email}
+              >
+                {userName[0]?.toUpperCase()}
+              </button>
+              <ProfileMenu user={user} open={menuOpen} anchorRef={menuRef} onClose={() => setMenuOpen(false)} />
+            </div>
           ) : (
             <a href="/admin/login" className={`btn${loading ? ' opacity-50 pointer-events-none' : ''}`}>Connecter</a>
           )}

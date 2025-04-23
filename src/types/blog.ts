@@ -32,7 +32,7 @@ export interface User {
 export interface Comment {
   id: string;
   content: string;
-  createdAt: string;
+  createdAt: Date;
   authorId: string;
   blogId: string;
   author?: User;

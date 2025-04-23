@@ -33,11 +33,19 @@ export default function BlogComments({ blogId, comments: initialComments }: { bl
   return (
     <section>
       <h2 className="text-xl font-semibold mb-2">Commentaires</h2>
-      <ul className="space-y-2">
+      <ul className="space-y-4 mt-4">
         {comments?.map(comment => (
-          <li key={comment.id} className="bg-gray-100 rounded p-2">
-            <div className="text-sm text-gray-700">{comment.content}</div>
-            <div className="text-xs text-gray-400">par {comment.author?.email} le {new Date(comment.createdAt).toLocaleDateString()}</div>
+          <li key={comment.id} className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex gap-3 items-start">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+              {comment.author?.name?.[0]?.toUpperCase() || comment.author?.email?.[0]?.toUpperCase()}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-semibold text-gray-900 text-sm">{comment.author?.name || comment.author?.email}</span>
+                <span className="text-xs text-gray-400">{new Date(comment.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="text-gray-700 text-base leading-relaxed">{comment.content}</div>
+            </div>
           </li>
         ))}
       </ul>

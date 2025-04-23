@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 export interface AuthUser {
   id: string;
+  name?: string;
   email: string;
   role?: string;
 }
@@ -25,8 +26,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data: { session } } = await supabase.auth.getSession();
     console.log(session);
     if (session?.user) {
+      let name = `${session.user?.user_metadata?.first_name} ${session.user?.user_metadata?.last_name}` || "";
       setUser({
         id: session.user.id,
+        name: name,
         email: session.user.email ?? "",
         // Prend le rôle à la racine, sinon dans user_metadata
         role: session.user.role || undefined,

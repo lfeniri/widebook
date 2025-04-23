@@ -39,7 +39,19 @@ export default async function BlogPage({ params }: { params: Promise<{ slug: str
       </div>
       {blog.image && <img src={blog.image} alt="" className="rounded-lg mb-8 w-full max-h-[420px] object-cover animate-fadeIn" />}
       <div className="prose prose-lg max-w-none mb-10 animate-fadeIn" dangerouslySetInnerHTML={{ __html: blog.content }} />
-      <BlogComments blogId={blog.id} comments={blog.comments} />
+      <BlogComments
+        blogId={blog.id}
+        comments={(blog.comments ?? []).map(comment => ({
+          ...comment,
+          author: comment.author
+            ? {
+                ...comment.author,
+                email: comment.author.email ?? '',
+                name: typeof comment.author.name === 'string' ? comment.author.name : '',
+              }
+            : undefined,
+        }))}
+      />
     </article>
   );
 }

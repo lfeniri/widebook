@@ -47,8 +47,14 @@ export default function ClientHomePageClient() {
           <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mb-6">
             Explorez des articles exclusifs, conseils d’experts et retours d’expérience pour progresser chaque jour.
           </p>
-          <Button size="lg" className="w-fit bg-[#ff385c] hover:bg-[#e11d48] text-white shadow-lg animate-fadeIn delay-200">
-          <span>Découvrir les blogs</span>
+          <Button
+            size="lg"
+            className="w-fit bg-[#ff385c] hover:bg-[#e11d48] text-white shadow-lg animate-fadeIn delay-200"
+            onClick={() => {
+              document.getElementById('blogs')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            <span>Découvrir les blogs</span>
           </Button>
         </div>
         <div className="flex-1 flex justify-center relative z-0">
