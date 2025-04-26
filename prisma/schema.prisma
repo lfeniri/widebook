@@ -47,6 +47,7 @@ model Blog {
   categoryId  String
   category    Category  @relation(fields: [categoryId], references: [id])
   comments    Comment[]
+  blogChatMessages BlogChatMessage[]
 }
 
 model Comment {
@@ -57,4 +58,13 @@ model Comment {
   author    User     @relation("UserToComments", fields: [authorId], references: [id])
   blogId    String
   blog      Blog     @relation(fields: [blogId], references: [id])
+}
+
+model BlogChatMessage {
+  id        String   @id @default(uuid())
+  blogId    String
+  blog      Blog     @relation(fields: [blogId], references: [id])
+  role      String   // 'user' ou 'assistant'
+  content   String
+  createdAt DateTime @default(now())
 }

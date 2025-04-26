@@ -8,9 +8,10 @@ import { Button } from "./ui/button";
 interface BlogContentEditorProps {
   value: string;
   onChange: (html: string) => void;
+  blogId: string; // Ajout de la prop blogId
 }
 
-export default function BlogContentEditor({ value, onChange }: BlogContentEditorProps) {
+export default function BlogContentEditor({ value, onChange, blogId }: BlogContentEditorProps) {
   const [mode, setMode] = useState<'wysiwyg' | 'ai'>("wysiwyg");
   const [showAIModal, setShowAIModal] = useState(false);
 
@@ -38,7 +39,7 @@ export default function BlogContentEditor({ value, onChange }: BlogContentEditor
           onChange(html);
           // Optionnel : fermer la popup après génération
           // setShowAIModal(false);
-        }} />
+        }} blogId={blogId} />
       </FullscreenModal>
     </div>
   );

@@ -119,7 +119,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
       <input type="file" accept="image/*" onChange={handleImageChange} className="border rounded px-3 py-2" />
       {imageFile && <div className="text-xs text-gray-500">Image sélectionnée : {imageFile.name}</div>}
       {/* Remplacement du textarea par l'éditeur combiné */}
-      <BlogContentEditor value={content} onChange={setContent} />
+      <BlogContentEditor value={content} onChange={setContent} blogId={blog?.id || "new-blog"} />
       <input type="text" placeholder="SEO Title" value={seoTitle} onChange={e => setSeoTitle(e.target.value)} className="border rounded px-3 py-2" />
       <input type="text" placeholder="SEO Description" value={seoDesc} onChange={e => setSeoDesc(e.target.value)} className="border rounded px-3 py-2" />
       {error && <div className="text-red-500 text-sm">{error}</div>}

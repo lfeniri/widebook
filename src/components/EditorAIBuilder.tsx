@@ -11,11 +11,12 @@ interface Message {
 interface EditorAIBuilderProps {
   initialHtml: string;
   onHtmlChange: (html: string) => void;
+  blogId: string; // Ajout de la prop blogId
 }
 
 const OPENROUTER_API_URL = "/api/openrouter";
 
-export default function EditorAIBuilder({ initialHtml, onHtmlChange }: EditorAIBuilderProps) {
+export default function EditorAIBuilder({ initialHtml, onHtmlChange, blogId }: EditorAIBuilderProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [html, setHtml] = useState(initialHtml);
@@ -24,24 +25,21 @@ export default function EditorAIBuilder({ initialHtml, onHtmlChange }: EditorAIB
   const handleSend = async () => {
     if (!input.trim()) return;
     setLoading(true);
-    const newMessages = [...messages, { role: "user", content: input }];
-    setMessages(newMessages);
+    setMessages([...messages, { role: "user", content: input }]);
     setInput("");
 
     try {
+      // Un seul appel à openrouter, le back gère tout (sauvegarde + génération IA)
       const res = await fetchWithAuth(OPENROUTER_API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          blogId,
           message: input,
-          history: messages.filter((msg) => msg.role != "assistant"),
           initialHtml,
         }),
       });
       const data = await res.json();
-      // Affiche un message de confirmation dans la discussion, sans montrer le HTML
       setMessages((msgs) => [
         ...msgs,
         { role: "assistant", content: "✅ La génération IA est terminée, la page a été mise à jour en temps réel ci-dessous." },

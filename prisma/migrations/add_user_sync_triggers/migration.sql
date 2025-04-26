@@ -39,19 +39,27 @@ end;
 $$ language plpgsql security definer;
 
 -- === TRIGGERS ===
-drop trigger if exists on_auth_user_insert on auth.users;
-drop trigger if exists on_auth_user_update on auth.users;
-drop trigger if exists on_auth_user_delete on auth.users;
+-- Les lignes suivantes provoquent l'erreur si le schéma auth n'existe pas dans la shadow database Prisma
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'auth') THEN
+    DROP TRIGGER IF EXISTS on_auth_user_insert ON auth.users;
+    DROP TRIGGER IF EXISTS on_auth_user_update ON auth.users;
+    DROP TRIGGER IF EXISTS on_auth_user_delete ON auth.users;
+  END IF;
+END $$;
 
-
-create trigger on_auth_user_insert
-after insert on auth.users
-for each row execute function public.sync_user_from_auth();
-
-create trigger on_auth_user_update
-after update on auth.users
-for each row execute function public.sync_user_from_auth();
-
-create trigger on_auth_user_delete
-after delete on auth.users
-for each row execute function public.sync_user_from_auth();
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'auth') THEN
+    CREATE TRIGGER on_auth_user_insert
+      AFTER INSERT ON auth.users
+      FOR EACH ROW EXECUTE FUNCTION public.sync_user_from_auth();
+    CREATE TRIGGER on_auth_user_update
+      AFTER UPDATE ON auth.users
+      FOR EACH ROW EXECUTE FUNCTION public.sync_user_from_auth();
+    CREATE TRIGGER on_auth_user_delete
+      AFTER DELETE ON auth.users
+      FOR EACH ROW EXECUTE FUNCTION public.sync_user_from_auth();
+  END IF;
+END $$;
