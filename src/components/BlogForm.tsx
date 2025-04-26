@@ -4,6 +4,7 @@ import { Category, Blog } from '@/types/blog';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
 import { useRouter } from 'next/navigation';
+import BlogContentEditor from "./BlogContentEditor";
 
 export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; blog?: Blog | null }) {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -117,13 +118,14 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
       </select>
       <input type="file" accept="image/*" onChange={handleImageChange} className="border rounded px-3 py-2" />
       {imageFile && <div className="text-xs text-gray-500">Image sélectionnée : {imageFile.name}</div>}
-      <textarea placeholder="Contenu HTML" value={content} onChange={e => setContent(e.target.value)} className="border rounded px-3 py-2 min-h-[120px] font-mono" required />
+      {/* Remplacement du textarea par l'éditeur combiné */}
+      <BlogContentEditor value={content} onChange={setContent} />
       <input type="text" placeholder="SEO Title" value={seoTitle} onChange={e => setSeoTitle(e.target.value)} className="border rounded px-3 py-2" />
       <input type="text" placeholder="SEO Description" value={seoDesc} onChange={e => setSeoDesc(e.target.value)} className="border rounded px-3 py-2" />
-      {success && <div className="text-green-600 text-sm">{success}</div>}
       {error && <div className="text-red-500 text-sm">{error}</div>}
-      <button type="submit" className="btn" disabled={loading}>
-        {loading ? (blog ? "Modification..." : "Création...") : (blog ? "Modifier le blog" : "Créer le blog")}
+      {success && <div className="text-green-600 text-sm">{success}</div>}
+      <button type="submit" className="bg-primary text-white rounded px-4 py-2 mt-2" disabled={loading}>
+        {loading ? 'Enregistrement...' : blog ? 'Modifier' : 'Créer'}
       </button>
     </form>
   );
