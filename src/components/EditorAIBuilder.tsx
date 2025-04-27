@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
@@ -22,6 +22,23 @@ export default function EditorAIBuilder({ initialHtml, onHtmlChange, blogId }: E
   const [html, setHtml] = useState(initialHtml);
   const [loading, setLoading] = useState(false);
 
+  // Charger la discussion à l'initialisation
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const res = await fetch(`/api/blogs/${blogId}/chat?blogId=${blogId}`);
+        if (res.ok) {
+          const data = await res.json();
+          // On suppose que chaque message a { role, content }
+          setMessages(data.map((msg: any) => ({ role: msg.role, content: msg.content })));
+        }
+      } catch (e) {
+        // Optionnel : afficher une erreur ou ignorer
+      }
+    };
+    fetchMessages();
+  }, [blogId]);
+
   const handleSend = async () => {
     if (!input.trim()) return;
     setLoading(true);
@@ -29,16 +46,25 @@ export default function EditorAIBuilder({ initialHtml, onHtmlChange, blogId }: E
     setInput("");
 
     try {
-      // Un seul appel à openrouter, le back gère tout (sauvegarde + génération IA)
+      // Toujours envoyer le HTML courant du blog (pas seulement initialHtml)
       const res = await fetchWithAuth(OPENROUTER_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           blogId,
           message: input,
-          initialHtml,
+          initialHtml: html, // Utiliser le HTML courant
         }),
       });
+      if (!res.ok) {
+        const errorData = await res.json();
+        setMessages((msgs) => [
+          ...msgs,
+          { role: "assistant", content: `Erreur API: ${errorData.error || res.statusText}` },
+        ]);
+        setLoading(false);
+        return;
+      }
       const data = await res.json();
       setMessages((msgs) => [
         ...msgs,
@@ -46,10 +72,10 @@ export default function EditorAIBuilder({ initialHtml, onHtmlChange, blogId }: E
       ]);
       setHtml(data.html || "");
       onHtmlChange(data.html || "");
-    } catch (e) {
+    } catch (e: any) {
       setMessages((msgs) => [
         ...msgs,
-        { role: "assistant", content: "Erreur lors de l'appel à OpenRouter." },
+        { role: "assistant", content: `Erreur lors de l'appel à OpenRouter: ${e?.message || e}` },
       ]);
     } finally {
       setLoading(false);
