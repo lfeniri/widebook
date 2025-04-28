@@ -23,27 +23,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async () => {
     setLoading(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    console.log(session);
-    if (session?.user) {
-      let name = `${session.user?.user_metadata?.first_name} ${session.user?.user_metadata?.last_name}` || "";
-      setUser({
-        id: session.user.id,
-        name: name,
-        email: session.user.email ?? "",
-        // Prend le rôle à la racine, sinon dans user_metadata
-        role: session.user.role || undefined,
-      });
-    } else {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error fetching session:", error);
+        setUser(null);
+      } else if (session?.user) {
+        const { first_name, last_name } = session.user.user_metadata || {};
+        const name = `${first_name || ""} ${last_name || ""}`.trim();
+        setUser({
+          id: session.user.id,
+          name: name || session.user.email,
+          email: session.user.email ?? "",
+          role: session.user.role || undefined,
+        });
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      console.error("Unexpected error fetching user:", err);
       setUser(null);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
-    fetchUser();
-    const { data: listener } = supabase.auth.onAuthStateChange(() => fetchUser());
-    return () => listener?.subscription.unsubscribe();
+    let isMounted = true;
+    if (isMounted) fetchUser();
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      if (isMounted) fetchUser();
+    });
+    return () => {
+      isMounted = false;
+      listener?.subscription.unsubscribe();
+    };
   }, []);
 
   return (

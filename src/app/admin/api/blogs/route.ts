@@ -1,3 +1,4 @@
+import { QueryMode } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { NextResponse, NextRequest } from 'next/server';
 import { getUserFromRequest } from '@/lib/utils';
@@ -11,8 +12,7 @@ export async function GET(request: NextRequest) {
   const where = search
     ? {
         OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          // Recherche dans le contenu JSON (optionnel, à adapter selon besoin)
+          { title: { contains: search } },
         ],
       }
     : {};
@@ -30,39 +30,44 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: Request) {
-  const user = await getUserFromRequest(request);
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
+  try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
+    }
+    const body = await request.json();
+    const { title, contentConfig, slug, image, categoryId, seoTitle, seoDesc } = body;
+    if (!title || !contentConfig || !slug || !categoryId) {
+      return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
+    }
+    const blog = await prisma.blog.create({
+      data: { title, contentConfig, slug, image, categoryId, authorId: user.id, seoTitle, seoDesc },
+    });
+    return NextResponse.json(blog);
+  } catch (err) {
+    console.error("Erreur lors de la création du blog:", err);
+    return NextResponse.json({ error: 'Erreur interne du serveur.' }, { status: 500 });
   }
-  const body = await request.json();
-  const { title, contentConfig, slug, image, categoryId, seoTitle, seoDesc } = body;
-  if (!title || !contentConfig || !slug || !categoryId) {
-    return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
-  }
-  const blog = await prisma.blog.create({
-    data: { title, contentConfig, slug, image, categoryId, authorId: user.id, seoTitle, seoDesc },
-  });
-  return NextResponse.json(blog);
 }
 
 export async function PUT(request: NextRequest) {
-  const user = await getUserFromRequest(request);
-  if (!user) {
-    return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
+  try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
+    }
+    const body = await request.json();
+    const { id, title, contentConfig, slug, image, categoryId, seoTitle, seoDesc } = body;
+    if (!id || !title || !contentConfig || !slug || !categoryId) {
+      return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
+    }
+    const blog = await prisma.blog.update({
+      where: { id },
+      data: { title, contentConfig, slug, image, categoryId, seoTitle, seoDesc },
+    });
+    return NextResponse.json(blog);
+  } catch (err) {
+    console.error("Erreur lors de la mise à jour du blog:", err);
+    return NextResponse.json({ error: 'Erreur interne du serveur.' }, { status: 500 });
   }
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-  if (!id) {
-    return NextResponse.json({ error: 'ID manquant.' }, { status: 400 });
-  }
-  const body = await request.json();
-  const { title, contentConfig, slug, image, categoryId, seoTitle, seoDesc } = body;
-  if (!title || !contentConfig || !slug || !categoryId) {
-    return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
-  }
-  const updated = await prisma.blog.update({
-    where: { id },
-    data: { title, contentConfig, slug, image, categoryId, seoTitle, seoDesc },
-  });
-  return NextResponse.json(updated);
 }

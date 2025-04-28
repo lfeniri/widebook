@@ -23,9 +23,20 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/admin/api/categories")
-      .then(res => res.json())
-      .then(data => setCategories(data));
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/admin/api/categories");
+        if (!res.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+        const data = await res.json();
+        setCategories(data);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+        setError("Impossible de charger les catégories. Veuillez réessayer plus tard.");
+      }
+    };
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -50,68 +61,39 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    try {
-        console.log("Form submission started");
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
-        setSuccess(null);
-        let imageUrl = image;
-        if (imageFile) {
-            console.log("Uploading image...");
-            const formData = new FormData();
-            formData.append('file', imageFile);
-            const uploadRes = await fetch('/admin/api/upload-image', {
-                method: 'POST',
-                body: formData,
-            });
-            const uploadData = await uploadRes.json();
-            if (!uploadRes.ok) throw new Error(uploadData.error || 'Erreur upload image');
-            imageUrl = uploadData.url;
-            console.log("Image uploaded successfully: ", imageUrl);
-        }
-        console.log("Saving blog...");
-        const method = blog ? "PUT" : "POST";
-        const url = blog ? `/admin/api/blogs?id=${blog.id}` : "/admin/api/blogs";
-        const res = await fetchWithAuth(url, {
-            method,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                title,
-                contentConfig,
-                slug,
-                image: imageUrl,
-                categoryId,
-                seoTitle,
-                seoDesc,
-            }),
-        });
-        if (res.ok) {
-            console.log("Blog saved successfully");
-            if (blog) {
-                setSuccess('Blog modifié avec succès !');
-            } else {
-                const data = await res.json();
-                setSuccess('Blog créé avec succès !');
-                setTimeout(() => {
-                    setSuccess(null);
-                    router.replace(`/admin/blogs/${data.id}`);
-                }, 1200);
-            }
-        } else {
-            const data = await res.json();
-            setError(data.error || `Erreur lors de la ${blog ? 'modification' : 'création'} du blog.`);
-            console.error("Error saving blog: ", data.error);
-        }
-        setLoading(false);
-    } catch (err: any) {
-        setLoading(false);
-        setError(err?.message || `Erreur lors de la ${blog ? 'modification' : 'création'} du blog.`);
-        console.error("Error during form submission: ", err);
+    e.preventDefault();
+    if (!title || !slug || !categoryId) {
+      setError("Veuillez remplir tous les champs obligatoires.");
+      return;
     }
-};
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("slug", slug);
+      formData.append("categoryId", categoryId);
+      formData.append("seoTitle", seoTitle);
+      formData.append("seoDesc", seoDesc);
+      if (imageFile) formData.append("image", imageFile);
+      const res = await fetchWithAuth(`/admin/api/blogs${blog ? `/${blog.id}` : ""}`, {
+        method: blog ? "PUT" : "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        throw new Error("Failed to save blog");
+      }
+      setSuccess("Blog enregistré avec succès !");
+      if (onCreated) onCreated();
+      else router.push("/admin/blogs");
+    } catch (err) {
+      console.error("Error saving blog:", err);
+      setError("Une erreur est survenue lors de l'enregistrement du blog.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded shadow p-4 mb-8 flex flex-col gap-3 card animate-fadeInUp">

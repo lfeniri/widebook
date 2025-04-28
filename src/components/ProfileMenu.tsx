@@ -4,7 +4,7 @@ import AdminLogoutButton from "@/components/AdminLogoutButton";
 interface ProfileMenuProps {
   user: { name?: string; email?: string };
   open: boolean;
-  anchorRef: React.RefObject<HTMLDivElement>;
+  anchorRef: React.RefObject<HTMLDivElement | null>;
   onClose: () => void;
 }
 

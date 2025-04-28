@@ -1,16 +1,16 @@
 "use client";
 
-import React from "react";
-import BlogForm from '@/components/BlogForm';
+import React, { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Blog } from '@/types/blog';
+import { BlogContentBlock, Blog } from '@/types/blog';
+import { VisualBlogBuilder } from 'visual-blog-builder-lib/VisualBlogBuilder';
+import EditorAIBuilder from '@/components/EditorAIBuilder';
 
 export default function EditBlogPage({ params }: { params: Promise<{ id: string }> }) {
+  const [mode, setMode] = useState<'visual' | 'ai'>('visual');
+  const [contentConfig, setContentConfig] = useState<BlogContentBlock[]>([]);
   const [blog, setBlog] = useState<Blog | null>(null);
-  const [loading, setLoading] = useState(true);
   const [id, setId] = useState<string | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     params.then(p => setId(p.id));
@@ -19,26 +19,32 @@ export default function EditBlogPage({ params }: { params: Promise<{ id: string 
   useEffect(() => {
     if (!id) return;
     async function fetchBlog() {
-      setLoading(true);
-      const res = await fetch(`/admin/api/blogs/${id}`);
-      if (res.ok) {
-        const data = await res.json();
+      const response = await fetch(`/api/blogs/${id}`);
+      if (response.ok) {
+        const data = await response.json();
         setBlog(data);
-      } else {
-        router.replace('/admin/blogs');
+        setContentConfig(data.contentConfig || []);
       }
-      setLoading(false);
     }
     fetchBlog();
-  }, [id, router]);
-
-  if (loading) return <div className="py-10 text-center">Chargement...</div>;
-  if (!blog) return <div className="py-10 text-center text-red-500">Blog introuvable.</div>;
+  }, [id]);
 
   return (
-    <div className="max-w-3xl mx-auto py-10 animate-fadeInUp">
-      <h2 className="text-2xl font-bold mb-6">Éditer le blog</h2>
-      <BlogForm blog={blog} />
+    <div>
+      <button onClick={() => setMode('visual')}>Visual Builder</button>
+      <button onClick={() => setMode('ai')}>AI Builder</button>
+      {mode === 'visual' ? (
+        <VisualBlogBuilder
+          initialValue={contentConfig}
+          onChange={(newConfig: BlogContentBlock[]) => setContentConfig(newConfig)}
+        />
+      ) : (
+        <EditorAIBuilder
+          initialContentConfig={contentConfig}
+          onContentConfigChange={(newConfig: BlogContentBlock[]) => setContentConfig(newConfig)}
+          blogId={id || ''}
+        />
+      )}
     </div>
   );
 }
