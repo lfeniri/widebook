@@ -56,13 +56,13 @@ export default function Header() {
               className="block h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200"
             />
           </a>
-          {isAdmin && (
+          {isAuth && (
             <a
-              href="/admin"
+              href="/admin/blogs"
               className="relative group transition-colors"
-              aria-label="Accéder au tableau de bord administrateur"
+              aria-label="Afficher la liste des blogs administratifs"
             >
-              Admin
+              Blogs
               <span
                 className="block h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200"
               />
@@ -71,12 +71,15 @@ export default function Header() {
         </nav>
         <div className="flex items-center gap-4">
           {isAuth ? (
-            <ProfileMenu
-              user={{ name: user?.name, email: user?.email }}
-              open={menuOpen}
-              anchorRef={menuRef}
-              onClose={() => setMenuOpen(false)}
-            />
+            <>
+              <div
+                className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center cursor-pointer"
+                onClick={() => window.location.href = '/profile'}
+                title="Profil"
+              >
+                <span className="sr-only">Profil</span>
+              </div>
+            </>
           ) : (
             <a
               href="/login"

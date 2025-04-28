@@ -77,16 +77,18 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
       formData.append("seoTitle", seoTitle);
       formData.append("seoDesc", seoDesc);
       if (imageFile) formData.append("image", imageFile);
+      // Utiliser l'état local contentConfig au lieu de blog.contentConfig
+      if (contentConfig) {
+        formData.append("contentConfig", JSON.stringify(contentConfig));
+      }
       const res = await fetchWithAuth(`/admin/api/blogs${blog ? `/${blog.id}` : ""}`, {
         method: blog ? "PUT" : "POST",
         body: formData,
       });
       if (!res.ok) {
         throw new Error("Failed to save blog");
-      }
-      setSuccess("Blog enregistré avec succès !");
+      }      setSuccess("Blog enregistré avec succès !");
       if (onCreated) onCreated();
-      else router.push("/admin/blogs");
     } catch (err) {
       console.error("Error saving blog:", err);
       setError("Une erreur est survenue lors de l'enregistrement du blog.");
@@ -111,7 +113,6 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
       {/* Remplacement du textarea par l'éditeur combiné */}
       <input type="text" placeholder="SEO Title" value={seoTitle} onChange={e => setSeoTitle(e.target.value)} className="border rounded px-3 py-2" />
       <input type="text" placeholder="SEO Description" value={seoDesc} onChange={e => setSeoDesc(e.target.value)} className="border rounded px-3 py-2" />
-      <GridRenderer grid={convertContentConfigToGrid(contentConfig || [])} />
       {error && <div className="text-red-500 text-sm">{error}</div>}
       {success && <div className="text-green-600 text-sm">{success}</div>}
       <button

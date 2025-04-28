@@ -50,24 +50,4 @@ export async function POST(request: Request) {
   }
 }
 
-export async function PUT(request: NextRequest) {
-  try {
-    const user = await getUserFromRequest(request);
-    if (!user) {
-      return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
-    }
-    const body = await request.json();
-    const { id, title, contentConfig, slug, image, categoryId, seoTitle, seoDesc } = body;
-    if (!id || !title || !contentConfig || !slug || !categoryId) {
-      return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
-    }
-    const blog = await prisma.blog.update({
-      where: { id },
-      data: { title, contentConfig, slug, image, categoryId, seoTitle, seoDesc },
-    });
-    return NextResponse.json(blog);
-  } catch (err) {
-    console.error("Erreur lors de la mise à jour du blog:", err);
-    return NextResponse.json({ error: 'Erreur interne du serveur.' }, { status: 500 });
-  }
-}
+
