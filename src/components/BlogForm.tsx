@@ -85,11 +85,18 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
         }),
       });
       if (res.ok) {
-        setSuccess(blog ? 'Blog modifié avec succès !' : 'Blog créé avec succès !');
-        setTimeout(() => {
-          setSuccess(null);
-          router.push('/admin/blogs');
-        }, 1200);
+        if (blog) {
+          setSuccess('Blog modifié avec succès !');
+          // Pas de redirection, on reste sur la page d'édition
+        } else {
+          // Création : récupérer l'id du blog créé et rediriger vers la page d'édition
+          const data = await res.json();
+          setSuccess('Blog créé avec succès !');
+          setTimeout(() => {
+            setSuccess(null);
+            router.replace(`/admin/blogs/${data.id}`);
+          }, 1200);
+        }
         if (!blog) {
           setTitle(""); setContent(""); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
         }
@@ -119,13 +126,26 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
       <input type="file" accept="image/*" onChange={handleImageChange} className="border rounded px-3 py-2" />
       {imageFile && <div className="text-xs text-gray-500">Image sélectionnée : {imageFile.name}</div>}
       {/* Remplacement du textarea par l'éditeur combiné */}
-      <BlogContentEditor value={content} onChange={setContent} blogId={blog?.id || "new-blog"} />
       <input type="text" placeholder="SEO Title" value={seoTitle} onChange={e => setSeoTitle(e.target.value)} className="border rounded px-3 py-2" />
       <input type="text" placeholder="SEO Description" value={seoDesc} onChange={e => setSeoDesc(e.target.value)} className="border rounded px-3 py-2" />
+      <BlogContentEditor value={content} onChange={setContent} blogId={blog?.id || "new-blog"} />
       {error && <div className="text-red-500 text-sm">{error}</div>}
       {success && <div className="text-green-600 text-sm">{success}</div>}
-      <button type="submit" className="bg-primary text-white rounded px-4 py-2 mt-2" disabled={loading}>
-        {loading ? 'Enregistrement...' : blog ? 'Modifier' : 'Créer'}
+      <button
+        type="submit"
+        className="w-full bg-primary hover:bg-primary/90 transition-colors text-white font-semibold rounded-lg px-6 py-3 mt-4 shadow focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        style={{ backgroundColor: "#FF385C" }} // Couleur Airbnb.fr
+        disabled={loading}
+      >
+        {loading ? (
+          <>
+        <svg className="animate-spin h-5 w-5 text-white mr-2" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+        </svg>
+        Enregistrement...
+          </>
+        ) : blog ? 'Modifier' : 'Créer'}
       </button>
     </form>
   );

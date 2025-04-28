@@ -42,20 +42,20 @@ export const ConfigComponentModal: React.FC<ConfigComponentModalProps> = ({ open
             <div className="text-gray-400 text-center py-8">Aucun composant sélectionné.</div>
           )}
         </div>
-        <div className="flex justify-end gap-2 mt-6">
+        <div className="flex justify-end gap-3 mt-8 border-t border-gray-200 pt-6 bg-gradient-to-t from-gray-50 via-white/80 to-white sticky bottom-0 z-10 rounded-b-xl shadow-inner">
           <button
             type="button"
-            className="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold shadow-sm transition-colors"
+            className="px-6 py-2 bg-gray-50 hover:bg-gray-200 text-gray-700 border border-gray-300 rounded-lg font-semibold shadow transition-all focus:outline-none focus:ring-2 focus:ring-primary/30"
             onClick={onClose}
           >
             Annuler
           </button>
           <button
             type="button"
-            className="px-5 py-2 bg-primary text-white hover:bg-primary/90 rounded-lg font-semibold shadow-sm transition-colors"
+            className="px-6 py-2 bg-primary text-white hover:bg-primary/90 border border-primary rounded-lg font-semibold shadow transition-all focus:outline-none focus:ring-2 focus:ring-primary/40"
             onClick={() => {
               if (configModalRef.current && typeof configModalRef.current.save === 'function') {
-                configModalRef.current.save();
+            configModalRef.current.save();
               }
             }}
           >
