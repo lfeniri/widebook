@@ -35,7 +35,7 @@ model Category {
 model Blog {
   id          String    @id @default(uuid())
   title       String
-  content     String    // HTML content
+  contentConfig Json?    // JSON content (blocks)
   slug        String    @unique
   image       String?
   createdAt   DateTime  @default(now())

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Category, Blog } from '@/types/blog';
+import { Category, Blog, BlogContentBlock } from '@/types/blog';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,7 @@ import BlogContentEditor from "./BlogContentEditor";
 export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; blog?: Blog | null }) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [contentConfig, setContentConfig] = useState<BlogContentBlock[] | undefined>(undefined);
   const [slug, setSlug] = useState("");
   const [image, setImage] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -30,7 +30,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
   useEffect(() => {
     if (blog) {
       setTitle(blog.title || "");
-      setContent(blog.content || "");
+      setContentConfig(blog.contentConfig || []);
       setSlug(blog.slug || "");
       setImage(blog.image || "");
       setCategoryId(blog.categoryId || "");
@@ -38,7 +38,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
       setSeoDesc(blog.seoDesc || "");
       setImageFile(null);
     } else {
-      setTitle(""); setContent(""); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
+      setTitle(""); setContentConfig([]); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
     }
   }, [blog]);
 
@@ -76,7 +76,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
         },
         body: JSON.stringify({
           title,
-          content,
+          contentConfig,
           slug,
           image: imageUrl,
           categoryId,
@@ -98,7 +98,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
           }, 1200);
         }
         if (!blog) {
-          setTitle(""); setContent(""); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
+          setTitle(""); setContentConfig([]); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
         }
         onCreated && onCreated();
       } else {
@@ -128,7 +128,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
       {/* Remplacement du textarea par l'éditeur combiné */}
       <input type="text" placeholder="SEO Title" value={seoTitle} onChange={e => setSeoTitle(e.target.value)} className="border rounded px-3 py-2" />
       <input type="text" placeholder="SEO Description" value={seoDesc} onChange={e => setSeoDesc(e.target.value)} className="border rounded px-3 py-2" />
-      <BlogContentEditor value={content} onChange={setContent} blogId={blog?.id || "new-blog"} />
+      <BlogContentEditor value={contentConfig} onChange={setContentConfig} blogId={blog?.id || "new-blog"} />
       {error && <div className="text-red-500 text-sm">{error}</div>}
       {success && <div className="text-green-600 text-sm">{success}</div>}
       <button

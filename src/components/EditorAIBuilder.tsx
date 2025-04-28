@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { BlogContentBlock } from '@/types/blog';
 
 interface Message {
   role: "user" | "assistant";
@@ -9,17 +10,17 @@ interface Message {
 }
 
 interface EditorAIBuilderProps {
-  initialHtml: string;
-  onHtmlChange: (html: string) => void;
-  blogId: string; // Ajout de la prop blogId
+  initialContentConfig: BlogContentBlock[];
+  onContentConfigChange: (blocks: BlogContentBlock[]) => void;
+  blogId: string;
 }
 
 const OPENROUTER_API_URL = "/api/openrouter";
 
-export default function EditorAIBuilder({ initialHtml, onHtmlChange, blogId }: EditorAIBuilderProps) {
+export default function EditorAIBuilder({ initialContentConfig, onContentConfigChange, blogId }: EditorAIBuilderProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [html, setHtml] = useState(initialHtml);
+  const [contentConfig, setContentConfig] = useState<BlogContentBlock[]>(initialContentConfig);
   const [loading, setLoading] = useState(false);
 
   // Charger la discussion à l'initialisation
@@ -46,14 +47,14 @@ export default function EditorAIBuilder({ initialHtml, onHtmlChange, blogId }: E
     setInput("");
 
     try {
-      // Toujours envoyer le HTML courant du blog (pas seulement initialHtml)
+      // Envoie le contentConfig courant (JSON)
       const res = await fetchWithAuth(OPENROUTER_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           blogId,
           message: input,
-          initialHtml: html, // Utiliser le HTML courant
+          contentConfig, // Utilise le contentConfig courant
         }),
       });
       if (!res.ok) {
@@ -70,8 +71,8 @@ export default function EditorAIBuilder({ initialHtml, onHtmlChange, blogId }: E
         ...msgs,
         { role: "assistant", content: "✅ La génération IA est terminée, la page a été mise à jour en temps réel ci-dessous." },
       ]);
-      setHtml(data.html || "");
-      onHtmlChange(data.html || "");
+      setContentConfig(data.contentConfig || []);
+      onContentConfigChange(data.contentConfig || []);
     } catch (e: any) {
       setMessages((msgs) => [
         ...msgs,
@@ -119,7 +120,9 @@ export default function EditorAIBuilder({ initialHtml, onHtmlChange, blogId }: E
       </div>
       <div>
         <div className="mb-1 font-semibold">Aperçu du rendu</div>
-        <div className="border rounded p-4 min-h-[200px] bg-background" dangerouslySetInnerHTML={{ __html: html }} />
+        <div className="border rounded p-4 min-h-[200px] bg-background">
+          <pre className="text-xs whitespace-pre-wrap break-all">{JSON.stringify(contentConfig, null, 2)}</pre>
+        </div>
       </div>
     </div>
   );

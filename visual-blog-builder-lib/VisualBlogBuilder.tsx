@@ -5,19 +5,15 @@ import { useBlogBuilderStore } from "./store/blogBuilderStore";
 import { GridRenderer } from "./components/GridRenderer";
 import { BlogBuilderDndProvider, useComponentDnD } from "./components/useComponentDnD";
 import { AnimatePresence, motion } from "framer-motion";
+import { BlogContentBlock } from '@/types/blog';
+import { BlogGrid } from "../types/blogBuilderTypes";
 
 export interface VisualBlogBuilderProps {
-  initialValue?: any;
-  onChange?: (value: any) => void;
+  initialValue?: BlogGrid;
+  onChange?: (value: BlogGrid) => void;
 }
 
-export const VisualBlogBuilder: React.FC<VisualBlogBuilderProps> = ({ initialValue, onChange }) => {
-  // Initialisation de l'état global (dans un effet pour éviter le setState during render)
-  React.useEffect(() => {
-    useBlogBuilderStore.getState().initialize(initialValue);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialValue]);
-
+export const VisualBlogBuilder: React.FC<VisualBlogBuilderProps> = ({ onChange }) => {
   const grid = useBlogBuilderStore((state) => state.grid);
   const addComponent = useBlogBuilderStore((state: any) => state.addComponent);
   const updateComponentConfig = useBlogBuilderStore((state: any) => state.updateComponentConfig);
@@ -123,6 +119,17 @@ export const VisualBlogBuilder: React.FC<VisualBlogBuilderProps> = ({ initialVal
   // TODO: Ajout des modales, drag & drop, etc.
   // Sécurisation de l'accès à grid et grid.rows pour éviter toute erreur d'itérabilité
   const safeGrid = React.useMemo(() => (grid && typeof grid === 'object' && Array.isArray(grid.rows) ? grid : { rows: [] }), [grid]);
+
+  // Ajoute un effet pour notifier le parent à chaque changement de la grille
+  // Correction : n'appelle onChange QUE si la référence du grid change (évite boucle infinie)
+  const lastGridRef = React.useRef<any>(null);
+  React.useEffect(() => {
+    if (onChange && grid !== lastGridRef.current) {
+      lastGridRef.current = grid;
+      onChange(grid);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grid]);
 
   return (
     <BlogBuilderDndProvider onDragEnd={handleDragEnd}>

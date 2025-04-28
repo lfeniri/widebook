@@ -4,11 +4,12 @@ import EditorAIBuilder from "./EditorAIBuilder";
 import FullscreenModal from "./FullscreenModal";
 import { Button } from "./ui/button";
 import BlogBuilderModal from "./BlogBuilderModal";
+import { BlogContentBlock } from "@/types/blog";
 
 interface BlogContentEditorProps {
-  value: string;
-  onChange: (html: string) => void;
-  blogId: string; // Ajout de la prop blogId
+  value: BlogContentBlock[] | undefined;
+  onChange: (blocks: BlogContentBlock[]) => void;
+  blogId: string;
 }
 
 export default function BlogContentEditor({ value, onChange, blogId }: BlogContentEditorProps) {
@@ -33,11 +34,23 @@ export default function BlogContentEditor({ value, onChange, blogId }: BlogConte
           Mode AI Builder
         </Button>
       </div>
-      <BlogBuilderModal open={showVisualModal} onClose={() => setShowVisualModal(false)} value={value} onChange={onChange} />
-      <FullscreenModal open={showAIModal} onClose={() => setShowAIModal(false)}>
-        <EditorAIBuilder initialHtml={value} onHtmlChange={html => {
-          onChange(html);
-        }} blogId={blogId} />
+      <BlogBuilderModal
+        key={showVisualModal ? `visual-open-${blogId}` : `visual-closed-${blogId}`}
+        open={showVisualModal}
+        onClose={() => setShowVisualModal(false)}
+        value={value}
+        onChange={onChange}
+      />
+      <FullscreenModal
+        key={showAIModal ? `ai-open-${blogId}` : `ai-closed-${blogId}`}
+        open={showAIModal}
+        onClose={() => setShowAIModal(false)}
+      >
+        <EditorAIBuilder
+          initialContentConfig={value || []}
+          onContentConfigChange={onChange}
+          blogId={blogId}
+        />
       </FullscreenModal>
     </div>
   );
