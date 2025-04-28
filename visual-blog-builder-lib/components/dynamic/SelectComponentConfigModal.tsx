@@ -46,33 +46,45 @@ export const SelectComponentConfigModal = forwardRef<any, SelectComponentConfigM
   }));
 
   return (
-    <div className="space-y-4 p-4">
-      <label className="flex flex-col gap-1">
-        Label
-        <input className="border rounded p-2" value={label} onChange={e => setLabel(e.target.value)} />
-      </label>
-      <div className="flex flex-col gap-2">
-        <span className="font-semibold text-sm">Options</span>
-        {options.map((opt: string, idx: number) => (
-          <div key={idx} className="flex gap-2 items-center">
-            <input className="border rounded p-2 flex-1" value={opt} onChange={e => handleOptionChange(idx, e.target.value)} />
-            <button type="button" className="text-red-500" onClick={() => handleRemoveOption(idx)} title="Supprimer">✕</button>
-          </div>
-        ))}
-
-        <button type="button" className="text-primary underline text-sm mt-1" onClick={handleAddOption}>Ajouter une option</button>
+    <div className="space-y-6 p-6 bg-white rounded-xl shadow-lg max-w-lg w-full">
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">Configuration Select</h2>
+      <div className="grid grid-cols-1 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Label *</label>
+          <input type="text" className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition" value={label} onChange={e => setLabel(e.target.value)} required />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Options *</label>
+          {options.map((opt, idx) => (
+            <div key={idx} className="flex gap-2 items-center mb-1">
+              <input
+                type="text"
+                className="input flex-1 w-full rounded-md border border-gray-300 px-3 py-2"
+                value={opt}
+                onChange={e => handleOptionChange(idx, e.target.value)}
+                required
+              />
+              <button type="button" className="text-red-500 font-bold px-2" onClick={() => handleRemoveOption(idx)}>&times;</button>
+            </div>
+          ))}
+          <button type="button" className="px-3 py-1 rounded bg-primary text-white font-semibold hover:bg-primary/90 transition" onClick={handleAddOption}>Ajouter une option</button>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Valeur sélectionnée</label>
+          <input type="text" className="w-full rounded-md border border-gray-300 px-3 py-2" value={selected} onChange={e => setSelected(e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Aria-label (accessibilité)</label>
+          <input type="text" className="w-full rounded-md border border-gray-300 px-3 py-2" value={ariaLabel} onChange={e => setAriaLabel(e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Marge</label>
+          <input type="text" className="w-full rounded-md border border-gray-300 px-3 py-2" value={margin} onChange={e => setMargin(e.target.value)} />
+        </div>
       </div>
-      <label className="flex flex-col gap-1">
-        Margin (px)
-        <input type="text" className="border rounded p-2" value={margin} onChange={e => setMargin(e.target.value)} placeholder="ex: 8px 0" />
-      </label>
-      <label className="flex flex-col gap-1">
-        Accessibilité (aria-label)
-        <input className="border rounded p-2" value={ariaLabel} onChange={e => setAriaLabel(e.target.value)} />
-      </label>
-      <div className="flex justify-end gap-2 mt-4">
-        <button type="button" className="btn btn-secondary" onClick={onClose}>Annuler</button>
-        <button type="button" className="btn btn-primary" onClick={handleSave}>Enregistrer</button>
+      <div className="flex justify-end gap-2 mt-6">
+        <button type="button" className="px-5 py-2 rounded-lg font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition" onClick={onClose}>Annuler</button>
+        <button type="button" className="px-5 py-2 rounded-lg font-semibold bg-primary text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition" onClick={handleSave}>Enregistrer</button>
       </div>
     </div>
   );

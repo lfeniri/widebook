@@ -51,51 +51,52 @@ const InputComponentConfigModal = forwardRef<any, InputComponentConfigModalProps
   }));
 
   return (
-    <div className="space-y-4 p-4">
-      <h2 className="text-lg font-semibold mb-2">Configuration Champ de saisie</h2>
-      <div>
-        <label className="block font-medium">Label *</label>
-        <input type="text" className="input" value={label} onChange={e => setLabel(e.target.value)} required />
-      </div>
-      <div>
-        <label className="block font-medium">Placeholder</label>
-        <input type="text" className="input" value={placeholder} onChange={e => setPlaceholder(e.target.value)} />
-      </div>
-      <div className="flex gap-4">
+    <div className="space-y-6 p-6 bg-white rounded-xl shadow-lg max-w-lg w-full">
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">Configuration du champ</h2>
+      <div className="grid grid-cols-1 gap-4">
         <div>
-          <label className="block font-medium">Type</label>
-          <select className="input" value={type} onChange={e => setType(e.target.value)}>
-            <option value="text">Texte</option>
-            <option value="email">Email</option>
-            <option value="password">Mot de passe</option>
-            <option value="number">Nombre</option>
-            <option value="date">Date</option>
-            <option value="url">URL</option>
-          </select>
-        </div>
-        <label className="flex items-center gap-2 mt-6">
-          <input type="checkbox" checked={required} onChange={e => setRequired(e.target.checked)} /> Requis
-        </label>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block font-medium">Padding</label>
-          <input type="text" className="input" value={padding} onChange={e => setPadding(e.target.value)} placeholder="0.5rem 1rem" />
+          <label className="block text-sm font-medium text-gray-700 mb-1">Label *</label>
+          <input type="text" className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition" value={label} onChange={e => setLabel(e.target.value)} required />
         </div>
         <div>
-          <label className="block font-medium">Marge</label>
-          <input type="text" className="input" value={margin} onChange={e => setMargin(e.target.value)} placeholder="0.5rem" />
+          <label className="block text-sm font-medium text-gray-700 mb-1">Placeholder</label>
+          <input type="text" className="w-full rounded-md border border-gray-300 px-3 py-2" value={placeholder} onChange={e => setPlaceholder(e.target.value)} />
         </div>
-        <div>
-          <label className="block font-medium">Bordure</label>
-          <input type="text" className="input" value={border} onChange={e => setBorder(e.target.value)} placeholder="1px solid #eee" />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+            <input type="text" className="w-full rounded-md border border-gray-300 px-3 py-2" value={type} onChange={e => setType(e.target.value)} />
+          </div>
+          <div className="flex items-center gap-2 mt-6">
+            <input type="checkbox" checked={required} onChange={e => setRequired(e.target.checked)} id="required" />
+            <label htmlFor="required" className="text-sm font-medium text-gray-700">Requis</label>
+          </div>
         </div>
-        <div>
-          <label className="block font-medium">Ombre</label>
-          <input type="text" className="input" value={boxShadow} onChange={e => setBoxShadow(e.target.value)} placeholder="0 2px 8px #0002" />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Padding</label>
+            <input type="text" className="w-full rounded-md border border-gray-300 px-3 py-2" value={padding} onChange={e => setPadding(e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Margin</label>
+            <input type="text" className="w-full rounded-md border border-gray-300 px-3 py-2" value={margin} onChange={e => setMargin(e.target.value)} />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Border</label>
+            <input type="text" className="w-full rounded-md border border-gray-300 px-3 py-2" value={border} onChange={e => setBorder(e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Box Shadow</label>
+            <input type="text" className="w-full rounded-md border border-gray-300 px-3 py-2" value={boxShadow} onChange={e => setBoxShadow(e.target.value)} />
+          </div>
         </div>
       </div>
-      {/* Les boutons sont désormais centralisés dans ConfigComponentModal */}
+      <div className="flex justify-end gap-2 mt-6">
+        <button type="button" className="px-5 py-2 rounded-lg font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition" onClick={onClose}>Annuler</button>
+        <button type="button" className="px-5 py-2 rounded-lg font-semibold bg-primary text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition" onClick={handleSave}>Enregistrer</button>
+      </div>
     </div>
   );
 });
