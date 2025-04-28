@@ -4,6 +4,7 @@ import Editor from "./Editor";
 import EditorAIBuilder from "./EditorAIBuilder";
 import FullscreenModal from "./FullscreenModal";
 import { Button } from "./ui/button";
+import BlogBuilderModal from "./BlogBuilderModal";
 
 interface BlogContentEditorProps {
   value: string;
@@ -14,6 +15,7 @@ interface BlogContentEditorProps {
 export default function BlogContentEditor({ value, onChange, blogId }: BlogContentEditorProps) {
   const [mode, setMode] = useState<'wysiwyg' | 'ai'>("wysiwyg");
   const [showAIModal, setShowAIModal] = useState(false);
+  const [showVisualModal, setShowVisualModal] = useState(false);
 
   return (
     <div className="flex flex-col gap-4">
@@ -27,13 +29,21 @@ export default function BlogContentEditor({ value, onChange, blogId }: BlogConte
         </Button>
         <Button
           type="button"
+          variant={showVisualModal ? "default" : "outline"}
+          onClick={() => setShowVisualModal(true)}
+        >
+          Mode Builder Visuel
+        </Button>
+        <Button
+          type="button"
           variant={mode === "ai" ? "default" : "outline"}
           onClick={() => setShowAIModal(true)}
         >
           Mode AI Builder
         </Button>
       </div>
-      <Editor value={value} onChange={onChange} />
+      {mode === "wysiwyg" && <Editor value={value} onChange={onChange} />}
+      <BlogBuilderModal open={showVisualModal} onClose={() => setShowVisualModal(false)} value={value} onChange={onChange} />
       <FullscreenModal open={showAIModal} onClose={() => setShowAIModal(false)}>
         <EditorAIBuilder initialHtml={value} onHtmlChange={html => {
           onChange(html);
