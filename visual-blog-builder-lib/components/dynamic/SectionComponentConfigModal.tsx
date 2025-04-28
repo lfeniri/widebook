@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { SectionConfig } from '../../types/blogBuilderTypes';
 
 interface SectionComponentConfigModalProps {
@@ -7,7 +7,7 @@ interface SectionComponentConfigModalProps {
   onClose: () => void;
 }
 
-export const SectionComponentConfigModal: React.FC<SectionComponentConfigModalProps> = ({ config, onSave, onClose }) => {
+export const SectionComponentConfigModal = forwardRef<any, SectionComponentConfigModalProps>(({ config, onSave, onClose }, ref) => {
   const safeConfig = config || {};
   const safeStyle = safeConfig.style || {};
 
@@ -38,6 +38,10 @@ export const SectionComponentConfigModal: React.FC<SectionComponentConfigModalPr
       },
     });
   };
+
+  useImperativeHandle(ref, () => ({
+    save: handleSave
+  }));
 
   return (
     <div className="space-y-4 p-4">
@@ -82,6 +86,6 @@ export const SectionComponentConfigModal: React.FC<SectionComponentConfigModalPr
       </div>
     </div>
   );
-};
+});
 
 export default SectionComponentConfigModal;

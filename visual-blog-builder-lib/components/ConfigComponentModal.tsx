@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Modal } from "./Modal";
 import { componentRegistry } from "./componentRegistry";
 import { BlogGrid, BlogComponentInstance } from "../types/blogBuilderTypes";
@@ -23,6 +23,8 @@ export const ConfigComponentModal: React.FC<ConfigComponentModalProps> = ({ open
   });
   if (!comp) return null;
   const ConfigModal = componentRegistry[comp.type]?.ConfigModal;
+  // Ref for imperative save
+  const configModalRef = useRef<any>(null);
   return (
     <Modal open={open} onClose={onClose}>
       <div className="relative w-full max-w-screen-md max-h-[90vh] bg-white rounded-xl shadow-2xl border border-gray-100 p-6 flex flex-col overflow-y-auto">
@@ -31,6 +33,7 @@ export const ConfigComponentModal: React.FC<ConfigComponentModalProps> = ({ open
         <div className="flex-1 overflow-y-auto">
           {compId && grid ? (
             <ConfigModal
+              ref={configModalRef}
               config={comp.config}
               onSave={(config: any) => onSave(compId, config)}
               onClose={onClose}
@@ -46,6 +49,17 @@ export const ConfigComponentModal: React.FC<ConfigComponentModalProps> = ({ open
             onClick={onClose}
           >
             Annuler
+          </button>
+          <button
+            type="button"
+            className="px-5 py-2 bg-primary text-white hover:bg-primary/90 rounded-lg font-semibold shadow-sm transition-colors"
+            onClick={() => {
+              if (configModalRef.current && typeof configModalRef.current.save === 'function') {
+                configModalRef.current.save();
+              }
+            }}
+          >
+            Enregistrer
           </button>
         </div>
       </div>

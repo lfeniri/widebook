@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { CardConfig } from '../../types/blogBuilderTypes';
 
 interface CardComponentConfigModalProps {
@@ -7,7 +7,7 @@ interface CardComponentConfigModalProps {
   onClose: () => void;
 }
 
-export const CardComponentConfigModal: React.FC<CardComponentConfigModalProps> = ({ config, onSave, onClose }) => {
+export const CardComponentConfigModal = forwardRef<any, CardComponentConfigModalProps>(({ config, onSave, onClose }, ref) => {
   const safeConfig = config || {};
   const safeStyle = safeConfig.style || {};
 
@@ -44,6 +44,10 @@ export const CardComponentConfigModal: React.FC<CardComponentConfigModalProps> =
       },
     });
   };
+
+  useImperativeHandle(ref, () => ({
+    save: handleSave
+  }));
 
   return (
     <div className="space-y-4 p-4">
@@ -100,6 +104,6 @@ export const CardComponentConfigModal: React.FC<CardComponentConfigModalProps> =
       </div>
     </div>
   );
-};
+});
 
 export default CardComponentConfigModal;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { BadgeConfig } from '../../types/blogBuilderTypes';
 
 interface BadgeComponentConfigModalProps {
@@ -7,7 +7,7 @@ interface BadgeComponentConfigModalProps {
   onClose: () => void;
 }
 
-export const BadgeComponentConfigModal: React.FC<BadgeComponentConfigModalProps> = ({ config, onSave, onClose }) => {
+export const BadgeComponentConfigModal = forwardRef<any, BadgeComponentConfigModalProps>(({ config, onSave, onClose }, ref) => {
   const safeConfig = config || {};
   const safeStyle = safeConfig.style || {};
 
@@ -46,6 +46,10 @@ export const BadgeComponentConfigModal: React.FC<BadgeComponentConfigModalProps>
       },
     });
   };
+
+  useImperativeHandle(ref, () => ({
+    save: handleSave
+  }));
 
   return (
     <div className="space-y-4 p-4">
@@ -117,4 +121,4 @@ export const BadgeComponentConfigModal: React.FC<BadgeComponentConfigModalProps>
       </div>
     </div>
   );
-};
+});

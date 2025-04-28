@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { TextConfig } from '../../types/blogBuilderTypes';
 
 interface TextComponentConfigModalProps {
@@ -7,7 +7,7 @@ interface TextComponentConfigModalProps {
   onClose: () => void;
 }
 
-export const TextComponentConfigModal: React.FC<TextComponentConfigModalProps> = ({ config, onSave, onClose }) => {
+export const TextComponentConfigModal = forwardRef<any, TextComponentConfigModalProps>(({ config, onSave, onClose }, ref) => {
   const safeConfig = config || {};
   const safeStyle = safeConfig.style || {};
 
@@ -59,6 +59,10 @@ export const TextComponentConfigModal: React.FC<TextComponentConfigModalProps> =
       },
     });
   };
+
+  useImperativeHandle(ref, () => ({
+    save: handleSave
+  }));
 
   return (
     <div className="space-y-4 p-4">
@@ -124,10 +128,7 @@ export const TextComponentConfigModal: React.FC<TextComponentConfigModalProps> =
         Accessibilité (aria-label)
         <input className="border rounded p-2" value={ariaLabel} onChange={e => setAriaLabel(e.target.value)} />
       </label>
-      <div className="flex justify-end gap-2 mt-4">
-        <button type="button" className="btn btn-secondary" onClick={onClose}>Annuler</button>
-        <button type="button" className="btn btn-primary" onClick={handleSave}>Enregistrer</button>
-      </div>
+      {/* Les boutons sont désormais centralisés dans ConfigComponentModal */}
     </div>
   );
-};
+});

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { InputConfig } from '../../types/blogBuilderTypes';
 
 interface InputComponentConfigModalProps {
@@ -7,7 +7,7 @@ interface InputComponentConfigModalProps {
   onClose: () => void;
 }
 
-const InputComponentConfigModal: React.FC<InputComponentConfigModalProps> = ({ config, onSave, onClose }) => {
+const InputComponentConfigModal = forwardRef<any, InputComponentConfigModalProps>(({ config, onSave, onClose }, ref) => {
   const safeConfig = config || {};
   const safeStyle = safeConfig.style || {};
 
@@ -20,7 +20,7 @@ const InputComponentConfigModal: React.FC<InputComponentConfigModalProps> = ({ c
   const [border, setBorder] = useState(safeStyle.border || '');
   const [boxShadow, setBoxShadow] = useState(safeStyle.boxShadow || '');
 
-  React.useEffect(() => {
+  useEffect(() => {
     setLabel(safeConfig.label || '');
     setPlaceholder(safeConfig.placeholder || '');
     setType(safeConfig.type || 'text');
@@ -45,6 +45,10 @@ const InputComponentConfigModal: React.FC<InputComponentConfigModalProps> = ({ c
       },
     });
   };
+
+  useImperativeHandle(ref, () => ({
+    save: handleSave
+  }));
 
   return (
     <div className="space-y-4 p-4">
@@ -91,12 +95,9 @@ const InputComponentConfigModal: React.FC<InputComponentConfigModalProps> = ({ c
           <input type="text" className="input" value={boxShadow} onChange={e => setBoxShadow(e.target.value)} placeholder="0 2px 8px #0002" />
         </div>
       </div>
-      <div className="flex justify-end gap-2 mt-4">
-        <button type="button" className="btn btn-secondary" onClick={onClose}>Annuler</button>
-        <button type="button" className="btn btn-primary" onClick={handleSave}>Enregistrer</button>
-      </div>
+      {/* Les boutons sont désormais centralisés dans ConfigComponentModal */}
     </div>
   );
-};
+});
 
 export default InputComponentConfigModal;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { FooterConfig } from '../../types/blogBuilderTypes';
 
 interface FooterComponentConfigModalProps {
@@ -7,7 +7,7 @@ interface FooterComponentConfigModalProps {
   onClose: () => void;
 }
 
-const FooterComponentConfigModal: React.FC<FooterComponentConfigModalProps> = ({ config, onSave, onClose }) => {
+const FooterComponentConfigModal = forwardRef<any, FooterComponentConfigModalProps>(({ config, onSave, onClose }, ref) => {
   const [content, setContent] = useState(config.content || '');
   const [backgroundColor, setBackgroundColor] = useState(config.style?.backgroundColor || '');
   const [color, setColor] = useState(config.style?.color || '');
@@ -31,6 +31,10 @@ const FooterComponentConfigModal: React.FC<FooterComponentConfigModalProps> = ({
       },
     });
   };
+
+  useImperativeHandle(ref, () => ({
+    save: handleSave
+  }));
 
   return (
     <div className="space-y-4 p-4">
@@ -75,6 +79,6 @@ const FooterComponentConfigModal: React.FC<FooterComponentConfigModalProps> = ({
       </div>
     </div>
   );
-};
+});
 
 export default FooterComponentConfigModal;

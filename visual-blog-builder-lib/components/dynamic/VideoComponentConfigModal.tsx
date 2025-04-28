@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { VideoConfig } from '../../types/blogBuilderTypes';
 
 interface VideoComponentConfigModalProps {
@@ -7,7 +7,7 @@ interface VideoComponentConfigModalProps {
   onClose: () => void;
 }
 
-export const VideoComponentConfigModal: React.FC<VideoComponentConfigModalProps> = ({ config, onSave, onClose }) => {
+export const VideoComponentConfigModal = forwardRef<any, VideoComponentConfigModalProps>(({ config, onSave, onClose }, ref) => {
   const safeConfig = config || {};
   const safeStyle = safeConfig.style || {};
 
@@ -28,6 +28,10 @@ export const VideoComponentConfigModal: React.FC<VideoComponentConfigModalProps>
       },
     });
   };
+
+  useImperativeHandle(ref, () => ({
+    save: handleSave
+  }));
 
   return (
     <div className="space-y-4 p-4">
@@ -53,6 +57,6 @@ export const VideoComponentConfigModal: React.FC<VideoComponentConfigModalProps>
       </div>
     </div>
   );
-};
+});
 
 export default VideoComponentConfigModal;

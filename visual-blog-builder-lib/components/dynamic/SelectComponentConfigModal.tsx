@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { SelectConfig } from '../../types/blogBuilderTypes';
 
 interface SelectComponentConfigModalProps {
@@ -7,7 +7,7 @@ interface SelectComponentConfigModalProps {
   onClose: () => void;
 }
 
-export const SelectComponentConfigModal: React.FC<SelectComponentConfigModalProps> = ({ config, onSave, onClose }) => {
+export const SelectComponentConfigModal = forwardRef<any, SelectComponentConfigModalProps>(({ config, onSave, onClose }, ref) => {
   const safeConfig = config || {};
   const safeStyle = safeConfig.style || {};
 
@@ -41,6 +41,10 @@ export const SelectComponentConfigModal: React.FC<SelectComponentConfigModalProp
     });
   };
 
+  useImperativeHandle(ref, () => ({
+    save: handleSave
+  }));
+
   return (
     <div className="space-y-4 p-4">
       <label className="flex flex-col gap-1">
@@ -72,4 +76,4 @@ export const SelectComponentConfigModal: React.FC<SelectComponentConfigModalProp
       </div>
     </div>
   );
-};
+});

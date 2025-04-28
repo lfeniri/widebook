@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { AudioConfig } from '../../types/blogBuilderTypes';
 
 interface AudioComponentConfigModalProps {
@@ -7,7 +7,7 @@ interface AudioComponentConfigModalProps {
   onClose: () => void;
 }
 
-export const AudioComponentConfigModal: React.FC<AudioComponentConfigModalProps> = ({ config, onSave, onClose }) => {
+export const AudioComponentConfigModal = forwardRef<any, AudioComponentConfigModalProps>(({ config, onSave, onClose }, ref) => {
   const safeConfig = config || {};
   const safeStyle = safeConfig.style || {};
 
@@ -15,7 +15,6 @@ export const AudioComponentConfigModal: React.FC<AudioComponentConfigModalProps>
   const [controls, setControls] = useState(safeConfig.controls ?? true);
   const [margin, setMargin] = useState(safeStyle.margin || "0px");
   const [ariaLabel, setAriaLabel] = useState(safeConfig.ariaLabel || "");
-
   const [autoplay, setAutoplay] = useState(safeConfig.autoplay ?? false);
   const [loop, setLoop] = useState(safeConfig.loop ?? false);
   const [muted, setMuted] = useState(safeConfig.muted ?? false);
@@ -35,6 +34,10 @@ export const AudioComponentConfigModal: React.FC<AudioComponentConfigModalProps>
       },
     });
   };
+
+  useImperativeHandle(ref, () => ({
+    save: handleSave
+  }));
 
   return (
     <div className="space-y-4 p-4">
@@ -63,6 +66,6 @@ export const AudioComponentConfigModal: React.FC<AudioComponentConfigModalProps>
       </div>
     </div>
   );
-};
+});
 
 export default AudioComponentConfigModal;
