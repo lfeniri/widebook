@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { BlogGrid } from "../types/blogBuilderTypes";
 import { componentRegistry } from "./componentRegistry";
@@ -169,8 +171,10 @@ export const GridRenderer: React.FC<{
               </div>
             </div>
           ))}
+
         </div>
       ))}
+
       <button
         className="mt-4 bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-primary/80"
         title="Ajouter une ligne"

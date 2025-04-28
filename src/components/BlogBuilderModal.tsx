@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { BlogGrid } from "../../visual-blog-builder-lib/types/blogBuilderTypes";
 import { BlogContentBlock } from '@/types/blog';
 import { useBlogBuilderStore } from '../../visual-blog-builder-lib/store/blogBuilderStore';
+import isEqual from 'lodash.isequal';
 
 const VisualBlogBuilder = dynamic(() => import("../../visual-blog-builder-lib/VisualBlogBuilder"), { ssr: false });
 
@@ -35,6 +36,19 @@ export default function BlogBuilderModal({ open, onClose, value, onChange }: {
   // Empêche la boucle infinie : n'initialise que si la modal s'ouvre et que c'est la première ouverture
   const [initialized, setInitialized] = useState(false);
   const prevOpen = useRef(false);
+
+  // Synchronisation descendante : si la value change depuis l'extérieur, on réinitialise le builder
+  useEffect(() => {
+    if (open && initialized) {
+      const currentGrid = useBlogBuilderStore.getState().grid;
+      const nextGrid = toBlogGrid(value);
+      if (!isEqual(currentGrid, nextGrid)) {
+        useBlogBuilderStore.getState().initialize(nextGrid);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
   useEffect(() => {
     // Initialisation UNIQUEMENT lors du passage de open: false -> true
     if (open && !prevOpen.current) {

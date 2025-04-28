@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { RadioConfig } from '../../types/blogBuilderTypes';
 

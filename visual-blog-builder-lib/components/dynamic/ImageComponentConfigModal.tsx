@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { ImageConfig } from '../../types/blogBuilderTypes';
 

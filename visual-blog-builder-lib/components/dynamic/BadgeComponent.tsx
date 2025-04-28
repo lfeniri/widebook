@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 export const BadgeComponent: React.FC<{ config: any }> = ({ config }) => {

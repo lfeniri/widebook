@@ -1,4 +1,6 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+"use client";
+
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { InputConfig } from '../../types/blogBuilderTypes';
 
 interface InputComponentConfigModalProps {

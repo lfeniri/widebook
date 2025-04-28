@@ -7,6 +7,8 @@ import { Blog } from '@/types/blog';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from 'next/navigation';
+import { GridRenderer } from '../../../visual-blog-builder-lib/components/GridRenderer';
+import { convertContentConfigToGrid } from '@/lib/utils';
 
 export default function ClientHomePageClient() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -30,9 +32,7 @@ export default function ClientHomePageClient() {
   }, [categoryId]);
 
   useEffect(() => {
-    const handleRouteChange = () => setLoadingBlogId(null);
-    router.events?.on?.('routeChangeComplete', handleRouteChange);
-    return () => router.events?.off?.('routeChangeComplete', handleRouteChange);
+    setLoadingBlogId(null); // Reset loading state on component mount
   }, [router]);
 
   return (
@@ -103,7 +103,7 @@ export default function ClientHomePageClient() {
                     className="text-lg font-bold text-gray-900 group-hover:text-[#ff385c] transition-colors line-clamp-2">
                     {blog.title}
                   </Link>
-                  <div className="line-clamp-3 text-gray-600 text-base" dangerouslySetInnerHTML={{ __html: blog.content }} />
+                  <GridRenderer grid={convertContentConfigToGrid(blog.contentConfig || [])} />
                   <div className="mt-auto flex items-center gap-2 pt-4">
                     <span className="text-xs text-gray-500">Par {blog.author?.email || 'Auteur inconnu'}</span>
                     <Button

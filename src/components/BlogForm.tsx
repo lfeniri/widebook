@@ -4,7 +4,8 @@ import { Category, Blog, BlogContentBlock } from '@/types/blog';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
 import { useRouter } from 'next/navigation';
-import BlogContentEditor from "./BlogContentEditor";
+import { GridRenderer } from 'visual-blog-builder-lib/components/GridRenderer';
+import { convertContentConfigToGrid } from '@/lib/utils';
 
 export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; blog?: Blog | null }) {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -50,67 +51,67 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
 
   const handleSubmit = async (e: React.FormEvent) => {
     try {
-      e.preventDefault();
-      setLoading(true);
-      setError(null);
-      setSuccess(null);
-      let imageUrl = image;
-      if (imageFile) {
-        // Upload image to S3 via API route
-        const formData = new FormData();
-        formData.append('file', imageFile);
-        const uploadRes = await fetch('/admin/api/upload-image', {
-          method: 'POST',
-          body: formData,
+        console.log("Form submission started");
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+        let imageUrl = image;
+        if (imageFile) {
+            console.log("Uploading image...");
+            const formData = new FormData();
+            formData.append('file', imageFile);
+            const uploadRes = await fetch('/admin/api/upload-image', {
+                method: 'POST',
+                body: formData,
+            });
+            const uploadData = await uploadRes.json();
+            if (!uploadRes.ok) throw new Error(uploadData.error || 'Erreur upload image');
+            imageUrl = uploadData.url;
+            console.log("Image uploaded successfully: ", imageUrl);
+        }
+        console.log("Saving blog...");
+        const method = blog ? "PUT" : "POST";
+        const url = blog ? `/admin/api/blogs?id=${blog.id}` : "/admin/api/blogs";
+        const res = await fetchWithAuth(url, {
+            method,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                title,
+                contentConfig,
+                slug,
+                image: imageUrl,
+                categoryId,
+                seoTitle,
+                seoDesc,
+            }),
         });
-        const uploadData = await uploadRes.json();
-        if (!uploadRes.ok) throw new Error(uploadData.error || 'Erreur upload image');
-        imageUrl = uploadData.url;
-      }
-      const method = blog ? "PUT" : "POST";
-      const url = blog ? `/admin/api/blogs?id=${blog.id}` : "/admin/api/blogs";
-      const res = await fetchWithAuth(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          contentConfig,
-          slug,
-          image: imageUrl,
-          categoryId,
-          seoTitle,
-          seoDesc,
-        }),
-      });
-      if (res.ok) {
-        if (blog) {
-          setSuccess('Blog modifié avec succès !');
-          // Pas de redirection, on reste sur la page d'édition
+        if (res.ok) {
+            console.log("Blog saved successfully");
+            if (blog) {
+                setSuccess('Blog modifié avec succès !');
+            } else {
+                const data = await res.json();
+                setSuccess('Blog créé avec succès !');
+                setTimeout(() => {
+                    setSuccess(null);
+                    router.replace(`/admin/blogs/${data.id}`);
+                }, 1200);
+            }
         } else {
-          // Création : récupérer l'id du blog créé et rediriger vers la page d'édition
-          const data = await res.json();
-          setSuccess('Blog créé avec succès !');
-          setTimeout(() => {
-            setSuccess(null);
-            router.replace(`/admin/blogs/${data.id}`);
-          }, 1200);
+            const data = await res.json();
+            setError(data.error || `Erreur lors de la ${blog ? 'modification' : 'création'} du blog.`);
+            console.error("Error saving blog: ", data.error);
         }
-        if (!blog) {
-          setTitle(""); setContentConfig([]); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
-        }
-        onCreated && onCreated();
-      } else {
-        const data = await res.json();
-        setError(data.error || `Erreur lors de la ${blog ? 'modification' : 'création'} du blog.`);
-      }
-      setLoading(false);
+        setLoading(false);
     } catch (err: any) {
-      setLoading(false);
-      setError(err?.message || `Erreur lors de la ${blog ? 'modification' : 'création'} du blog.`);
+        setLoading(false);
+        setError(err?.message || `Erreur lors de la ${blog ? 'modification' : 'création'} du blog.`);
+        console.error("Error during form submission: ", err);
     }
-  };
+};
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded shadow p-4 mb-8 flex flex-col gap-3 card animate-fadeInUp">
@@ -128,7 +129,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
       {/* Remplacement du textarea par l'éditeur combiné */}
       <input type="text" placeholder="SEO Title" value={seoTitle} onChange={e => setSeoTitle(e.target.value)} className="border rounded px-3 py-2" />
       <input type="text" placeholder="SEO Description" value={seoDesc} onChange={e => setSeoDesc(e.target.value)} className="border rounded px-3 py-2" />
-      <BlogContentEditor value={contentConfig} onChange={setContentConfig} blogId={blog?.id || "new-blog"} />
+      <GridRenderer grid={convertContentConfigToGrid(contentConfig || [])} />
       {error && <div className="text-red-500 text-sm">{error}</div>}
       {success && <div className="text-green-600 text-sm">{success}</div>}
       <button

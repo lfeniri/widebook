@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { BadgeConfig } from '../../types/blogBuilderTypes';
 

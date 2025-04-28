@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import BlogComments from '@/components/BlogComments';
+import { GridRenderer } from 'visual-blog-builder-lib/components/GridRenderer';
+import { convertContentConfigToGrid } from '@/lib/utils';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -38,7 +40,9 @@ export default async function BlogPage({ params }: { params: Promise<{ slug: str
         <span>Publié le {new Date(blog.createdAt).toLocaleDateString()}</span>
       </div>
       {blog.image && <img src={blog.image} alt="" className="rounded-lg mb-8 w-full max-h-[420px] object-cover animate-fadeIn" />}
-      <div className="prose prose-lg max-w-none mb-10 animate-fadeIn" dangerouslySetInnerHTML={{ __html: blog.content }} />
+      {blog.contentConfig && (
+        <GridRenderer grid={convertContentConfigToGrid(blog.contentConfig)} />
+      )}
       <BlogComments
         blogId={blog.id}
         comments={(blog.comments ?? []).map(comment => ({

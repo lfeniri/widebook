@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 export const ImageComponent: React.FC<{ config: any }> = ({ config }) => {
