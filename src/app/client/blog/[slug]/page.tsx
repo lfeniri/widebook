@@ -1,17 +1,38 @@
-import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import BlogPageClient from './BlogPageClient';
+import { prisma } from '@/lib/prisma';
 
-export default async function BlogPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function BlogPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const { slug } = await params;
+  if (!slug) notFound();
+
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <BlogContent slug={slug} />
+    </Suspense>
+  );
+}
+
+async function BlogContent({ slug }: { slug: string }) {
   const blog = await prisma.blog.findUnique({
     where: { slug },
-    include: { category: true, author: true, comments: { include: { author: true } } },
+    include: { 
+      category: true, 
+      author: true, 
+      comments: { 
+        include: { 
+          author: true 
+        } 
+      }
+    }
   });
-  if (!blog) return notFound();
 
-  // Pass a snapshot of the blog data to the client component
-  const blogData = JSON.parse(JSON.stringify(blog));
+  if (!blog) notFound();
 
-  return <BlogPageClient blog={blogData} />;
+  return <BlogPageClient blog={JSON.parse(JSON.stringify(blog))} />;
 }

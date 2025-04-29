@@ -7,36 +7,25 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
     const user = await getUserFromRequest(request);
     if (!user) {
       return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
     }
 
-    // Récupération du formData au lieu de JSON
-    const formData = await request.formData();
-    const title = formData.get('title') as string;
-    const slug = formData.get('slug') as string;
-    const categoryId = formData.get('categoryId') as string;
-    const seoTitle = formData.get('seoTitle') as string;
-    const seoDesc = formData.get('seoDesc') as string;
-    const contentConfigStr = formData.get('contentConfig') as string;
-    const contentConfig = contentConfigStr ? JSON.parse(contentConfigStr) : undefined;
-    const imageFile = formData.get('image') as Blob | null;
+    const body = await request.json();
+    const { title, slug, categoryId, seoTitle, seoDesc, contentConfig } = body;
 
     if (!title || !slug || !categoryId) {
       return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
     }
 
-    // TODO: Gérer l'upload de l'image si nécessaire
-    const image = imageFile ? 'path/to/uploaded/image' : undefined;
-
     const blog = await prisma.blog.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title,
         contentConfig,
         slug,
-        image,
         categoryId,
         seoTitle,
         seoDesc,
@@ -55,7 +44,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const blog = await prisma.blog.findUnique({
       where: { id },
       include: { category: true, author: true }
@@ -75,11 +64,12 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
     const user = await getUserFromRequest(request);
     if (!user) {
       return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
     }
-    const { id } = params;
+
     await prisma.blog.delete({
       where: { id },
     });

@@ -70,24 +70,40 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
     setError(null);
     setSuccess(null);
     try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("slug", slug);
-      formData.append("categoryId", categoryId);
-      formData.append("seoTitle", seoTitle);
-      formData.append("seoDesc", seoDesc);
-      if (imageFile) formData.append("image", imageFile);
-      // Utiliser l'état local contentConfig au lieu de blog.contentConfig
-      if (contentConfig) {
-        formData.append("contentConfig", JSON.stringify(contentConfig));
+      let imageUrl = image;
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        const uploadRes = await fetch('/admin/api/upload-image', {
+          method: 'POST',
+          body: formData
+        });
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) throw new Error(uploadData.error || 'Erreur upload image');
+        imageUrl = uploadData.url;
       }
+
       const res = await fetchWithAuth(`/admin/api/blogs${blog ? `/${blog.id}` : ""}`, {
         method: blog ? "PUT" : "POST",
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title,
+          slug,
+          categoryId,
+          seoTitle,
+          seoDesc,
+          image: imageUrl,
+          contentConfig
+        })
       });
+
       if (!res.ok) {
         throw new Error("Failed to save blog");
-      }      setSuccess("Blog enregistré avec succès !");
+      }
+      
+      setSuccess("Blog enregistré avec succès !");
       if (onCreated) onCreated();
     } catch (err) {
       console.error("Error saving blog:", err);

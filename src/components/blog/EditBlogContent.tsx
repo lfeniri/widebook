@@ -5,13 +5,19 @@ import { Blog, BlogContentBlock } from '@/types/blog';
 import BlogForm from '@/components/BlogForm';
 import BlogBuilderModal from '@/components/BlogBuilderModal';
 
-export function EditBlogContent({ blog: initialBlog }: { blog: Blog }) {
+interface EditBlogContentProps {
+  blog: Blog;
+}
+
+export default function EditBlogContent({ blog: initialBlog }: EditBlogContentProps) {
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [localBlog, setLocalBlog] = useState<Blog>(initialBlog);
 
   const handleContentConfigChange = (newConfig: BlogContentBlock[]) => {
     setLocalBlog({ ...localBlog, contentConfig: newConfig });
   };
+
+  if (!localBlog) return null;
 
   return (
     <div className="container mx-auto px-4 py-8">

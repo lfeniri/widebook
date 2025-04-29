@@ -1,15 +1,6 @@
-import { EditBlogContent } from '@/components/blog/EditBlogContent';
-import { prisma } from '@/lib/prisma';
+import BlogEditPageClient from '@/components/blog/EditBlogPageClient';
 
-export default async function EditBlogPage({ params }: { params: { id: string } }) {
-  const blog = await prisma.blog.findUnique({
-    where: { id: params.id },
-    include: { category: true }
-  });
-
-  if (!blog) {
-    return <div>Blog introuvable</div>;
-  }
-
-  return <EditBlogContent blog={blog} />;
+export default async function Page({ params }: { params: { id: string } }) {
+  const { id } = await params;
+  return <BlogEditPageClient id={id} />;
 }

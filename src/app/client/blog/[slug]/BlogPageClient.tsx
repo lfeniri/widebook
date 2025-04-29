@@ -14,7 +14,10 @@ const BlogPageClient: React.FC<BlogPageClientProps> = ({ blog }) => {
     <div>
       <h1>{blog.title}</h1>
       {blog.contentConfig && (
-        <GridRenderer grid={convertContentConfigToGrid(blog.contentConfig)} />
+        <GridRenderer 
+          grid={convertContentConfigToGrid(blog.contentConfig)} 
+          isClientView={true}
+        />
       )}
     </div>
   );
