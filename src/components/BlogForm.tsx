@@ -4,8 +4,7 @@ import { Category, Blog, BlogContentBlock } from '@/types/blog';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
 import { useRouter } from 'next/navigation';
-import { GridRenderer } from 'visual-blog-builder-lib/components/GridRenderer';
-import { convertContentConfigToGrid } from '@/lib/utils';
+
 
 export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; blog?: Blog | null }) {
   const [categories, setCategories] = useState<Category[]>([]);

@@ -34,21 +34,17 @@ export default function EditBlogContent({ id }: { id: string }) {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Modifier le blog</h2>
-        <button
-          onClick={() => setIsBuilderOpen(true)}
-          className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg shadow"
-          style={{ backgroundColor: "#FF385C" }}
-        >
-          Ouvrir l'éditeur visuel
-        </button>
+        {localBlog && (
+          <button
+            onClick={() => window.location.assign(`/admin/blogs/${localBlog.id}/edit-content`)}
+            className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg shadow"
+            style={{ backgroundColor: "#FF385C" }}
+          >
+            Ouvrir l'éditeur visuel
+          </button>
+        )}
       </div>
-      <BlogForm blog={localBlog} />
-      <BlogBuilderModal
-        open={isBuilderOpen}
-        onClose={() => setIsBuilderOpen(false)}
-        value={localBlog?.contentConfig}
-        onChange={handleContentConfigChange}
-      />
+      <BlogForm blog={localBlog || undefined} />
     </div>
   );
 }

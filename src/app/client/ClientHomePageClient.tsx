@@ -7,8 +7,7 @@ import { Blog } from '@/types/blog';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from 'next/navigation';
-import { GridRenderer } from '../../../visual-blog-builder-lib/components/GridRenderer';
-import { convertContentConfigToGrid } from '@/lib/utils';
+
 
 export default function ClientHomePageClient() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -97,13 +96,19 @@ export default function ClientHomePageClient() {
                         {blog.category.name}
                       </Badge>
                     )}
-                    <span className="text-xs text-gray-400 ml-auto">{new Date(blog.createdAt).toLocaleDateString("fr-FR")}</span>
+                    <span className="text-xs text-gray-400 ml-auto" suppressHydrationWarning>{new Date(blog.createdAt).toLocaleDateString("fr-FR")}</span>
                   </div>
                   <Link href={`/client/blog/${blog.slug}`}
                     className="text-lg font-bold text-gray-900 group-hover:text-[#ff385c] transition-colors line-clamp-2">
                     {blog.title}
                   </Link>
-                  <GridRenderer grid={convertContentConfigToGrid(blog.contentConfig || [])} />
+                  {blog.contentConfig && (
+                    <div
+                      className="prose max-w-none"
+                      suppressHydrationWarning
+                      dangerouslySetInnerHTML={{ __html: typeof blog.contentConfig === 'string' ? blog.contentConfig : '' }}
+                    />
+                  )}
                   <div className="mt-auto flex items-center gap-2 pt-4">
                     <span className="text-xs text-gray-500">Par {blog.author?.email || 'Auteur inconnu'}</span>
                     <Button
