@@ -9,18 +9,22 @@ interface BlogPageClientProps {
 }
 
 const BlogPageClient: React.FC<BlogPageClientProps> = ({ blog }) => {
+  console.log('BlogPageClient', removeBodyTag(blog.content));
   return (
     <div>
       <h1>{blog.title}</h1>
-      {blog.contentConfig && (
+      {blog.content && (
         <div
           className="prose max-w-none"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: typeof blog.contentConfig === 'string' ? blog.contentConfig : '' }}
+          dangerouslySetInnerHTML={{ __html: typeof blog.content === 'string' ? removeBodyTag(blog.content) : '' }}
         />
       )}
     </div>
   );
 };
+
+function removeBodyTag(html: string | undefined): string {
+  return html?.replace(/<\/?body[^>]*>/gi, '') || '';
+}
 
 export default BlogPageClient;

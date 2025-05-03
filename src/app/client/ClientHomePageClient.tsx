@@ -102,11 +102,11 @@ export default function ClientHomePageClient() {
                     className="text-lg font-bold text-gray-900 group-hover:text-[#ff385c] transition-colors line-clamp-2">
                     {blog.title}
                   </Link>
-                  {blog.contentConfig && (
+                  {blog.content && (
                     <div
                       className="prose max-w-none"
                       suppressHydrationWarning
-                      dangerouslySetInnerHTML={{ __html: typeof blog.contentConfig === 'string' ? blog.contentConfig : '' }}
+                      dangerouslySetInnerHTML={{ __html: typeof blog.content === 'string' ? blog.content : '' }}
                     />
                   )}
                   <div className="mt-auto flex items-center gap-2 pt-4">

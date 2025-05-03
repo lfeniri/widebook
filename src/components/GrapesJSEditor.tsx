@@ -1,7 +1,9 @@
 "use client";
 import React, { useEffect, useRef } from "react";
+
 import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
+import grapesjsCustomCode from "grapesjs-custom-code";
 
 interface GrapesJSEditorProps {
   value?: string;
@@ -23,6 +25,10 @@ const GrapesJSEditor: React.FC<GrapesJSEditorProps> = ({ value, onChange, height
         storageManager: false,
         components: value || '',
         style: '',
+        plugins: [grapesjsCustomCode],
+        pluginsOpts: {
+          grapesjsCustomCode: {},
+        },
       });
 
       // Ajout des blocs de base
@@ -50,6 +56,7 @@ const GrapesJSEditor: React.FC<GrapesJSEditorProps> = ({ value, onChange, height
 
       grapesEditor.current.on('update', () => {
         if (onChange) {
+            console.log(grapesEditor);
           onChange(grapesEditor.current.getHtml());
         }
       });

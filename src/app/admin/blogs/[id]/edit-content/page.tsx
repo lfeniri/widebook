@@ -42,7 +42,7 @@ export default function EditBlogContentPage() {
       const res = await fetch(`/admin/api/blogs/${blog.id}/content`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentConfig: html }),
+        body: JSON.stringify({ content: html }),
       });
       if (!res.ok) throw new Error("Erreur lors de la sauvegarde");
       router.refresh();
@@ -74,9 +74,9 @@ export default function EditBlogContentPage() {
               </button>
             </div>
             <GrapesJSEditor
-              value={blog.contentConfig ? JSON.stringify(blog.contentConfig) : undefined}
+              value={blog.content}
               onChange={setEditorContent}
-              height="70vh"
+              height="80vh"
             />
           </>
         ) : null}

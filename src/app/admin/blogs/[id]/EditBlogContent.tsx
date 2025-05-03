@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Blog, BlogContentBlock } from '@/types/blog';
+import { Blog } from '@/types/blog';
 import BlogForm from '@/components/BlogForm';
-import BlogBuilderModal from '@/components/BlogBuilderModal';
 
 export default function EditBlogContent({ id }: { id: string }) {
   const [blog, setBlog] = useState<Blog | null>(null);
@@ -24,11 +23,6 @@ export default function EditBlogContent({ id }: { id: string }) {
     fetchBlog();
   }, [id]);
 
-  const handleContentConfigChange = (newConfig: BlogContentBlock[]) => {
-    if (localBlog) {
-      setLocalBlog({ ...localBlog, contentConfig: newConfig });
-    }
-  };
 
   return (
     <div className="container mx-auto px-4 py-8">

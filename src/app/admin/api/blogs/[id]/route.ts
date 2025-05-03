@@ -14,7 +14,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { title, slug, categoryId, seoTitle, seoDesc, contentConfig } = body;
+    const { title, slug, categoryId, seoTitle, seoDesc, content } = body;
 
     if (!title || !slug || !categoryId) {
       return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
@@ -24,7 +24,7 @@ export async function PUT(
       where: { id },
       data: {
         title,
-        contentConfig,
+        content,
         slug,
         categoryId,
         seoTitle,

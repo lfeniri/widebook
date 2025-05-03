@@ -36,12 +36,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
     }
     const body = await request.json();
-    const { title, contentConfig, slug, image, categoryId, seoTitle, seoDesc } = body;
-    if (!title || !contentConfig || !slug || !categoryId) {
+    const { title, content, slug, image, categoryId, seoTitle, seoDesc } = body;
+    if (!title || !content || !slug || !categoryId) {
       return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
     }
     const blog = await prisma.blog.create({
-      data: { title, contentConfig, slug, image, categoryId, authorId: user.id, seoTitle, seoDesc },
+      data: { title, content, slug, image, categoryId, authorId: user.id, seoTitle, seoDesc },
     });
     return NextResponse.json(blog);
   } catch (err) {

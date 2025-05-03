@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Category, Blog, BlogContentBlock } from '@/types/blog';
+import { Category, Blog } from '@/types/blog';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; blog?: Blog | null }) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [title, setTitle] = useState("");
-  const [contentConfig, setContentConfig] = useState<BlogContentBlock[] | undefined>(undefined);
+  const [content, setContent] = useState<string>("");
   const [slug, setSlug] = useState("");
   const [image, setImage] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -41,7 +41,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
   useEffect(() => {
     if (blog) {
       setTitle(blog.title || "");
-      setContentConfig(blog.contentConfig || []);
+      setContent(blog.content || "");
       setSlug(blog.slug || "");
       setImage(blog.image || "");
       setCategoryId(blog.categoryId || "");
@@ -49,7 +49,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
       setSeoDesc(blog.seoDesc || "");
       setImageFile(null);
     } else {
-      setTitle(""); setContentConfig([]); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
+      setTitle(""); setContent(""); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
     }
   }, [blog]);
 
@@ -94,7 +94,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
           seoTitle,
           seoDesc,
           image: imageUrl,
-          contentConfig
+          content
         })
       });
 
