@@ -6,8 +6,8 @@ import "grapesjs/dist/css/grapes.min.css";
 import grapesjsCustomCode from "grapesjs-custom-code";
 
 interface GrapesJSEditorProps {
-  value?: string;
-  onChange?: (html: string) => void;
+  value?: { html: string; css: string };
+  onChange?: (data: { html: string; css: string }) => void;
   height?: string;
 }
 
@@ -20,11 +20,10 @@ const GrapesJSEditor: React.FC<GrapesJSEditorProps> = ({ value, onChange, height
       grapesEditor.current = grapesjs.init({
         container: editorRef.current,
         fromElement: false,
-        height,
-        width: "auto",
+        height,        width: "auto",
         storageManager: false,
-        components: value || '',
-        style: '',
+        components: value?.html || '',
+        style: value?.css || '',
         plugins: [grapesjsCustomCode],
         pluginsOpts: {
           grapesjsCustomCode: {},
@@ -56,8 +55,9 @@ const GrapesJSEditor: React.FC<GrapesJSEditorProps> = ({ value, onChange, height
 
       grapesEditor.current.on('update', () => {
         if (onChange) {
-            console.log(grapesEditor);
-          onChange(grapesEditor.current.getHtml());
+          const html = grapesEditor.current.getWrapper().toHTML();
+          const css = grapesEditor.current.getCss();
+          onChange({ html, css });
         }
       });
     }
@@ -71,7 +71,8 @@ const GrapesJSEditor: React.FC<GrapesJSEditorProps> = ({ value, onChange, height
 
   useEffect(() => {
     if (grapesEditor.current && value !== undefined) {
-      grapesEditor.current.setComponents(value);
+      grapesEditor.current.setComponents(value.html || '');
+      grapesEditor.current.setStyle(value.css || '');
     }
   }, [value]);
 

@@ -1,4 +1,3 @@
-import { QueryMode } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { NextResponse, NextRequest } from 'next/server';
 import { getUserFromRequest } from '@/lib/utils';
@@ -40,8 +39,18 @@ export async function POST(request: Request) {
     if (!title || !content || !slug || !categoryId) {
       return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
     }
+    // Prisma Blog model now expects content as Json
     const blog = await prisma.blog.create({
-      data: { title, content, slug, image, categoryId, authorId: user.id, seoTitle, seoDesc },
+      data: {
+        title,
+        content: content,
+        slug,
+        image,
+        categoryId,
+        authorId: user.id,
+        seoTitle,
+        seoDesc,
+      },
     });
     return NextResponse.json(blog);
   } catch (err) {

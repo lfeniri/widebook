@@ -5,14 +5,14 @@ import { prisma } from '@/lib/prisma';
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = await params;
   const { content } = await req.json();
-  if (!id || typeof content !== 'string') {
-    return NextResponse.json({ error: 'Missing id or content (string)' }, { status: 400 });
+  if (!id || !content) {
+    return NextResponse.json({ error: 'Missing id or content' }, { status: 400 });
   }
   try {
-    // Stocke le JSON stringifié tel que reçu de GrapesJS
+    // Stocke le JSON tel que reçu de GrapesJS (doit être un objet { html, css })
     const updated = await prisma.blog.update({
       where: { id },
-      data: { content },
+      data: { content: content },
     });
     return NextResponse.json(updated);
   } catch (e) {

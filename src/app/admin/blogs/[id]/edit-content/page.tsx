@@ -13,7 +13,7 @@ export default function EditBlogContentPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [editorContent, setEditorContent] = useState<string>("");
+  const [editorContent, setEditorContent] = useState<{ html: string; css: string }>({ html: '', css: '' });
 
   useEffect(() => {
     if (!id) return;
@@ -34,7 +34,7 @@ export default function EditBlogContentPage() {
     fetchBlog();
   }, [id]);
 
-  const handleSave = async (html: string) => {
+  const handleSave = async (data: { html: string; css: string }) => {
     if (!blog) return;
     setSaving(true);
     setError(null);
@@ -42,7 +42,7 @@ export default function EditBlogContentPage() {
       const res = await fetch(`/admin/api/blogs/${blog.id}/content`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: html }),
+        body: JSON.stringify({ content: data }),
       });
       if (!res.ok) throw new Error("Erreur lors de la sauvegarde");
       router.refresh();
@@ -72,9 +72,8 @@ export default function EditBlogContentPage() {
               >
                 {saving ? "Sauvegarde..." : "Sauvegarder"}
               </button>
-            </div>
-            <GrapesJSEditor
-              value={blog.content}
+            </div>            <GrapesJSEditor
+              value={blog.content || { html: '', css: '' }}
               onChange={setEditorContent}
               height="80vh"
             />

@@ -24,14 +24,14 @@ export async function PUT(
       where: { id },
       data: {
         title,
-        content,
+        content: content,
         slug,
         categoryId,
         seoTitle,
         seoDesc,
       },
     });
-    
+
     return NextResponse.json(blog);
   } catch (err) {
     console.error("Erreur lors de la mise à jour du blog:", err);
