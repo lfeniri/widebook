@@ -73,11 +73,36 @@ const GrapesJSEditor: React.FC<GrapesJSEditorProps> = ({ value, onChange, height
       }
     };
   }, []);
-
   useEffect(() => {
     if (grapesEditor.current && value !== undefined) {
-      grapesEditor.current.setComponents(value.html || '');
-      grapesEditor.current.setStyle(value.css || '');
+      // Vérifier si les valeurs ont réellement changé pour éviter des rechargements inutiles
+      const currentHtml = grapesEditor.current.getHtml();
+      const currentCss = grapesEditor.current.getCss();
+      
+      if (value.html !== currentHtml || value.css !== currentCss) {
+        grapesEditor.current.setComponents(value.html || '');
+        grapesEditor.current.setStyle(value.css || '');
+        
+        // Afficher une notification que le contenu a été mis à jour
+        if (currentHtml && currentCss) {
+          const notification = document.createElement('div');
+          notification.textContent = 'Contenu mis à jour par l\'assistant IA';
+          notification.style.position = 'fixed';
+          notification.style.bottom = '20px';
+          notification.style.right = '20px';
+          notification.style.backgroundColor = '#4CAF50';
+          notification.style.color = 'white';
+          notification.style.padding = '10px 20px';
+          notification.style.borderRadius = '5px';
+          notification.style.zIndex = '9999';
+          
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            document.body.removeChild(notification);
+          }, 3000);
+        }
+      }
     }
   }, [value]);
 

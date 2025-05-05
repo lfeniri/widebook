@@ -61,10 +61,11 @@ model Comment {
 }
 
 model BlogChatMessage {
-  id        String   @id @default(uuid())
-  blogId    String
-  blog      Blog     @relation(fields: [blogId], references: [id])
-  role      String   // 'user' ou 'assistant'
-  content   String
-  createdAt DateTime @default(now())
+  id            String   @id @default(uuid())
+  blogId        String
+  blog          Blog     @relation(fields: [blogId], references: [id])
+  role          String   // 'user' ou 'assistant'
+  content       String
+  isJsonContent Boolean  @default(false) @map("is_json_content")
+  createdAt     DateTime @default(now())
 }
