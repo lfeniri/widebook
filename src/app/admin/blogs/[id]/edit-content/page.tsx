@@ -13,9 +13,9 @@ export default function EditBlogContentPage() {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [editorContent, setEditorContent] = useState<{ html: string; css: string }>({ html: '', css: '' });
-  const [chatbotOpen, setChatbotOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);  const [editorContent, setEditorContent] = useState<{ html: string; css: string }>({ html: '', css: '' });
+  const [chatbotExpanded, setChatbotExpanded] = useState(false);
+  const [chatbotUnreadCount, setChatbotUnreadCount] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -82,11 +82,9 @@ export default function EditBlogContentPage() {
                 disabled={saving}
               >
                 {saving ? "Sauvegarde..." : "Sauvegarder"}
-              </button>
-              
-              <button
-                className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
-                onClick={() => setChatbotOpen(true)}
+              </button>              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 relative"
+                onClick={() => setChatbotExpanded(true)}
               >
                 <span className="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -94,6 +92,11 @@ export default function EditBlogContentPage() {
                   </svg>
                   Assistant IA
                 </span>
+                {chatbotUnreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {chatbotUnreadCount > 9 ? '9+' : chatbotUnreadCount}
+                  </span>
+                )}
               </button>
             </div>            
             <GrapesJSEditor
@@ -101,15 +104,16 @@ export default function EditBlogContentPage() {
               onChange={setEditorContent}
               height="80vh"
             />
-            
-            {/* Composant chatbot */}
-            {blog && (
-              <BlogContentChatbot
-                open={chatbotOpen}
-                onClose={() => setChatbotOpen(false)}
+              {/* Composant chatbot - toujours ouvert mais peut être minimisé */}
+            {blog && (              <BlogContentChatbot
+                open={true}
+                onClose={() => {/* Ne fait rien, le chat ne peut pas être fermé */}}
                 blogId={blog.id}
                 currentContent={editorContent}
                 onContentUpdate={handleContentUpdate}
+                initialExpanded={chatbotExpanded}
+                onExpandChange={(expanded) => setChatbotExpanded(expanded)}
+                onNewMessage={(count) => setChatbotUnreadCount(count)}
               />
             )}
           </>

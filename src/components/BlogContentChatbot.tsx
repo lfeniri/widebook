@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import FullscreenModal from "./FullscreenModal";
+import FloatingChatbot from "./FloatingChatbot";
 
 interface Message {
   id: string;
@@ -16,6 +16,9 @@ interface BlogContentChatbotProps {
   blogId: string;
   currentContent: { html: string; css: string };
   onContentUpdate: (content: { html: string; css: string }) => void;
+  initialExpanded?: boolean;
+  onExpandChange?: (isExpanded: boolean) => void;
+  onNewMessage?: (count: number) => void;
 }
 
 export default function BlogContentChatbot({
@@ -24,11 +27,16 @@ export default function BlogContentChatbot({
   blogId,
   currentContent,
   onContentUpdate,
+  initialExpanded = false,
+  onExpandChange,
+  onNewMessage,
 }: BlogContentChatbotProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLengthRef = useRef(0);
 
   // Récupérer l'historique des messages
   useEffect(() => {
@@ -36,13 +44,38 @@ export default function BlogContentChatbot({
       fetchMessages();
     }
   }, [open, blogId]);
-
   // Auto-scroll vers le bas lors de l'ajout de nouveaux messages
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [messages]);
+    
+    // Vérifier s'il y a de nouveaux messages de l'assistant
+    if (messages.length > prevMessagesLengthRef.current) {
+      const newAssistantMessages = messages.slice(prevMessagesLengthRef.current)
+        .filter(msg => msg.role === 'assistant').length;
+      
+      if (newAssistantMessages > 0 && !initialExpanded) {
+        setUnreadCount(prev => prev + newAssistantMessages);
+      }
+      
+      prevMessagesLengthRef.current = messages.length;
+    }
+  }, [messages, initialExpanded]);
+  
+  // Mettre à jour le compteur de messages non lus
+  useEffect(() => {
+    if (onNewMessage) {
+      onNewMessage(unreadCount);
+    }
+  }, [unreadCount, onNewMessage]);
+  
+  // Réinitialiser le compteur lorsque le chatbot est agrandi
+  useEffect(() => {
+    if (initialExpanded) {
+      setUnreadCount(0);
+    }
+  }, [initialExpanded]);
 
   const fetchMessages = async () => {
     try {
@@ -155,27 +188,27 @@ export default function BlogContentChatbot({
     } finally {
       setIsLoading(false);
     }
-  };
-
-  return (
-    <FullscreenModal open={open} onClose={onClose}>
-      <div className="flex flex-col h-full">
-        <div className="text-xl font-bold border-b pb-4 mb-4">
-          Assistant d&apos;édition de contenu
-        </div>
-        
+  };  return (
+    <FloatingChatbot 
+      open={open} 
+      onClose={onClose}
+      initialExpanded={initialExpanded}
+      onExpandChange={onExpandChange}
+      unreadCount={unreadCount}
+    >
+      <div className="flex flex-col h-full p-3">
         <div 
           ref={chatContainerRef}
-          className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-[300px]"
-        >
-          {messages.length === 0 ? (
-            <div className="text-center text-gray-500 mt-8">
+          className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-[180px] max-h-[300px]"
+        >{messages.length === 0 ? (
+            <div className="text-center text-gray-500 mt-8 text-xs">
               Commencez à discuter avec l&apos;assistant pour modifier le contenu de votre blog.
             </div>
           ) : (
-            messages.map((msg) => (              <div
+            messages.map((msg) => (
+              <div
                 key={msg.id}
-                className={`p-3 rounded-lg max-w-[80%] ${
+                className={`p-2 rounded-lg mb-2 max-w-[90%] text-xs ${
                   msg.role === 'user'
                     ? 'bg-blue-100 ml-auto'
                     : msg.isJsonContent 
@@ -183,55 +216,53 @@ export default function BlogContentChatbot({
                       : 'bg-gray-100 mr-auto'
                 }`}
               >
-                <div className="text-sm font-semibold mb-1 flex items-center">
+                <div className="text-xs font-semibold mb-1 flex items-center">
                   {msg.role === 'user' ? 'Vous' : 'Assistant'}
                   {msg.isJsonContent && (
-                    <span className="ml-2 text-green-600 text-xs bg-green-50 px-2 py-0.5 rounded">Modification appliquée</span>
+                    <span className="ml-1 text-green-600 text-xs bg-green-50 px-1 py-0.5 rounded">✓</span>
                   )}
                 </div>
-                <div className="whitespace-pre-wrap">
-                  {msg.isJsonContent ? "✅ Les modifications ont été appliquées avec succès à votre contenu." : msg.content}
+                <div className="whitespace-pre-wrap text-xs">
+                  {msg.isJsonContent ? "✅ Modifications appliquées avec succès" : msg.content}
                 </div>
               </div>
             ))
           )}
-          
-          {isLoading && (
-            <div className="bg-gray-100 p-3 rounded-lg max-w-[80%] mr-auto">
-              <div className="flex space-x-2 items-center">
-                <div className="text-sm font-semibold">Assistant</div>
+            {isLoading && (
+            <div className="bg-gray-100 p-2 rounded-lg max-w-[90%] mr-auto">
+              <div className="flex space-x-1 items-center">
+                <div className="text-xs font-semibold">Assistant</div>
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-100"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-200"></div>
+                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse"></div>
+                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse delay-100"></div>
+                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse delay-200"></div>
                 </div>
               </div>
             </div>
           )}
         </div>
-        
-        <form onSubmit={sendMessage} className="mt-auto border-t pt-4">
+          <form onSubmit={sendMessage} className="mt-auto border-t pt-3">
           <div className="flex items-center">
             <input
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Comment puis-je vous aider à modifier votre contenu ?"
-              className="flex-1 border rounded-l-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Votre message..."
+              className="flex-1 border rounded-l-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={isLoading}
-            />
-            <button
+            />            <button
               type="submit"
-              className={`bg-blue-600 text-white py-2 px-6 rounded-r-lg ${
+              className={`bg-blue-600 text-white py-2 px-4 rounded-r-lg text-sm ${
                 isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
               }`}
               disabled={isLoading}
             >
-              Envoyer
-            </button>
-          </div>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </button></div>
         </form>
       </div>
-    </FullscreenModal>
+    </FloatingChatbot>
   );
 }
