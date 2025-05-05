@@ -49,10 +49,14 @@ export async function POST(req: NextRequest) {
     role: 'system', 
     content: "Tu dois répondre UNIQUEMENT avec un objet JSON valide au format strict {\"html\":\"...\",\"css\":\"...\"}. Ce JSON ne doit contenir aucune explication ni commentaire additionnel. Si tu as besoin de plus d'informations, pose simplement ta question sans inclure de JSON."
   });
+    messages.push({
+    role: 'system',
+    content: "IMPORTANT: Ton JSON doit être valide selon la syntaxe JavaScript. Vérifie que tous les guillemets sont bien échappés et que la structure est correcte. Pas de balises ```json ou ``` autour du JSON."
+  });
   
   messages.push({
     role: 'system',
-    content: "IMPORTANT: Ton JSON doit être valide selon la syntaxe JavaScript. Vérifie que tous les guillemets sont bien échappés et que la structure est correcte. Pas de balises ```json ou ``` autour du JSON."
+    content: "CRITIQUE: Modifie UNIQUEMENT les parties du contenu impactées par la demande spécifique de l'utilisateur. Préserve intact tout le reste du contenu HTML et CSS. Ne modifie jamais la structure globale du document ou les éléments non liés à la requête actuelle. Ne fais jamais de modifications non demandées."
   });
   
   // Ajouter le message utilisateur
