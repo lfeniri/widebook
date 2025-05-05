@@ -72,7 +72,8 @@ export default function EditBlogContentPage() {
               >
                 {saving ? "Sauvegarde..." : "Sauvegarder"}
               </button>
-            </div>            <GrapesJSEditor
+            </div>            
+            <GrapesJSEditor
               value={blog.content || { html: '', css: '' }}
               onChange={setEditorContent}
               height="80vh"

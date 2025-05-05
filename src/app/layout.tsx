@@ -26,6 +26,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="fr">
       <head>
         <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-[#f8fafc] to-[#e0e7ef] min-h-screen flex flex-col`}>
         <AuthProvider>

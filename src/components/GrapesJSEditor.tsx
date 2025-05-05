@@ -4,6 +4,9 @@ import React, { useEffect, useRef } from "react";
 import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
 import grapesjsCustomCode from "grapesjs-custom-code";
+import pluginAdvanceComponents from 'grapesjs-advance-components';
+import presetWebpage from 'grapesjs-preset-webpage';
+import pluginForms from 'grapesjs-plugin-forms';
 
 interface GrapesJSEditorProps {
   value?: { html: string; css: string };
@@ -20,38 +23,40 @@ const GrapesJSEditor: React.FC<GrapesJSEditorProps> = ({ value, onChange, height
       grapesEditor.current = grapesjs.init({
         container: editorRef.current,
         fromElement: false,
-        height,        width: "auto",
+               width: "auto",
         storageManager: false,
         components: value?.html || '',
         style: value?.css || '',
-        plugins: [grapesjsCustomCode],
+        canvas: {
+            styles: [
+                'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css'
+            ]
+        },
+        panels: {
+            defaults: [
+            {
+                buttons: [
+                //...
+                {
+                    attributes: { title: 'Open Code' },
+                    className: 'fa fa-home',
+                    command: 'open-code',
+                    id: 'open-code'
+                }
+                //...
+                ],
+                id: 'views'
+            }
+            ]
+        },
+        plugins: [grapesjsCustomCode, pluginAdvanceComponents, presetWebpage, pluginForms, 'grapesjs-component-code-editor'],
         pluginsOpts: {
-          grapesjsCustomCode: {},
+          grapesjsCustomCode: {}
         },
       });
 
       // Ajout des blocs de base
-      const blockManager = grapesEditor.current.BlockManager;
-      blockManager.add('section', {
-        label: 'Section',
-        attributes: { class: 'gjs-block-section' },
-        content: '<section><h1>Titre de section</h1><p>Votre texte ici...</p></section>',
-      });
-      blockManager.add('text', {
-        label: 'Texte',
-        content: '<div data-gjs-type="text">Double-cliquez pour éditer le texte</div>',
-      });
-      blockManager.add('image', {
-        label: 'Image',
-        select: true,
-        content: { type: 'image' },
-        activate: true,
-      });
-      blockManager.add('2-columns', {
-        label: '2 Colonnes',
-        content:
-          '<div class="row"><div class="cell" style="width: 50%; padding: 10px;">Colonne 1</div><div class="cell" style="width: 50%; padding: 10px;">Colonne 2</div></div>',
-      });
+    
 
       grapesEditor.current.on('update', () => {
         if (onChange) {

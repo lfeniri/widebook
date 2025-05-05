@@ -4,12 +4,13 @@ import { Category, Blog } from '@/types/blog';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
 import { useRouter } from 'next/navigation';
+import { Html } from "next/document";
 
 
 export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; blog?: Blog | null }) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState<string>("");
+  const [content, setContent] = useState<any>({});
   const [slug, setSlug] = useState("");
   const [image, setImage] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -41,7 +42,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
   useEffect(() => {
     if (blog) {
       setTitle(blog.title || "");
-      setContent(blog.content || "");
+      setContent(blog.content || {});
       setSlug(blog.slug || "");
       setImage(blog.image || "");
       setCategoryId(blog.categoryId || "");
@@ -49,7 +50,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
       setSeoDesc(blog.seoDesc || "");
       setImageFile(null);
     } else {
-      setTitle(""); setContent(""); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
+      setTitle(""); setContent({}); setSlug(""); setImage(""); setCategoryId(""); setSeoTitle(""); setSeoDesc(""); setImageFile(null);
     }
   }, [blog]);
 
