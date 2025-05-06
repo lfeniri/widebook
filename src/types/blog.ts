@@ -1,7 +1,7 @@
 export interface Blog {
   id: string;
   title: string;
-  content?: { html?: string; css?: string };
+  content?: { html?: string; css?: string; js?: string };
   slug: string;
   image?: string;
   createdAt: string;

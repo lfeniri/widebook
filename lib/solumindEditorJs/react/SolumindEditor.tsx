@@ -1,0 +1,140 @@
+"use client";
+import React, { useEffect, useRef } from "react";
+
+import { SolumindEditor } from '../types';
+import '../styles/editor.css';
+
+interface SolumindEditorProps {
+  value?: { html: string; css: string; js: string };
+  onChange?: (data: { html: string; css: string; js: string }) => void;
+  height?: string;
+  config?: any;
+}
+
+const SolumindEditorComponent: React.FC<SolumindEditorProps> = ({ 
+  value, 
+  onChange, 
+  height = "600px",
+  config = {}
+}) => {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const editorInstance = useRef<SolumindEditor | null>(null);
+
+  useEffect(() => {
+    // Only initialize once
+    if (editorRef.current && !editorInstance.current) {
+      // Import dynamically to ensure it's only loaded client-side
+      import('../core/editor').then(({ createSolumindEditor }) => {
+        const defaultConfig = {
+          container: editorRef.current,
+          height: height,
+          width: "auto",
+          components: value?.html || '',
+          style: value?.css || '',
+          script: value?.js || '',
+          canvas: {
+            styles: [
+              'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css'
+            ]
+          },
+          // Merge with user config
+          ...config
+        };
+
+        // Initialize the editor
+        editorInstance.current = createSolumindEditor(defaultConfig);
+
+        // Setup onChange event handler
+        if (onChange) {
+          editorInstance.current.on('update', () => {
+            const html = editorInstance.current!.getHtml();
+            const css = editorInstance.current!.getCss();
+            const js = editorInstance.current!.getJs();
+            
+            onChange({ html, css, js });
+          });
+        }
+      });
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (editorInstance.current) {
+        editorInstance.current.destroy();
+        editorInstance.current = null;
+      }
+    };
+  }, []);
+
+  // Handle external value changes
+  useEffect(() => {
+    if (editorInstance.current && value !== undefined) {
+      // Get current values
+      const currentHtml = editorInstance.current.getHtml();
+      const currentCss = editorInstance.current.getCss();
+      const currentJs = editorInstance.current.getJs();
+      
+      // Only update if values have changed to avoid loops
+      if (value.html !== currentHtml || value.css !== currentCss || value.js !== currentJs) {
+        // Update components
+        if (value.html !== currentHtml) {
+          editorInstance.current.setComponents(value.html || '');
+        }
+        
+        // Update styles
+        if (value.css !== currentCss) {
+          editorInstance.current.setStyle(value.css || '');
+        }
+        
+        // Update scripts
+        if (value.js !== currentJs && editorInstance.current.setJs) {
+          editorInstance.current.setJs(value.js || '');
+        }
+        
+        // Show notification when content is updated externally
+        if (currentHtml && currentCss) {
+          showNotification('Content updated', 'success');
+        }
+      }
+    }
+  }, [value]);
+
+  const showNotification = (message: string, type: 'success' | 'warning' | 'error') => {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `solumind-notification solumind-notification-${type}`;
+    notification.textContent = message;
+    notification.style.position = 'fixed';
+    notification.style.bottom = '20px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '9999';
+    
+    // Add to body
+    document.body.appendChild(notification);
+    
+    // Remove after delay
+    setTimeout(() => {
+      notification.classList.add('solumind-notification-hide');
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    }, 3000);
+  };
+
+  return (
+    <div 
+      ref={editorRef} 
+      style={{ 
+        height, 
+        border: "1px solid #e5e7eb", 
+        borderRadius: 8, 
+        background: "#fff",
+        position: "relative",
+        overflow: "hidden"
+      }} 
+      className="solumind-editor-container"
+    />
+  );
+};
+
+export default SolumindEditorComponent;

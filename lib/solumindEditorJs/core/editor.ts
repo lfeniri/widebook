@@ -1,0 +1,574 @@
+/**
+ * SolumindEditor core implementation
+ */
+
+import { 
+  SolumindEditorConfig, 
+  SolumindEditor, 
+  EditorOutput, 
+  CustomBlock, 
+  CustomComponent,
+  EDITOR_EVENTS
+} from '../types';
+
+import { setupDragAndDrop } from '../managers/dragDropManager';
+import { registerBaseBlocks } from '../blocks';
+import { setupPanels } from '../managers/panelsManager';
+import { setupStyleManager } from '../managers/styleManager';
+import { setupCodeEditor } from '../managers/codeManager';
+import { setupComponentManager } from '../managers/componentManager';
+
+import '../styles/editor.css';
+
+/**
+ * Creates a new SolumindEditor instance
+ */
+export function createEditor(config: SolumindEditorConfig): SolumindEditor {
+  // State variables
+  let container: HTMLElement;
+  let editorContainer: HTMLElement;
+  let componentsContainer: HTMLElement;
+  let blocksContainer: HTMLElement;
+  let stylesPanel: HTMLElement;
+  let toolbarPanel: HTMLElement;
+  let codeEditorPanel: HTMLElement;
+  let previewMode = false;
+
+  // Data state
+  let htmlContent = config.components || '';
+  let cssContent = config.style || '';
+  let jsContent = '';
+  let customBlocks: CustomBlock[] = config.customBlocks || [];
+  let customComponents: CustomComponent[] = config.customComponents || [];
+  
+  // Event listeners registry
+  const eventListeners: Record<string, ((...args: any[]) => void)[]> = {};
+  
+  // Initialize the editor
+  function init(): SolumindEditor {
+    // Find or create container
+    if (typeof config.container === 'string') {
+      container = document.querySelector(config.container) as HTMLElement;
+      if (!container) {
+        throw new Error(`Container ${config.container} not found`);
+      }
+    } else {
+      container = config.container;
+    }
+    
+    // Create editor structure
+    createEditorDOM();
+    
+    // Setup managers
+    setupDragAndDrop(editorContainer, componentsContainer);
+    setupPanels(toolbarPanel, editorInstance);
+    setupStyleManager(stylesPanel, editorInstance);
+    setupCodeEditor(codeEditorPanel, editorInstance);
+    setupComponentManager(componentsContainer, editorInstance);
+    
+    // Register default blocks
+    registerBaseBlocks(editorInstance);
+    
+    // Register custom blocks
+    if (customBlocks.length) {
+      customBlocks.forEach(block => {
+        registerCustomBlock(block);
+      });
+    }
+    
+    // Register custom components
+    if (customComponents.length) {
+      customComponents.forEach(component => {
+        registerCustomComponent(component);
+      });
+    }
+    
+    // If there's initial content, set it
+    if (htmlContent) {
+      setComponents(htmlContent);
+    }
+    
+    if (cssContent) {
+      setStyle(cssContent);
+    }
+    
+    // Add update event listener if provided in config
+    if (config.onUpdate) {
+      on(EDITOR_EVENTS.UPDATE, config.onUpdate);
+    }
+    
+    return editorInstance;
+  }
+  
+  // Create the DOM structure for the editor
+  function createEditorDOM() {
+    // Create main editor container
+    editorContainer = document.createElement('div');
+    editorContainer.className = 'solumind-editor';
+    editorContainer.style.height = config.height || '600px';
+    editorContainer.style.width = config.width || 'auto';
+    
+    // Create main layout
+    const topBar = document.createElement('div');
+    topBar.className = 'solumind-editor-topbar';
+    
+    const mainContent = document.createElement('div');
+    mainContent.className = 'solumind-editor-content';
+    
+    const leftSidebar = document.createElement('div');
+    leftSidebar.className = 'solumind-editor-sidebar left';
+    
+    const canvas = document.createElement('div');
+    canvas.className = 'solumind-editor-canvas';
+    
+    const rightSidebar = document.createElement('div');
+    rightSidebar.className = 'solumind-editor-sidebar right';
+    
+    // Create panels
+    blocksContainer = document.createElement('div');
+    blocksContainer.className = 'solumind-blocks-container';
+    
+    componentsContainer = document.createElement('div');
+    componentsContainer.className = 'solumind-components-container';
+    
+    stylesPanel = document.createElement('div');
+    stylesPanel.className = 'solumind-styles-panel';
+    
+    toolbarPanel = document.createElement('div');
+    toolbarPanel.className = 'solumind-toolbar-panel';
+    
+    codeEditorPanel = document.createElement('div');
+    codeEditorPanel.className = 'solumind-code-editor';
+    codeEditorPanel.style.display = 'none';
+    
+    // Create canvas iframe for component rendering
+    const canvasFrame = document.createElement('iframe');
+    canvasFrame.className = 'solumind-canvas-frame';
+    canvasFrame.setAttribute('seamless', 'seamless');
+    
+    // Append elements to their containers
+    leftSidebar.appendChild(blocksContainer);
+    
+    canvas.appendChild(canvasFrame);
+    
+    rightSidebar.appendChild(stylesPanel);
+    
+    topBar.appendChild(toolbarPanel);
+    
+    mainContent.appendChild(leftSidebar);
+    mainContent.appendChild(canvas);
+    mainContent.appendChild(rightSidebar);
+    
+    editorContainer.appendChild(topBar);
+    editorContainer.appendChild(mainContent);
+    editorContainer.appendChild(codeEditorPanel);
+    
+    // Add editor to the container
+    container.appendChild(editorContainer);
+    
+    // Setup canvas iframe with required styles
+    const iframe = canvasFrame.contentWindow!.document;
+    iframe.open();
+    iframe.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body {
+              margin: 0;
+              padding: 20px;
+              box-sizing: border-box;
+              min-height: 100vh;
+            }
+            /* Component placeholder styles */
+            .solumind-component-selected {
+              outline: 2px solid #4e9bff;
+            }
+            /* Base CSS reset */
+            * {
+              box-sizing: border-box;
+            }
+          </style>
+          ${config.canvas?.styles?.map(style => `<link rel="stylesheet" href="${style}" />`).join('') || ''}
+          <style id="solumind-custom-css"></style>
+          ${config.canvas?.scripts?.map(script => `<script src="${script}"></script>`).join('') || ''}
+        </head>
+        <body id="solumind-canvas-body"></body>
+      </html>
+    `);
+    iframe.close();
+  }
+  
+  // Register a custom block
+  function registerCustomBlock(block: CustomBlock) {
+    customBlocks.push(block);
+    
+    // Create block element in the blocks panel
+    const blockElement = document.createElement('div');
+    blockElement.className = 'solumind-block';
+    blockElement.setAttribute('draggable', 'true');
+    blockElement.setAttribute('data-block-id', block.id);
+    
+    // Add block content
+    if (block.media) {
+      const mediaElem = document.createElement('div');
+      mediaElem.className = 'solumind-block-media';
+      mediaElem.innerHTML = block.media;
+      blockElement.appendChild(mediaElem);
+    }
+    
+    const labelElem = document.createElement('div');
+    labelElem.className = 'solumind-block-label';
+    labelElem.textContent = block.label;
+    blockElement.appendChild(labelElem);
+    
+    // Append to blocks container
+    blocksContainer.appendChild(blockElement);
+    
+    // Trigger event
+    trigger(EDITOR_EVENTS.BLOCK_ADDED, block);
+    
+    return blockElement;
+  }
+  
+  // Register a custom component
+  function registerCustomComponent(component: CustomComponent) {
+    customComponents.push(component);
+    
+    // Create component element in the components panel
+    const componentElement = document.createElement('div');
+    componentElement.className = 'solumind-component-item';
+    componentElement.setAttribute('draggable', 'true');
+    componentElement.setAttribute('data-component-id', component.id);
+    componentElement.textContent = component.label;
+    
+    // Add special badge for NextJS components
+    if (component.isNextJs) {
+      const badge = document.createElement('span');
+      badge.className = 'solumind-component-badge nextjs';
+      badge.textContent = 'Next';
+      componentElement.appendChild(badge);
+    }
+    
+    // Append to components container
+    componentsContainer.appendChild(componentElement);
+    
+    return componentElement;
+  }
+  
+  // Get the HTML content
+  function getHtml(): string {
+    return htmlContent;
+  }
+  
+  // Get the CSS content
+  function getCss(): string {
+    return cssContent;
+  }
+  
+  // Get the JS content
+  function getJs(): string {
+    return jsContent;
+  }
+  
+  // Set the components (HTML)
+  function setComponents(html: string): void {
+    htmlContent = html;
+    
+    // Update the canvas
+    const canvasBody = editorContainer.querySelector('.solumind-canvas-frame')?.contentWindow?.document.body;
+    if (canvasBody) {
+      canvasBody.innerHTML = html;
+    }
+    
+    // Trigger update event
+    trigger(EDITOR_EVENTS.UPDATE, getState());
+  }
+  
+  // Set the style (CSS)
+  function setStyle(css: string): void {
+    cssContent = css;
+    
+    // Update the canvas
+    const customCssElement = editorContainer.querySelector('.solumind-canvas-frame')?.contentWindow?.document.getElementById('solumind-custom-css');
+    if (customCssElement) {
+      customCssElement.textContent = css;
+    }
+    
+    // Trigger update event
+    trigger(EDITOR_EVENTS.UPDATE, getState());
+  }
+  
+  // Get the wrapper (main canvas body)
+  function getWrapper(): HTMLElement {
+    return editorContainer.querySelector('.solumind-canvas-frame')?.contentWindow?.document.body as HTMLElement;
+  }
+  
+  // Get the container
+  function getContainer(): HTMLElement {
+    return container;
+  }
+  
+  // Toggle preview mode
+  function togglePreview(): void {
+    previewMode = !previewMode;
+    
+    if (previewMode) {
+      editorContainer.classList.add('solumind-preview-mode');
+      // Hide all panels
+      const leftSidebar = editorContainer.querySelector('.solumind-editor-sidebar.left');
+      const rightSidebar = editorContainer.querySelector('.solumind-editor-sidebar.right');
+      const topBar = editorContainer.querySelector('.solumind-editor-topbar');
+      
+      if (leftSidebar) leftSidebar.classList.add('hidden');
+      if (rightSidebar) rightSidebar.classList.add('hidden');
+      if (topBar) topBar.classList.add('preview-mode');
+    } else {
+      editorContainer.classList.remove('solumind-preview-mode');
+      // Show all panels
+      const leftSidebar = editorContainer.querySelector('.solumind-editor-sidebar.left');
+      const rightSidebar = editorContainer.querySelector('.solumind-editor-sidebar.right');
+      const topBar = editorContainer.querySelector('.solumind-editor-topbar');
+      
+      if (leftSidebar) leftSidebar.classList.remove('hidden');
+      if (rightSidebar) rightSidebar.classList.remove('hidden');
+      if (topBar) topBar.classList.remove('preview-mode');
+    }
+    
+    trigger(EDITOR_EVENTS.PREVIEW_TOGGLED, previewMode);
+  }
+  
+  // Check if in preview mode
+  function isInPreviewMode(): boolean {
+    return previewMode;
+  }
+  
+  // Open code editor
+  function openCodeEditor(): void {
+    const codeEditor = editorContainer.querySelector('.solumind-code-editor');
+    if (codeEditor) {
+      codeEditor.classList.add('active');
+      
+      // Create code editor UI if it doesn't exist
+      if (!codeEditor.innerHTML) {
+        const codeEditorContent = document.createElement('div');
+        codeEditorContent.className = 'solumind-code-editor-content';
+        
+        const tabs = document.createElement('div');
+        tabs.className = 'solumind-code-editor-tabs';
+        
+        const htmlTab = document.createElement('button');
+        htmlTab.className = 'solumind-tab active';
+        htmlTab.textContent = 'HTML';
+        htmlTab.onclick = () => switchCodeEditorTab('html');
+        
+        const cssTab = document.createElement('button');
+        cssTab.className = 'solumind-tab';
+        cssTab.textContent = 'CSS';
+        cssTab.onclick = () => switchCodeEditorTab('css');
+        
+        const jsTab = document.createElement('button');
+        jsTab.className = 'solumind-tab';
+        jsTab.textContent = 'JS';
+        jsTab.onclick = () => switchCodeEditorTab('js');
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'solumind-code-editor-close';
+        closeBtn.textContent = '×';
+        closeBtn.onclick = closeCodeEditor;
+        
+        tabs.appendChild(htmlTab);
+        tabs.appendChild(cssTab);
+        tabs.appendChild(jsTab);
+        tabs.appendChild(closeBtn);
+        
+        const htmlEditor = document.createElement('textarea');
+        htmlEditor.className = 'solumind-code-editor-textarea active';
+        htmlEditor.setAttribute('data-mode', 'html');
+        htmlEditor.value = htmlContent;
+        
+        const cssEditor = document.createElement('textarea');
+        cssEditor.className = 'solumind-code-editor-textarea';
+        cssEditor.setAttribute('data-mode', 'css');
+        cssEditor.value = cssContent;
+        
+        const jsEditor = document.createElement('textarea');
+        jsEditor.className = 'solumind-code-editor-textarea';
+        jsEditor.setAttribute('data-mode', 'js');
+        jsEditor.value = jsContent;
+        
+        const applyBtn = document.createElement('button');
+        applyBtn.className = 'solumind-code-editor-apply';
+        applyBtn.textContent = 'Apply Changes';
+        applyBtn.onclick = applyCodeEditorChanges;
+        
+        codeEditorContent.appendChild(tabs);
+        codeEditorContent.appendChild(htmlEditor);
+        codeEditorContent.appendChild(cssEditor);
+        codeEditorContent.appendChild(jsEditor);
+        codeEditorContent.appendChild(applyBtn);
+        
+        codeEditor.appendChild(codeEditorContent);
+      }
+    }
+    
+    trigger(EDITOR_EVENTS.CODE_EDITOR_OPENED);
+  }
+  
+  // Switch code editor tab
+  function switchCodeEditorTab(mode: 'html' | 'css' | 'js'): void {
+    const tabs = editorContainer.querySelectorAll('.solumind-code-editor-tabs .solumind-tab');
+    const editors = editorContainer.querySelectorAll('.solumind-code-editor-textarea');
+    
+    // Deactivate all tabs and editors
+    tabs.forEach(tab => tab.classList.remove('active'));
+    editors.forEach(editor => editor.classList.remove('active'));
+    
+    // Activate the selected tab and editor
+    const activeTab = Array.from(tabs).find(tab => tab.textContent?.toLowerCase() === mode);
+    const activeEditor = Array.from(editors).find(editor => editor.getAttribute('data-mode') === mode);
+    
+    if (activeTab) activeTab.classList.add('active');
+    if (activeEditor) activeEditor.classList.add('active');
+  }
+  
+  // Apply code editor changes
+  function applyCodeEditorChanges(): void {
+    const htmlEditor = editorContainer.querySelector('.solumind-code-editor-textarea[data-mode="html"]') as HTMLTextAreaElement;
+    const cssEditor = editorContainer.querySelector('.solumind-code-editor-textarea[data-mode="css"]') as HTMLTextAreaElement;
+    const jsEditor = editorContainer.querySelector('.solumind-code-editor-textarea[data-mode="js"]') as HTMLTextAreaElement;
+    
+    if (htmlEditor) {
+      setComponents(htmlEditor.value);
+    }
+    
+    if (cssEditor) {
+      setStyle(cssEditor.value);
+    }
+    
+    if (jsEditor) {
+      jsContent = jsEditor.value;
+    }
+    
+    trigger(EDITOR_EVENTS.UPDATE, getState());
+  }
+  
+  // Close code editor
+  function closeCodeEditor(): void {
+    const codeEditor = editorContainer.querySelector('.solumind-code-editor');
+    if (codeEditor) {
+      codeEditor.classList.remove('active');
+    }
+    
+    trigger(EDITOR_EVENTS.CODE_EDITOR_CLOSED);
+  }
+  
+  // Register event listener
+  function on(event: string, callback: (...args: any[]) => void): void {
+    if (!eventListeners[event]) {
+      eventListeners[event] = [];
+    }
+    
+    eventListeners[event].push(callback);
+  }
+  
+  // Unregister event listener
+  function off(event: string, callback: (...args: any[]) => void): void {
+    if (eventListeners[event]) {
+      eventListeners[event] = eventListeners[event].filter(cb => cb !== callback);
+    }
+  }
+  
+  // Trigger event
+  function trigger(event: string, ...args: any[]): void {
+    if (eventListeners[event]) {
+      eventListeners[event].forEach(callback => callback(...args));
+    }
+  }
+  
+  // Get editor state
+  function getState(): EditorOutput {
+    return {
+      html: htmlContent,
+      css: cssContent,
+      js: jsContent,
+    };
+  }
+  
+  // Load editor state
+  function loadState(state: EditorOutput): void {
+    if (state.html !== undefined) {
+      setComponents(state.html);
+    }
+    
+    if (state.css !== undefined) {
+      setStyle(state.css);
+    }
+    
+    if (state.js !== undefined) {
+      jsContent = state.js;
+    }
+    
+    trigger(EDITOR_EVENTS.UPDATE, getState());
+  }
+  
+  // Destroy the editor
+  function destroy(): void {
+    // Remove all event listeners
+    for (const event in eventListeners) {
+      eventListeners[event] = [];
+    }
+    
+    // Remove DOM elements
+    if (container && editorContainer) {
+      container.removeChild(editorContainer);
+    }
+  }
+  
+  // Render the editor
+  function render(): void {
+    // Refresh the canvas
+    const canvasBody = editorContainer.querySelector('.solumind-canvas-frame')?.contentWindow?.document.body;
+    if (canvasBody) {
+      canvasBody.innerHTML = htmlContent;
+    }
+    
+    // Refresh the CSS
+    const customCssElement = editorContainer.querySelector('.solumind-canvas-frame')?.contentWindow?.document.getElementById('solumind-custom-css');
+    if (customCssElement) {
+      customCssElement.textContent = cssContent;
+    }
+  }
+  
+  // Create editor instance
+  const editorInstance: SolumindEditor = {
+    getHtml,
+    getCss,
+    getJs,
+    setComponents,
+    setStyle,
+    getWrapper,
+    getContainer,
+    addPanel: () => {}, // Will be implemented in panelsManager
+    addBlock: () => {}, // Will be implemented by extending registerCustomBlock
+    addComponent: () => {}, // Will be implemented by extending registerCustomComponent
+    on,
+    off,
+    trigger,
+    destroy,
+    render,
+    getState,
+    loadState,
+    togglePreview,
+    isInPreviewMode,
+    openCodeEditor,
+    closeCodeEditor,
+    registerCustomBlock,
+    registerCustomComponent,
+  };
+  
+  // Initialize and return the editor instance
+  return init();
+}
+
+export default createEditor;

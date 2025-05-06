@@ -1,0 +1,902 @@
+/**
+ * SolumindEditor CSS
+ */
+
+/* Base editor styles */
+.solumind-editor {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  color: #333;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+/* Editor layout */
+.solumind-editor-topbar {
+  background-color: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  z-index: 10;
+}
+
+.solumind-editor-topbar.preview-mode {
+  background-color: #f0f9ff;
+}
+
+.solumind-editor-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.solumind-editor-sidebar {
+  width: 280px;
+  background-color: #fff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.solumind-editor-sidebar.right {
+  border-right: none;
+  border-left: 1px solid #e5e7eb;
+}
+
+.solumind-editor-sidebar.hidden {
+  display: none;
+}
+
+.solumind-editor-canvas {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.solumind-canvas-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: #fff;
+  transition: width 0.3s ease;
+}
+
+.solumind-canvas-frame.device-tablet {
+  width: 768px;
+  height: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.solumind-canvas-frame.device-mobile {
+  width: 375px;
+  height: 100%;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Toolbar */
+.solumind-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
+.solumind-toolbar-button {
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #666;
+  cursor: pointer;
+  font-size: 16px;
+  height: 36px;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.solumind-toolbar-button:hover {
+  background-color: #f1f5f9;
+  color: #333;
+}
+
+.solumind-toolbar-button.active {
+  background-color: #e6f7ff;
+  color: #0284c7;
+}
+
+/* Blocks Panel */
+.solumind-blocks-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.solumind-block-category {
+  margin-bottom: 16px;
+}
+
+.solumind-block-category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.solumind-block-category-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.solumind-block-category-toggle {
+  color: #666;
+}
+
+.solumind-block-category-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  max-height: 1000px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.solumind-block-category-content.collapsed {
+  max-height: a0;
+  margin-top: 0;
+}
+
+.solumind-block {
+  width: calc(50% - 4px);
+  padding: 12px 8px;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  cursor: grab;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.solumind-block:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+.solumind-block-media {
+  font-size: 20px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.solumind-block-label {
+  font-size: 12px;
+  color: #475569;
+}
+
+/* Components Panel */
+.solumind-component-manager {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.solumind-component-manager-header {
+  margin-bottom: 16px;
+}
+
+.solumind-component-manager-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.solumind-component-search {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.solumind-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  padding-left: 32px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.solumind-search-input::placeholder {
+  color: #a3a3a3;
+}
+
+.solumind-component-search::before {
+  content: "🔍";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+}
+
+.solumind-component-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.solumind-component-category {
+  padding: 6px 12px;
+  background-color: #f1f5f9;
+  border-radius: 16px;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+.solumind-component-category:hover {
+  background-color: #e2e8f0;
+}
+
+.solumind-component-category.active {
+  background-color: #0284c7;
+  color: #fff;
+}
+
+.solumind-components-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.solumind-component-item {
+  padding: 10px 12px;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  cursor: grab;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.solumind-component-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.solumind-component-item.hidden {
+  display: none;
+}
+
+.solumind-component-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.solumind-component-badge.nextjs {
+  background-color: #000;
+  color: #fff;
+}
+
+.solumind-add-component-btn {
+  margin-top: 16px;
+  padding: 8px;
+  background-color: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  border-radius: 4px;
+  color: #475569;
+  cursor: pointer;
+  font-size: 14px;
+  width: 100%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.solumind-add-component-btn:hover {
+  background-color: #e2e8f0;
+  color: #334155;
+}
+
+/* Style Manager */
+.solumind-style-manager {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.solumind-style-manager-header {
+  margin-bottom: 16px;
+}
+
+.solumind-style-manager-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.solumind-style-empty-message {
+  padding: 20px;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.solumind-style-sectors {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.solumind-style-sector {
+  margin-bottom: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.solumind-style-sector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.solumind-style-sector-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.solumind-style-sector-toggle {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.solumind-style-sector-content {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.solumind-style-sector:not(.open) .solumind-style-sector-content {
+  display: none;
+}
+
+.solumind-style-property {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.solumind-style-property-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.solumind-input {
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 13px;
+  width: 100%;
+}
+
+.solumind-input:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 1px #93c5fd;
+}
+
+.solumind-input-group {
+  display: flex;
+  width: 100%;
+}
+
+.solumind-input-group .solumind-input {
+  flex: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.solumind-unit-select {
+  width: 60px;
+  padding: 6px 4px;
+  border: 1px solid #e5e7eb;
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+  background-color: #f8fafc;
+  cursor: pointer;
+}
+
+.solumind-color-picker-container {
+  display: flex;
+}
+
+.solumind-color-input {
+  width: 40px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px 0 0 4px;
+  cursor: pointer;
+}
+
+.solumind-color-text-input {
+  flex: 1;
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+}
+
+.solumind-select-input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 13px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.solumind-radio-group {
+  display: flex;
+  gap: 8px;
+}
+
+.solumind-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.solumind-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.solumind-slider-input {
+  flex: 1;
+}
+
+.solumind-slider-value {
+  width: 40px;
+  text-align: center;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.solumind-composite-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.solumind-composite-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.solumind-composite-item label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* Code Editor */
+.solumind-code-editor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.solumind-code-editor.active {
+  display: flex;
+}
+
+.solumind-code-editor-content {
+  width: 90%;
+  height: 90%;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.solumind-code-editor-tabs {
+  display: flex;
+  background-color: #252526;
+  border-bottom: 1px solid #333;
+  padding: 0 16px;
+}
+
+.solumind-tab {
+  padding: 12px 20px;
+  background-color: transparent;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 14px;
+  border-bottom: 2px solid transparent;
+}
+
+.solumind-tab.active {
+  color: #fff;
+  border-bottom-color: #0284c7;
+  background-color: #2d2d2d;
+}
+
+.solumind-tab:hover:not(.active) {
+  background-color: #2a2a2a;
+}
+
+.solumind-code-editor-close {
+  margin-left: auto;
+  background-color: transparent;
+  border: none;
+  color: #ccc;
+  font-size: 20px;
+  cursor: pointer;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.solumind-code-editor-close:hover {
+  color: #fff;
+  background-color: #c53030;
+}
+
+.solumind-code-editor-textarea {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  padding: 16px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none;
+  tab-size: 2;
+  display: none;
+}
+
+.solumind-code-editor-textarea.active {
+  display: block;
+}
+
+.solumind-code-editor-textarea:focus {
+  outline: none;
+}
+
+.solumind-monaco-editor {
+  flex: 1;
+  display: none;
+}
+
+.solumind-monaco-editor.active {
+  display: block;
+}
+
+.solumind-code-editor-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 16px;
+  background-color: #252526;
+}
+
+.solumind-code-editor-apply,
+.solumind-code-editor-format {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.solumind-code-editor-apply {
+  background-color: #0284c7;
+  color: #fff;
+}
+
+.solumind-code-editor-apply:hover {
+  background-color: #0369a1;
+}
+
+.solumind-code-editor-format {
+  background-color: #4b5563;
+  color: #fff;
+}
+
+.solumind-code-editor-format:hover {
+  background-color: #374151;
+}
+
+/* Drag and Drop */
+.solumind-drop-placeholder {
+  margin: 10px 0;
+  height: 20px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.solumind-drop-indicator {
+  background-color: #0ea5e9;
+  height: 2px;
+  width: 100%;
+  position: relative;
+}
+
+.solumind-drop-indicator::before,
+.solumind-drop-indicator::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #0ea5e9;
+  position: absolute;
+  top: -2px;
+}
+
+.solumind-drop-indicator::before {
+  left: 0;
+}
+
+.solumind-drop-indicator::after {
+  right: 0;
+}
+
+.solumind-dragging {
+  opacity: 0.5;
+}
+
+/* Modal */
+.solumind-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.solumind-modal {
+  width: 500px;
+  max-width: 90%;
+  max-height: 90%;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.solumind-modal-header {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.solumind-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.solumind-modal-close {
+  background-color: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.solumind-modal-body {
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.solumind-modal-footer {
+  padding: 16px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.solumind-component-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.solumind-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.solumind-form-field label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.solumind-form-field input[type="text"],
+.solumind-form-field select,
+.solumind-form-field textarea {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.solumind-form-field textarea {
+  min-height: 100px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+.solumind-form-field.checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.solumind-form-help {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 2px 0 0 0;
+}
+
+.solumind-modal-submit {
+  margin-top: 8px;
+  padding: 10px 16px;
+  background-color: #0284c7;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.solumind-modal-submit:hover {
+  background-color: #0369a1;
+}
+
+/* Notifications */
+.solumind-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 14px;
+  z-index: 2000;
+  opacity: 1;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.solumind-notification-success {
+  background-color: #10b981;
+}
+
+.solumind-notification-warning {
+  background-color: #f59e0b;
+}
+
+.solumind-notification-error {
+  background-color: #ef4444;
+}
+
+.solumind-notification-hide {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Preview Mode */
+.solumind-preview-mode .solumind-editor-canvas {
+  background-color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .solumind-editor-sidebar {
+    width: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .solumind-editor-content {
+    flex-direction: column;
+  }
+  
+  .solumind-editor-sidebar {
+    width: 100%;
+    height: 200px;
+  }
+  
+  .solumind-editor-sidebar.right {
+    height: 300px;
+    border-top: 1px solid #e5e7eb;
+    border-left: none;
+  }
+}

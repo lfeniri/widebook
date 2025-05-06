@@ -43,11 +43,10 @@ export async function POST(req: NextRequest) {
   } else if (currentContent) {
     // Mettre à jour le contenu actuel dans chaque nouvelle requête
     messages.push({ role: 'system', content: `Voici le contenu actuel du blog: ${JSON.stringify(currentContent)}` });
-  }
-  // Ajouter des instructions spécifiques pour le format de réponse
+  }  // Ajouter des instructions spécifiques pour le format de réponse
   messages.push({ 
     role: 'system', 
-    content: "Tu dois répondre UNIQUEMENT avec un objet JSON valide au format strict {\"html\":\"...\",\"css\":\"...\"}. Ce JSON ne doit contenir aucune explication ni commentaire additionnel. Si tu as besoin de plus d'informations, pose simplement ta question sans inclure de JSON."
+    content: "Tu dois répondre UNIQUEMENT avec un objet JSON valide au format strict {\"html\":\"...\",\"css\":\"...\",\"js\":\"...\"}. Le champ js est optionnel. Ce JSON ne doit contenir aucune explication ni commentaire additionnel. Si tu as besoin de plus d'informations, pose simplement ta question sans inclure de JSON."
   });
     messages.push({
     role: 'system',

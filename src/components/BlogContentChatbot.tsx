@@ -14,8 +14,8 @@ interface BlogContentChatbotProps {
   open: boolean;
   onClose: () => void;
   blogId: string;
-  currentContent: { html: string; css: string };
-  onContentUpdate: (content: { html: string; css: string }) => void;
+  currentContent: { html: string; css: string; js?: string };
+  onContentUpdate: (content: { html: string; css: string; js?: string }) => void;
   initialExpanded?: boolean;
   onExpandChange?: (isExpanded: boolean) => void;
   onNewMessage?: (count: number) => void;
