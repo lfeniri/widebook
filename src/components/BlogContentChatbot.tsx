@@ -195,11 +195,10 @@ export default function BlogContentChatbot({
       initialExpanded={initialExpanded}
       onExpandChange={onExpandChange}
       unreadCount={unreadCount}
-    >
-      <div className="flex flex-col h-full p-3">
+    >      <div className="flex flex-col h-full p-3">
         <div 
           ref={chatContainerRef}
-          className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-[180px] max-h-[300px]"
+          className="flex-1 overflow-y-auto mb-4 space-y-4"
         >{messages.length === 0 ? (
             <div className="text-center text-gray-500 mt-8 text-xs">
               Commencez à discuter avec l&apos;assistant pour modifier le contenu de votre blog.
@@ -239,9 +238,8 @@ export default function BlogContentChatbot({
                 </div>
               </div>
             </div>
-          )}
-        </div>
-          <form onSubmit={sendMessage} className="mt-auto border-t pt-3">
+          )}        </div>
+          <form onSubmit={sendMessage} className="mt-auto border-t pt-2 sticky bottom-0 bg-white">
           <div className="flex items-center">
             <input
               type="text"
@@ -250,7 +248,7 @@ export default function BlogContentChatbot({
               placeholder="Votre message..."
               className="flex-1 border rounded-l-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={isLoading}
-            />            <button
+            /><button
               type="submit"
               className={`bg-blue-600 text-white py-2 px-4 rounded-r-lg text-sm ${
                 isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'

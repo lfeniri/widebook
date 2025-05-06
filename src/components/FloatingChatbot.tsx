@@ -35,13 +35,10 @@ export default function FloatingChatbot({
     }
   }, [unreadCount, isExpanded]);
 
-  if (!open) return null;
-
-  return (    <div className={`fixed top-20 right-4 z-50 flex flex-col ${isExpanded ? 'h-[450px] w-[320px]' : 'h-14 w-14'} transition-all duration-300`}>
+  if (!open) return null;  return (    <div className={`fixed top-20 right-4 z-50 flex flex-col ${isExpanded ? 'h-[50vh] max-h-[calc(100vh-120px)] w-[380px]' : 'h-14 w-14'} transition-all duration-300`}>
       <div className={`relative z-10 flex flex-col bg-white ${isExpanded ? 'rounded-lg shadow-xl' : 'rounded-full shadow-lg'} overflow-hidden ${isExpanded ? 'h-full w-full' : 'h-14 w-14'}`}>
         {/* Minimized state - chat icon */}        {!isExpanded && (
-          <div className="relative">
-            <button 
+          <div className="relative">            <button 
               className="w-full h-full bg-blue-600 text-white flex items-center justify-center rounded-full hover:bg-blue-700"
               onClick={() => {
                 setIsExpanded(true);
@@ -50,8 +47,8 @@ export default function FloatingChatbot({
                 }
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
             </button>
             {localUnreadCount > 0 && (              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
@@ -83,10 +80,9 @@ export default function FloatingChatbot({
                   ×
                 </button>
               </div>
-            </div>
-            
+            </div>            
             {/* Content area */}
-            <div className="flex-1 flex flex-col overflow-auto">
+            <div className="flex-1 flex flex-col overflow-hidden">
               {children}
             </div>
           </>

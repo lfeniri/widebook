@@ -73,8 +73,7 @@ export default function EditBlogContentPage() {
           <div className="text-red-500">{error}</div>
         ) : blog ? (
           <>
-            <h1 className="text-2xl font-bold mb-4">Édition du contenu visuel du blog : {blog.title}</h1>
-            <div className="mb-4 flex gap-3">
+            <h1 className="text-2xl font-bold mb-4">Édition du contenu visuel du blog : {blog.title}</h1>            <div className="mb-4 flex gap-3">
               <button
                 className="bg-primary text-white px-4 py-2 rounded shadow"
                 style={{ backgroundColor: "#FF385C" }}
@@ -82,23 +81,8 @@ export default function EditBlogContentPage() {
                 disabled={saving}
               >
                 {saving ? "Sauvegarde..." : "Sauvegarder"}
-              </button>              <button
-                className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 relative"
-                onClick={() => setChatbotExpanded(true)}
-              >
-                <span className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9.06 9.06 0 0 0 8 15z"/>
-                  </svg>
-                  Assistant IA
-                </span>
-                {chatbotUnreadCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {chatbotUnreadCount > 9 ? '9+' : chatbotUnreadCount}
-                  </span>
-                )}
               </button>
-            </div>            
+            </div>
             <GrapesJSEditor
               value={editorContent || { html: '', css: '' }}
               onChange={setEditorContent}
