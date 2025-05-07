@@ -1,9 +1,11 @@
 "use client";
 import React, { useEffect, useRef } from "react";
-import "@/app/editor.css";
-import "@/app/monaco-editor.css";
+// Import directly from the library
+import { createSolumindEditor } from "../../lib/solumindEditorJs";
+import "../../lib/solumindEditorJs/styles/editor.css";
+import "../../lib/solumindEditorJs/monaco/monaco-editor.css";
 
-// Import the types from the lib directory
+// Define types for the editor
 interface SolumindEditor {
   getHtml: () => string;
   getCss: () => string;
@@ -33,41 +35,40 @@ const SolumindEditorComponent: React.FC<SolumindEditorProps> = ({
   config = {}
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
-  const editorInstance = useRef<SolumindEditor | null>(null);  useEffect(() => {
+  const editorInstance = useRef<SolumindEditor | null>(null);
+  
+  useEffect(() => {
     // Only initialize once
     if (editorRef.current && !editorInstance.current) {
-      // Import the editor
-      import('@/lib/editorCore').then(({ createSolumindEditor }) => {
-        const defaultConfig = {
-          container: editorRef.current,
-          height: height,
-          width: "auto",
-          components: value?.html || '',
-          style: value?.css || '',
-          script: value?.js || '',
-          canvas: {
-            styles: [
-              'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css'
-            ]
-          },
-          // Merge with user config
-          ...config
-        };
+      const defaultConfig = {
+        container: editorRef.current,
+        height: height,
+        width: "auto",
+        components: value?.html || '',
+        style: value?.css || '',
+        script: value?.js || '',
+        canvas: {
+          styles: [
+            'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css'
+          ]
+        },
+        // Merge with user config
+        ...config
+      };
 
-        // Initialize the editor
-        editorInstance.current = createSolumindEditor(defaultConfig);
+      // Initialize the editor
+      editorInstance.current = createSolumindEditor(defaultConfig);
 
-        // Setup onChange event handler
-        if (onChange) {
-          editorInstance.current.on('update', () => {
-            const html = editorInstance.current?.getHtml() || '';
-            const css = editorInstance.current?.getCss() || '';
-            const js = editorInstance.current?.getJs() || '';
-            
-            onChange({ html, css, js });
-          });
-        }
-      });
+      // Setup onChange event handler
+      if (onChange) {
+        editorInstance.current.on('update', () => {
+          const html = editorInstance.current?.getHtml() || '';
+          const css = editorInstance.current?.getCss() || '';
+          const js = editorInstance.current?.getJs() || '';
+          
+          onChange({ html, css, js });
+        });
+      }
     }
 
     // Cleanup on unmount
@@ -78,6 +79,7 @@ const SolumindEditorComponent: React.FC<SolumindEditorProps> = ({
       }
     };
   }, []);
+  
   // Handle external value changes
   useEffect(() => {
     if (editorInstance.current && value !== undefined) {
