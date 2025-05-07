@@ -2,13 +2,12 @@
  * SolumindEditor core implementation
  */
 
-// Import the Monaco loader utility
-import { loadMonaco, isMonacoEditorLoaded } from './monacoLoader';
-
 // Define types for window Monaco
-interface Window {
-  monaco: any;
-  require: any;
+declare global {
+  interface Window {
+    monaco: any;
+    require: any;
+  }
 }
 
 export function createSolumindEditor(config: any) {
@@ -33,6 +32,7 @@ export function createSolumindEditor(config: any) {
   // For auto-update and debouncing
   let autoUpdate = true;
   let updateTimeout: any = null;
+
   // Debounce update function
   const debounceUpdate = () => {
     if (updateTimeout) clearTimeout(updateTimeout);
@@ -41,13 +41,43 @@ export function createSolumindEditor(config: any) {
       triggerEvent('update');
     }, 1000);
   };
-  
+
+  // Load Monaco editor without using workers
+  const loadMonaco = () => {
+    if (typeof window !== 'undefined' && !window.monaco) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.43.0/min/vs/loader.js';
+      script.async = true;
+      script.onload = () => {
+        // Configure require
+        window.require.config({
+          paths: {
+            'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.43.0/min/vs'
+          }
+        });
+        
+        // Load Monaco editor
+        window.require(['vs/editor/editor.main'], function() {
+          // Monaco is now loaded
+          document.dispatchEvent(new Event('monaco-loaded'));
+        });
+      };
+      document.head.appendChild(script);
+    }
+  };
+
   // Initialize Monaco editor
   const initMonacoEditor = (container: HTMLElement, language: string, initialValue: string) => {
-    // Use our unified Monaco loader
-    loadMonaco(() => {
+    if (!window.monaco) {
+      loadMonaco();
+      const handleMonacoLoad = () => {
+        createMonacoInstance(container, language, initialValue);
+        document.removeEventListener('monaco-loaded', handleMonacoLoad);
+      };
+      document.addEventListener('monaco-loaded', handleMonacoLoad);
+    } else {
       createMonacoInstance(container, language, initialValue);
-    });
+    }
   };
 
   // Create Monaco editor instance

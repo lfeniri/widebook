@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import "@/app/editor.css";
+import "@/app/monaco-editor.css";
 
 // Import the types from the lib directory
 interface SolumindEditor {
@@ -32,11 +33,10 @@ const SolumindEditorComponent: React.FC<SolumindEditorProps> = ({
   config = {}
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
-  const editorInstance = useRef<SolumindEditor | null>(null);
-  useEffect(() => {
+  const editorInstance = useRef<SolumindEditor | null>(null);  useEffect(() => {
     // Only initialize once
     if (editorRef.current && !editorInstance.current) {
-      // Import the editor synchronously since we're using a simplified version
+      // Import the editor
       import('@/lib/editorCore').then(({ createSolumindEditor }) => {
         const defaultConfig = {
           container: editorRef.current,
