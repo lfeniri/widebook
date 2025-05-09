@@ -629,12 +629,12 @@
   outline: none;
 }
 
-.solumind-monaco-editor {
+.solumind-editor-container {
   flex: 1;
   display: none;
 }
 
-.solumind-monaco-editor.active {
+.solumind-editor-container.active {
   display: block;
 }
 

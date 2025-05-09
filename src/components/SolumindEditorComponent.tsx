@@ -1,18 +1,16 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 // Import directly from the library
-import { createSolumindEditor } from "../../lib/solumindEditorJs";
+import createSolumindEditor from "../../lib/solumindEditorJs";
 import "../../lib/solumindEditorJs/styles/editor.css";
-import "../../lib/solumindEditorJs/monaco/monaco-editor.css";
 
 // Define types for the editor
-interface SolumindEditor {
-  getHtml: () => string;
+interface SolumindEditor {  getHtml: () => string;
   getCss: () => string;
   getJs: () => string;
   setComponents: (components: string) => void;
   setStyle: (style: string) => void;
-  setJs?: (js: string) => void;
+  setJs: (js: string) => void;
   getWrapper: () => any;
   getContainer: () => HTMLElement;
   on: (event: string, callback: (...args: any[]) => void) => void;
@@ -36,10 +34,10 @@ const SolumindEditorComponent: React.FC<SolumindEditorProps> = ({
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const editorInstance = useRef<SolumindEditor | null>(null);
-  
-  useEffect(() => {
+    useEffect(() => {
     // Only initialize once
     if (editorRef.current && !editorInstance.current) {
+      console.log("Initializing SolumindEditor...");
       const defaultConfig = {
         container: editorRef.current,
         height: height,
@@ -54,20 +52,24 @@ const SolumindEditorComponent: React.FC<SolumindEditorProps> = ({
         },
         // Merge with user config
         ...config
-      };
+      };      // Initialize the editor
+      try {
+        console.log("Creating SolumindEditor with config:", defaultConfig);
+        editorInstance.current = createSolumindEditor(defaultConfig);
+        console.log("SolumindEditor created successfully:", editorInstance.current);
 
-      // Initialize the editor
-      editorInstance.current = createSolumindEditor(defaultConfig);
-
-      // Setup onChange event handler
-      if (onChange) {
-        editorInstance.current.on('update', () => {
-          const html = editorInstance.current?.getHtml() || '';
-          const css = editorInstance.current?.getCss() || '';
-          const js = editorInstance.current?.getJs() || '';
-          
-          onChange({ html, css, js });
-        });
+        // Setup onChange event handler
+        if (onChange) {
+          editorInstance.current.on('update', () => {
+            const html = editorInstance.current?.getHtml() || '';
+            const css = editorInstance.current?.getCss() || '';
+            const js = editorInstance.current?.getJs() || '';
+            
+            onChange({ html, css, js });
+          });
+        }
+      } catch (error) {
+        console.error("Error initializing SolumindEditor:", error);
       }
     }
 
@@ -151,7 +153,6 @@ const SolumindEditorComponent: React.FC<SolumindEditorProps> = ({
       }, 300);
     }, 3000);
   };
-
   return (
     <div 
       ref={editorRef} 
@@ -161,9 +162,10 @@ const SolumindEditorComponent: React.FC<SolumindEditorProps> = ({
         borderRadius: 8, 
         background: "#fff",
         position: "relative",
-        overflow: "hidden"
+        overflow: "hidden",
+        display: "block" // Force l'affichage de l'éditeur
       }} 
-      className="solumind-editor-container"
+      className="solumind-editor-container active" // Ajout de la classe active pour s'assurer que l'éditeur est visible
     />
   );
 };

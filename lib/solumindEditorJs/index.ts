@@ -6,7 +6,10 @@
 export { default as SolumindEditor } from './react/SolumindEditor';
 
 // Export core editor for direct usage
-export { default as createSolumindEditor } from './core/editor';
+export { createEditor } from './core/editor';
+
+// Export core editor as default for convenience
+export { createEditor as default } from './core/editor';
 
 // Export types
 export * from './types';
@@ -19,8 +22,8 @@ export * from './managers/dragDropManager';
 export * from './managers/panelsManager';
 export * from './managers/historyManager';
 
-// Export Monaco Editor integration
-export * from './monaco';
+// Export Lightweight Editor integration
+export * from './light-editor';
 
 // Export blocks
 export * from './blocks';

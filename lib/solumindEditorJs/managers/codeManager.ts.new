@@ -15,9 +15,6 @@ export function setupCodeEditor(
   
   // Store editor instances
   const editorInstances: Record<string, any> = {};
-  
-  // Flag to prevent update recursion
-  let isUpdatingFromEditor = false;
 
   // Initialize the code editor
   function initCodeEditor(): void {
@@ -92,7 +89,7 @@ export function setupCodeEditor(
     // Format button
     const formatBtn = document.createElement('button');
     formatBtn.className = 'solumind-code-editor-format';
-    formatBtn.textContent = '? Format Code';
+    formatBtn.textContent = '✨ Format Code';
     formatBtn.style.marginLeft = '10px';
     bottomControls.appendChild(formatBtn);
     
@@ -148,11 +145,6 @@ export function setupCodeEditor(
       value: initialContent,
       language: mode,
       onChange: (content) => {
-        // Prevent recursion by checking the flag
-        if (isUpdatingFromEditor) {
-          return;
-        }
-        
         // Auto-update content as user types
         switch (mode) {
           case 'html':
@@ -160,9 +152,7 @@ export function setupCodeEditor(
             break;
           case 'css':
             // Apply CSS changes immediately
-            isUpdatingFromEditor = true;
             editor.setStyle(content);
-            setTimeout(() => { isUpdatingFromEditor = false; }, 0);
             break;
           case 'js':
             // Don't execute JS automatically for safety
@@ -245,23 +235,15 @@ export function setupCodeEditor(
     const cssContent = editorInstances['css']?.getValue() || '';
     const jsContent = editorInstances['js']?.getValue() || '';
     
-    // Set flag to prevent recursion
-    isUpdatingFromEditor = true;
-    
-    try {
-      // Update editor content
-      editor.setComponents(htmlContent);
-      editor.setStyle(cssContent);
+    // Update editor content
+    editor.setComponents(htmlContent);
+    editor.setStyle(cssContent);
+    if (typeof editor.setJs === 'function') {
       editor.setJs(jsContent);
-      
-      // Show success message
-      showNotification('Changes applied successfully!', 'success');
-    } finally {
-      // Reset flag after a small delay to allow other operations to complete
-      setTimeout(() => {
-        isUpdatingFromEditor = false;
-      }, 0);
     }
+    
+    // Show success message
+    showNotification('Changes applied successfully!', 'success');
   }
   
   // Format the code in the active editor
@@ -342,30 +324,16 @@ export function setupCodeEditor(
   
   // Update editor contents when the editor content changes
   function updateEditorContents(): void {
-    // Prevent recursion
-    if (isUpdatingFromEditor) {
-      return;
+    if (editorInstances['html']?.setValue) {
+      editorInstances['html'].setValue(editor.getHtml());
     }
     
-    isUpdatingFromEditor = true;
+    if (editorInstances['css']?.setValue) {
+      editorInstances['css'].setValue(editor.getCss());
+    }
     
-    try {
-      if (editorInstances['html']?.setValue) {
-        editorInstances['html'].setValue(editor.getHtml());
-      }
-      
-      if (editorInstances['css']?.setValue) {
-        editorInstances['css'].setValue(editor.getCss());
-      }
-      
-      if (editorInstances['js']?.setValue) {
-        editorInstances['js'].setValue(editor.getJs());
-      }
-    } finally {
-      // Reset flag after all updates
-      setTimeout(() => {
-        isUpdatingFromEditor = false;
-      }, 0);
+    if (editorInstances['js']?.setValue) {
+      editorInstances['js'].setValue(editor.getJs());
     }
   }
   
@@ -385,9 +353,9 @@ export function setupCodeEditor(
   initCodeEditor();
 }
 
-// No need for Monaco type definition anymore
+// Add type definition for window
 declare global {
   interface Window {
-    // Global window types if needed
+    monaco?: any;
   }
 }

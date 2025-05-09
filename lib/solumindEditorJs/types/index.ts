@@ -9,6 +9,7 @@ export interface SolumindEditorConfig {
   width?: string;
   components?: string;
   style?: string;
+  script?: string;  // Ajout de la propriété script pour le contenu JavaScript
   plugins?: string[];
   pluginsOpts?: Record<string, any>;
   blockManager?: BlockManagerConfig;
@@ -127,6 +128,7 @@ export interface SolumindEditor {
   getJs: () => string;
   setComponents: (components: string) => void;
   setStyle: (style: string) => void;
+  setJs: (js: string) => void; // Required method for JavaScript code
   getWrapper: () => any;
   getContainer: () => HTMLElement;
   addPanel: (panel: Panel) => any;
