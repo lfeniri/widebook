@@ -44,20 +44,14 @@ export async function POST(req: NextRequest) {
     // Mettre à jour le contenu actuel dans chaque nouvelle requête
     messages.push({ role: 'system', content: `Voici le contenu actuel du blog: ${JSON.stringify(currentContent)}` });
   }  // Ajouter des instructions spécifiques pour le format de réponse
-  messages.push({ 
-    role: 'system', 
-    content: "Tu dois répondre UNIQUEMENT avec un objet JSON valide au format strict {\"html\":\"...\",\"css\":\"...\",\"js\":\"...\"}. Le champ js est optionnel. Ce JSON ne doit contenir aucune explication ni commentaire additionnel. Si tu as besoin de plus d'informations, pose simplement ta question sans inclure de JSON."
-  });
-    messages.push({
-    role: 'system',
-    content: "IMPORTANT: Ton JSON doit être valide selon la syntaxe JavaScript. Vérifie que tous les guillemets sont bien échappés et que la structure est correcte. Pas de balises ```json ou ``` autour du JSON."
-  });
-  
   messages.push({
     role: 'system',
     content: "CRITIQUE: Modifie UNIQUEMENT les parties du contenu impactées par la demande spécifique de l'utilisateur. Préserve intact tout le reste du contenu HTML et CSS. Ne modifie jamais la structure globale du document ou les éléments non liés à la requête actuelle. Ne fais jamais de modifications non demandées."
   });
-  
+  messages.push({ 
+    role: 'system', 
+    content: "Tu dois répondre UNIQUEMENT avec un objet JSON valide au format strict {\"html\":\"...\",\"css\":\"...\",\"js\":\"...\"}. Le champ js est optionnel. Ce JSON ne doit contenir aucune explication ni commentaire additionnel. Si tu as besoin de plus d'informations, pose simplement ta question sans inclure de JSON."
+  });
   // Ajouter le message utilisateur
   messages.push({ role: 'user', content: message });
   // Appel à l'API IA
@@ -77,13 +71,13 @@ export async function POST(req: NextRequest) {
       Authorization: `Bearer ${OPENROUTER_TOKEN}`,
     },
     body: JSON.stringify(body),
-  });  const data = await res.json();
-  
+  });  
+  const data = await res.json();
   // Extraire et traiter la réponse
   let aiResponse = "";
   let isJsonResponse = false;
   let parsedContent = null;
-    if (data && Array.isArray(data.choices) && data.choices.length > 0) {
+  if (data && Array.isArray(data.choices) && data.choices.length > 0) {
     const content = data.choices[0]?.message?.content || "";
     
     // Nettoyer la réponse de tout balisage markdown
@@ -93,11 +87,6 @@ export async function POST(req: NextRequest) {
       .replace(/```$/g, "")
       .trim();
     
-    // Simple vérification si ça ressemble à un JSON
-    const startsWithBrace = aiResponse.trimStart().startsWith('{');
-    
-    // Nous vérifions simplement si c'est un JSON valide sans modifications
-    if (startsWithBrace) {
       try {
         // Tenter de parser le JSON tel quel sans modifications
         parsedContent = JSON.parse(aiResponse);
@@ -113,11 +102,6 @@ export async function POST(req: NextRequest) {
         isJsonResponse = false;
         console.log("La réponse n'est pas un JSON valide");
       }
-    } else {
-      // Si ce n'est pas un JSON valide, c'est probablement une question ou une réponse textuelle
-      isJsonResponse = false;
-      console.log("Réponse identifiée comme texte (non-JSON)", aiResponse);
-    }
   }
     // Préparation du contenu pour le stockage et la réponse
   const contentToStore = aiResponse;
