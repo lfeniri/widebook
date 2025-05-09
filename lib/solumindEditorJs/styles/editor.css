@@ -2,6 +2,9 @@
  * SolumindEditor CSS
  */
 
+/* Import the responsive components styles - assurez-vous que cette ligne est au début du fichier */
+@import url('./components-responsive.css');
+
 /* Base editor styles */
 .solumind-editor {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
@@ -311,35 +314,6 @@
 .solumind-component-category.active {
   background-color: #0284c7;
   color: #fff;
-}
-
-.solumind-components-list {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.solumind-component-item {
-  padding: 10px 12px;
-  background-color: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  cursor: grab;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.solumind-component-item:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.solumind-component-item.hidden {
-  display: none;
 }
 
 .solumind-component-badge {
@@ -715,30 +689,40 @@
 
 /* Drag and Drop */
 .solumind-drop-placeholder {
-  margin: 10px 0;
-  height: 20px;
+  margin: 14px 0;
+  height: 24px;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: pulse 1.5s infinite ease-in-out;
 }
 
 .solumind-drop-indicator {
   background-color: #0ea5e9;
-  height: 2px;
+  height: 4px;
   width: 100%;
   position: relative;
+  border-radius: 2px;
+  box-shadow: 0 0 5px rgba(14, 165, 233, 0.4);
 }
 
 .solumind-drop-indicator::before,
 .solumind-drop-indicator::after {
   content: "";
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background-color: #0ea5e9;
   position: absolute;
-  top: -2px;
+  top: -3px;
+  box-shadow: 0 0 5px rgba(14, 165, 233, 0.4);
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; transform: scaleY(0.9); }
+  50% { opacity: 1; transform: scaleY(1.1); }
+  100% { opacity: 0.6; transform: scaleY(0.9); }
 }
 
 .solumind-drop-indicator::before {
@@ -751,6 +735,16 @@
 
 .solumind-dragging {
   opacity: 0.5;
+}
+
+.solumind-element-added {
+  animation: highlight-element 1s ease-in-out;
+}
+
+@keyframes highlight-element {
+  0% { box-shadow: 0 0 0 2px rgba(14, 165, 233, 0); }
+  30% { box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.6); }
+  100% { box-shadow: 0 0 0 2px rgba(14, 165, 233, 0); }
 }
 
 /* Modal */

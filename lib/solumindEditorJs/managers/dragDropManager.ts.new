@@ -1,0 +1,346 @@
+/**
+ * Drag and Drop Manager for SolumindEditor
+ */
+
+import { SolumindEditor } from '../types';
+
+export function setupDragAndDrop(
+  editorContainer: HTMLElement,
+  componentsContainer: HTMLElement,
+) {
+  let draggedElement: HTMLElement | null = null;
+  let draggedElementType: 'block' | 'component' | 'element' | null = null;
+  let draggedElementId: string | null = null;
+  let dropPlaceholder: HTMLElement | null = null;
+  
+  // Create drop placeholder
+  function createDropPlaceholder() {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'solumind-drop-placeholder';
+    placeholder.innerHTML = '<div class="solumind-drop-indicator"></div>';
+    return placeholder;
+  }
+  
+  // Get canvas document
+  function getCanvasDocument() {
+    const iframe = editorContainer.querySelector('.solumind-canvas-frame') as HTMLIFrameElement;
+    return iframe?.contentWindow?.document;
+  }
+  
+  // Get canvas body
+  function getCanvasBody() {
+    return getCanvasDocument()?.body;
+  }
+  
+  // Setup drag events for blocks and components
+  const setupDragEvents = () => {
+    // Handle draggable blocks
+    const blocks = editorContainer.querySelectorAll('.solumind-block');
+    blocks.forEach(block => {
+      block.addEventListener('dragstart', (e) => {
+        const dragEvent = e as DragEvent;
+        draggedElement = block as HTMLElement;
+        draggedElementType = 'block';
+        draggedElementId = block.getAttribute('data-block-id');
+        
+        // Create ghost image for dragging
+        const ghostElement = block.cloneNode(true) as HTMLElement;
+        ghostElement.style.opacity = '0.5';
+        ghostElement.style.position = 'absolute';
+        ghostElement.style.top = '-1000px';
+        document.body.appendChild(ghostElement);
+        
+        if (dragEvent.dataTransfer) {
+          dragEvent.dataTransfer.setDragImage(ghostElement, 0, 0);
+          dragEvent.dataTransfer.effectAllowed = 'copy';
+          dragEvent.dataTransfer.setData('text/plain', draggedElementId || '');
+        }
+        
+        setTimeout(() => {
+          document.body.removeChild(ghostElement);
+        }, 0);
+      });
+      
+      block.addEventListener('dragend', () => {
+        draggedElement = null;
+        draggedElementType = null;
+        draggedElementId = null;
+        
+        // Remove placeholder if exists
+        if (dropPlaceholder && dropPlaceholder.parentNode) {
+          dropPlaceholder.parentNode.removeChild(dropPlaceholder);
+          dropPlaceholder = null;
+        }
+      });
+    });
+    
+    // Handle draggable components
+    const components = componentsContainer.querySelectorAll('.solumind-component-item');
+    components.forEach(component => {
+      component.addEventListener('dragstart', (e) => {
+        const dragEvent = e as DragEvent;
+        draggedElement = component as HTMLElement;
+        draggedElementType = 'component';
+        draggedElementId = component.getAttribute('data-component-id');
+        
+        // Create ghost image for dragging
+        const ghostElement = component.cloneNode(true) as HTMLElement;
+        ghostElement.style.opacity = '0.5';
+        ghostElement.style.position = 'absolute';
+        ghostElement.style.top = '-1000px';
+        document.body.appendChild(ghostElement);
+        
+        if (dragEvent.dataTransfer) {
+          dragEvent.dataTransfer.setDragImage(ghostElement, 0, 0);
+          dragEvent.dataTransfer.effectAllowed = 'copy';
+          dragEvent.dataTransfer.setData('text/plain', draggedElementId || '');
+        }
+        
+        setTimeout(() => {
+          document.body.removeChild(ghostElement);
+        }, 0);
+      });
+      
+      component.addEventListener('dragend', () => {
+        draggedElement = null;
+        draggedElementType = null;
+        draggedElementId = null;
+        
+        // Remove placeholder if exists
+        if (dropPlaceholder && dropPlaceholder.parentNode) {
+          dropPlaceholder.parentNode.removeChild(dropPlaceholder);
+          dropPlaceholder = null;
+        }
+      });
+    });
+  };
+  
+  // Setup drop events for canvas
+  const setupDropEvents = () => {
+    const canvasDocument = getCanvasDocument();
+    if (!canvasDocument) return;
+    
+    const canvasBody = getCanvasBody();
+    if (!canvasBody) return;
+    
+    // Handle dragover on canvas
+    canvasDocument.addEventListener('dragover', (e) => {
+      const dragEvent = e as DragEvent;
+      dragEvent.preventDefault();
+      
+      if (!draggedElement) return;
+      
+      // Create drop placeholder if not exists
+      if (!dropPlaceholder) {
+        dropPlaceholder = createDropPlaceholder();
+      }
+      
+      // Get position and determine where to insert the placeholder
+      const mouseY = dragEvent.clientY;
+      let closestElement: Element | null = null;
+      let closestDistance = Infinity;
+      let insertBefore = true;
+      
+      // Find the closest element to the mouse pointer
+      Array.from(canvasBody.children).forEach((child) => {
+        const rect = child.getBoundingClientRect();
+        const childCenter = rect.top + rect.height / 2;
+        const distanceToTop = Math.abs(mouseY - rect.top);
+        const distanceToBottom = Math.abs(mouseY - rect.bottom);
+        
+        const minDistance = Math.min(distanceToTop, distanceToBottom);
+        
+        if (minDistance < closestDistance) {
+          closestDistance = minDistance;
+          closestElement = child;
+          insertBefore = mouseY < childCenter;
+        }
+      });
+      
+      // Position the placeholder
+      if (closestElement) {
+        if (insertBefore) {
+          canvasBody.insertBefore(dropPlaceholder, closestElement);
+        } else {
+          const nextSibling = closestElement.nextSibling;
+          if (nextSibling) {
+            canvasBody.insertBefore(dropPlaceholder, nextSibling);
+          } else {
+            canvasBody.appendChild(dropPlaceholder);
+          }
+        }
+      } else if (canvasBody.children.length === 0) {
+        // If no elements in canvas, just append
+        canvasBody.appendChild(dropPlaceholder);
+      }
+    });
+    
+    // Handle drop on canvas
+    canvasDocument.addEventListener('drop', (e) => {
+      const dragEvent = e as DragEvent;
+      dragEvent.preventDefault();
+      
+      if (!draggedElement || !draggedElementId) return;
+      
+      // Create the actual element based on the dragged element type
+      let newElement: HTMLElement | null = null;
+      
+      if (draggedElementType === 'block') {
+        // Find block content and create element
+        const blockContent = document.querySelector(`[data-block-id="${draggedElementId}"]`)?.getAttribute('data-content');
+        if (blockContent) {
+          // Create temporary element to parse HTML
+          const tempContainer = document.createElement('div');
+          tempContainer.innerHTML = blockContent;
+          newElement = tempContainer.firstElementChild as HTMLElement;
+        }
+      } else if (draggedElementType === 'component') {
+        // For custom components, check if we have JSON data
+        const componentJson = draggedElement.getAttribute('data-component-json');
+        if (componentJson) {
+          try {
+            // Parse component data
+            const componentData = JSON.parse(componentJson);
+            
+            // Create element from component content
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = componentData.component?.content || 
+              `<div class="solumind-component-placeholder">${draggedElement.textContent}</div>`;
+            
+            newElement = tempContainer.firstElementChild as HTMLElement;
+            newElement.className += ' solumind-custom-component';
+            newElement.setAttribute('data-component-id', draggedElementId);
+          } catch (e) {
+            // Fallback to simple placeholder
+            newElement = document.createElement('div');
+            newElement.className = 'solumind-custom-component';
+            newElement.setAttribute('data-component-id', draggedElementId);
+            newElement.innerHTML = `<div class="solumind-component-placeholder">${draggedElement.textContent}</div>`;
+          }
+        } else {
+          // Fallback to simple placeholder if no JSON data
+          newElement = document.createElement('div');
+          newElement.className = 'solumind-custom-component';
+          newElement.setAttribute('data-component-id', draggedElementId);
+          newElement.innerHTML = `<div class="solumind-component-placeholder">${draggedElement.textContent}</div>`;
+        }
+      }
+      
+      // Insert the new element where the placeholder is
+      if (newElement && dropPlaceholder && dropPlaceholder.parentNode) {
+        // Ensure we're replacing the placeholder
+        dropPlaceholder.parentNode.replaceChild(newElement, dropPlaceholder);
+        
+        // Make dropped elements draggable for reordering
+        makeElementDraggable(newElement);
+        
+        // Add selection behavior to the new element
+        addSelectionBehavior(newElement);
+        
+        // Clear the placeholder reference
+        dropPlaceholder = null;
+        
+        // Trigger an update event to notify that content has changed
+        const event = new CustomEvent('solumind:content:updated');
+        document.dispatchEvent(event);
+      }
+    });
+    
+    // Handle dragleave on canvas
+    canvasDocument.addEventListener('dragleave', (e) => {
+      const dragEvent = e as DragEvent;
+      // Check if actually leaving the canvas (not just moving between elements)
+      const rect = canvasDocument.body.getBoundingClientRect();
+      const x = dragEvent.clientX;
+      const y = dragEvent.clientY;
+      
+      if (x <= rect.left || x >= rect.right || y <= rect.top || y >= rect.bottom) {
+        // Remove placeholder if exists
+        if (dropPlaceholder && dropPlaceholder.parentNode) {
+          dropPlaceholder.parentNode.removeChild(dropPlaceholder);
+          dropPlaceholder = null;
+        }
+      }
+    });
+  };
+  
+  // Make an element draggable for reordering
+  function makeElementDraggable(element: HTMLElement) {
+    element.setAttribute('draggable', 'true');
+    
+    element.addEventListener('dragstart', (e) => {
+      const dragEvent = e as DragEvent;
+      draggedElement = element;
+      draggedElementType = 'element';
+      
+      // Style for dragging
+      element.classList.add('solumind-dragging');
+      
+      if (dragEvent.dataTransfer) {
+        dragEvent.dataTransfer.effectAllowed = 'move';
+      }
+      
+      // Create placeholder for the original position
+      dropPlaceholder = createDropPlaceholder();
+      element.parentNode?.replaceChild(dropPlaceholder, element);
+    });
+    
+    element.addEventListener('dragend', () => {
+      draggedElement = null;
+      draggedElementType = null;
+      
+      // Remove dragging style
+      element.classList.remove('solumind-dragging');
+      
+      // Remove placeholder if it still exists
+      if (dropPlaceholder && dropPlaceholder.parentNode) {
+        dropPlaceholder.parentNode.removeChild(dropPlaceholder);
+        dropPlaceholder = null;
+      }
+    });
+  }
+  
+  // Add selection behavior to elements for editing
+  function addSelectionBehavior(element: HTMLElement) {
+    element.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      // Remove selection from all elements
+      const canvasDocument = getCanvasDocument();
+      if (!canvasDocument) return;
+      
+      const selectedElements = canvasDocument.querySelectorAll('.solumind-component-selected');
+      selectedElements.forEach(el => el.classList.remove('solumind-component-selected'));
+      
+      // Add selection to this element
+      element.classList.add('solumind-component-selected');
+      
+      // Trigger selection event for the style panel
+      // This would be handled by the editor instance
+    });
+  }
+  
+  // Initialize drag and drop
+  const init = () => {
+    setupDragEvents();
+    setupDropEvents();
+    
+    // Re-initialize when DOM changes
+    const observer = new MutationObserver(() => {
+      setupDragEvents();
+    });
+    
+    observer.observe(editorContainer, { 
+      childList: true, 
+      subtree: true 
+    });
+    
+    // Return cleanup function
+    return () => {
+      observer.disconnect();
+    };
+  };
+  
+  // Initialize
+  return init();
+}

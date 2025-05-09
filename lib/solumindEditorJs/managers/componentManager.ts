@@ -364,12 +364,28 @@ export function setupComponentManager(
     
     // Store component data
     componentElement.setAttribute('data-component-json', JSON.stringify(component));
-    
-    // Add drag events
+      // Add drag events
     componentElement.addEventListener('dragstart', (e) => {
-      if (e.dataTransfer) {
-        e.dataTransfer.setData('text/plain', component.id);
-        e.dataTransfer.effectAllowed = 'copy';
+      const dragEvent = e as DragEvent;
+      if (dragEvent.dataTransfer) {
+        // Store component ID
+        dragEvent.dataTransfer.setData('text/plain', component.id);
+        // Store full component data as JSON
+        dragEvent.dataTransfer.setData('application/json', JSON.stringify(component));
+        dragEvent.dataTransfer.effectAllowed = 'copy';
+        
+        // Create ghost image for dragging
+        const ghostElement = componentElement.cloneNode(true) as HTMLElement;
+        ghostElement.style.opacity = '0.5';
+        ghostElement.style.position = 'absolute';
+        ghostElement.style.top = '-1000px';
+        document.body.appendChild(ghostElement);
+        
+        dragEvent.dataTransfer.setDragImage(ghostElement, 10, 10);
+        
+        setTimeout(() => {
+          document.body.removeChild(ghostElement);
+        }, 0);
       }
     });
     

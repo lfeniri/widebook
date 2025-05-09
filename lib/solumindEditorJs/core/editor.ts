@@ -542,11 +542,13 @@ export function createEditor(config: SolumindEditorConfig): SolumindEditor {
     codeEditorPanel = document.createElement('div');
     codeEditorPanel.className = 'solumind-code-editor';
     codeEditorPanel.style.display = 'none';
-    
-    // Create canvas iframe for component rendering
+      // Create canvas iframe for component rendering
     const canvasFrame = document.createElement('iframe');
     canvasFrame.className = 'solumind-canvas-frame';
     canvasFrame.setAttribute('seamless', 'seamless');
+    canvasFrame.setAttribute('allow', 'clipboard-write');
+    // Set allow-same-origin and allow-scripts to enable drag and drop
+    canvasFrame.setAttribute('sandbox', 'allow-same-origin allow-scripts');
     
     // Append elements to their containers
     leftSidebar.appendChild(blocksContainer);
@@ -571,7 +573,7 @@ export function createEditor(config: SolumindEditorConfig): SolumindEditor {
     if (canvasFrameElement.contentWindow) {
       const iframe = canvasFrameElement.contentWindow.document;
       iframe.open();
-      iframe.write(`
+      iframe.write(        `
         <!DOCTYPE html>
         <html>
           <head>
@@ -581,10 +583,66 @@ export function createEditor(config: SolumindEditorConfig): SolumindEditor {
               padding: 20px;
               box-sizing: border-box;
               min-height: 100vh;
-            }
-            /* Component placeholder styles */
+            }            /* Component placeholder styles */
             .solumind-component-selected {
               outline: 2px solid #4e9bff;
+            }
+            .solumind-element-added {
+              animation: highlight-element 1s ease-in-out;
+            }
+            .solumind-custom-component {
+              padding: 10px;
+              border: 2px dotted #e5e7eb;
+              margin: 10px 0;
+              min-height: 60px;
+            }
+            .solumind-drop-placeholder {
+              margin: 10px 0;
+              height: 20px;
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              animation: pulse 1.5s infinite ease-in-out;
+            }
+            
+            .solumind-drop-indicator {
+              background-color: #0ea5e9;
+              height: 3px;
+              width: 100%;
+              position: relative;
+              border-radius: 1.5px;
+            }
+            
+            .solumind-drop-indicator::before,
+            .solumind-drop-indicator::after {
+              content: "";
+              width: 8px;
+              height: 8px;
+              border-radius: 50%;
+              background-color: #0ea5e9;
+              position: absolute;
+              top: -2.5px;
+            }
+            
+            @keyframes pulse {
+              0% { opacity: 0.6; }
+              50% { opacity: 1; }
+              100% { opacity: 0.6; }
+            }
+            
+            .solumind-drop-indicator::before {
+              left: 0;
+            }
+            
+            .solumind-drop-indicator::after {
+              right: 0;
+            }
+            
+            @keyframes highlight-element {
+              0% { box-shadow: 0 0 0 2px rgba(14, 165, 233, 0); }
+              30% { box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.6); }
+              100% { box-shadow: 0 0 0 2px rgba(14, 165, 233, 0); }
             }
             /* Base CSS reset */
             * {
@@ -594,8 +652,95 @@ export function createEditor(config: SolumindEditorConfig): SolumindEditor {
           ${config.canvas?.styles?.map(style => `<link rel="stylesheet" href="${style}" />`).join('') || ''}
           <style id="solumind-custom-css"></style>
           ${config.canvas?.scripts?.map(script => `<script src="${script}"></script>`).join('') || ''}
-        </head>
-        <body id="solumind-canvas-body"></body>
+        </head>        <body id="solumind-canvas-body"></body>
+        <script>
+          // Enable drag and drop on the body with better event handling
+          document.body.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.dataTransfer.dropEffect = 'copy';
+            
+            // Notifier le parent pour la position du curseur
+            const rect = document.body.getBoundingClientRect();
+            const data = {
+              type: 'dragover',
+              x: e.clientX,
+              y: e.clientY,
+              bodyWidth: rect.width,
+              bodyHeight: rect.height
+            };
+            window.parent.postMessage(data, '*');
+            return false;
+          });
+          
+          document.body.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Notifier le parent avec les données complètes
+            const data = {
+              type: 'drop',
+              x: e.clientX,
+              y: e.clientY,
+              componentId: e.dataTransfer.getData('text/plain'),
+              componentData: e.dataTransfer.getData('application/json') || null
+            };
+            window.parent.postMessage(data, '*');
+            return false;
+          });
+          
+          // Également gérer les événements de dragleave
+          document.body.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            const rect = document.body.getBoundingClientRect();
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            // Vérifier si le curseur a vraiment quitté l'iframe
+            if (x <= rect.left || x >= rect.right || y <= rect.top || y >= rect.bottom) {
+              window.parent.postMessage({type: 'dragleave'}, '*');
+            }
+            return false;
+          });
+          
+          // Ajouter une fonction pour créer facilement des éléments à partir du parent
+          window.createElementFromHTML = function(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html.trim();
+            return div.firstChild;
+          };
+          
+          // Ajouter écouteur pour les messages venant du parent
+          window.addEventListener('message', function(e) {
+            if (e.data && e.data.action === 'insertElement') {
+              try {
+                const element = window.createElementFromHTML(e.data.html);
+                if (element && e.data.targetId) {
+                  const target = document.getElementById(e.data.targetId);
+                  if (target) {
+                    target.appendChild(element);
+                  } else {
+                    document.body.appendChild(element);
+                  }
+                } else {
+                  document.body.appendChild(element);
+                }
+                // Confirmer l'insertion
+                window.parent.postMessage({
+                  type: 'elementInserted',
+                  success: true,
+                  id: element.id
+                }, '*');
+              } catch (err) {
+                window.parent.postMessage({
+                  type: 'elementInserted',
+                  success: false,
+                  error: err.message
+                }, '*');
+              }
+            }
+          });
+        </script>
       </html>
     `);
       iframe.close();
