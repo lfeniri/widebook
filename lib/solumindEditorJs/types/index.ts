@@ -161,6 +161,7 @@ export const EDITOR_EVENTS = {
   PREVIEW_TOGGLED: 'preview:toggled',
   CODE_EDITOR_OPENED: 'code:editor:opened',
   CODE_EDITOR_CLOSED: 'code:editor:closed',
+  PANEL_SWITCHED: 'panel:switched',
   UNDO: 'undo',
   REDO: 'redo',
 };

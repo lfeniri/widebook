@@ -177,9 +177,54 @@ export function createEditor(config: SolumindEditorConfig): SolumindEditor {
     }
     
     trigger(EDITOR_EVENTS.UPDATE, getState());
+  }  // Function to switch between panels
+  function switchPanel(panelType: 'components' | 'styles' | 'none'): void {
+    // Get all panels
+    const componentsPanel = editorContainer.querySelector('[data-panel-type="components"]') as HTMLElement;
+    const stylesPanel = editorContainer.querySelector('[data-panel-type="styles"]') as HTMLElement;
+    const leftSidebar = editorContainer.querySelector('.solumind-editor-sidebar.left') as HTMLElement;
+    const navButtons = editorContainer.querySelectorAll('.solumind-panel-nav-btn');
+    const canvas = editorContainer.querySelector('.solumind-editor-canvas') as HTMLElement;
+    
+    // Reset all buttons
+    navButtons.forEach(btn => btn.classList.remove('active'));
+    
+    // Handle panel visibility
+    switch (panelType) {
+      case 'components':
+        if (componentsPanel) componentsPanel.style.display = 'block';
+        if (stylesPanel) stylesPanel.style.display = 'none';
+        if (leftSidebar) leftSidebar.classList.remove('hidden');
+        if (canvas) canvas.style.marginLeft = '0';
+        navButtons[0].classList.add('active');
+        break;
+      case 'styles':
+        if (componentsPanel) componentsPanel.style.display = 'none';
+        if (stylesPanel) stylesPanel.style.display = 'block';
+        if (leftSidebar) leftSidebar.classList.remove('hidden');
+        if (canvas) canvas.style.marginLeft = '0';
+        navButtons[1].classList.add('active');
+        break;
+      case 'none':
+        if (leftSidebar) leftSidebar.classList.add('hidden');
+        if (canvas) {
+          canvas.style.marginLeft = '0';
+          canvas.style.transition = 'margin-left 0.3s ease';
+        }
+        navButtons[2].classList.add('active');
+        break;
+    }
+    
+    // Si on est dans le mode "none", désactivons aussi le mode prévisualisation si actif
+    if (panelType === 'none' && previewMode) {
+      previewMode = false;
+      editorContainer.classList.remove('solumind-preview-mode');
+    }
+    
+    // Trigger event when panel changes
+    trigger(EDITOR_EVENTS.PANEL_SWITCHED, panelType);
   }
-  
-  // Toggle preview mode
+    // Toggle preview mode
   function togglePreview(): void {
     previewMode = !previewMode;
     
@@ -187,22 +232,36 @@ export function createEditor(config: SolumindEditorConfig): SolumindEditor {
       editorContainer.classList.add('solumind-preview-mode');
       // Hide all panels
       const leftSidebar = editorContainer.querySelector('.solumind-editor-sidebar.left');
-      const rightSidebar = editorContainer.querySelector('.solumind-editor-sidebar.right');
       const topBar = editorContainer.querySelector('.solumind-editor-topbar');
+      const navButtons = editorContainer.querySelectorAll('.solumind-panel-nav-btn');
       
       if (leftSidebar) leftSidebar.classList.add('hidden');
-      if (rightSidebar) rightSidebar.classList.add('hidden');
       if (topBar) topBar.classList.add('preview-mode');
+      
+      // Mettre à jour l'état des boutons de navigation
+      navButtons.forEach(btn => btn.classList.remove('active'));
+      // Activer le bouton de visualisation
+      navButtons[2]?.classList.add('active');
     } else {
       editorContainer.classList.remove('solumind-preview-mode');
-      // Show all panels
-      const leftSidebar = editorContainer.querySelector('.solumind-editor-sidebar.left');
-      const rightSidebar = editorContainer.querySelector('.solumind-editor-sidebar.right');
-      const topBar = editorContainer.querySelector('.solumind-editor-topbar');
       
+      // Restaurer l'état précédent des panels
+      const componentsPanel = editorContainer.querySelector('[data-panel-type="components"]') as HTMLElement;
+      const stylesPanel = editorContainer.querySelector('[data-panel-type="styles"]') as HTMLElement;
+      const leftSidebar = editorContainer.querySelector('.solumind-editor-sidebar.left');
+      const topBar = editorContainer.querySelector('.solumind-editor-topbar');
+      const navButtons = editorContainer.querySelectorAll('.solumind-panel-nav-btn');
+      
+      // Revenons au panel de composants par défaut
+      if (componentsPanel) componentsPanel.style.display = 'block';
+      if (stylesPanel) stylesPanel.style.display = 'none'; 
       if (leftSidebar) leftSidebar.classList.remove('hidden');
-      if (rightSidebar) rightSidebar.classList.remove('hidden');
       if (topBar) topBar.classList.remove('preview-mode');
+      
+      // Mettre à jour l'état des boutons de navigation
+      navButtons.forEach(btn => btn.classList.remove('active'));
+      // Activer le bouton de composants par défaut
+      navButtons[0]?.classList.add('active');
     }
     
     trigger(EDITOR_EVENTS.PREVIEW_TOGGLED, previewMode);
@@ -424,8 +483,7 @@ export function createEditor(config: SolumindEditorConfig): SolumindEditor {
     editorContainer.className = 'solumind-editor';
     editorContainer.style.height = config.height || '600px';
     editorContainer.style.width = config.width || 'auto';
-    
-    // Create main layout
+      // Create main layout
     const topBar = document.createElement('div');
     topBar.className = 'solumind-editor-topbar';
     
@@ -438,21 +496,48 @@ export function createEditor(config: SolumindEditorConfig): SolumindEditor {
     const canvas = document.createElement('div');
     canvas.className = 'solumind-editor-canvas';
     
-    const rightSidebar = document.createElement('div');
-    rightSidebar.className = 'solumind-editor-sidebar right';
-    
     // Create panels
     blocksContainer = document.createElement('div');
     blocksContainer.className = 'solumind-blocks-container';
+    blocksContainer.setAttribute('data-panel-type', 'components');
     
     componentsContainer = document.createElement('div');
     componentsContainer.className = 'solumind-components-container';
     
     stylesPanel = document.createElement('div');
     stylesPanel.className = 'solumind-styles-panel';
+    stylesPanel.setAttribute('data-panel-type', 'styles');
+    stylesPanel.style.display = 'none'; // Caché par défaut
     
     toolbarPanel = document.createElement('div');
     toolbarPanel.className = 'solumind-toolbar-panel';
+    
+    // Créer la barre de navigation des panels
+    const panelsNav = document.createElement('div');
+    panelsNav.className = 'solumind-panels-nav';
+    
+    // Bouton pour le panel de composants
+    const componentsBtn = document.createElement('button');
+    componentsBtn.className = 'solumind-panel-nav-btn active';
+    componentsBtn.innerHTML = '<i class="fas fa-th-large"></i> Composants';
+    componentsBtn.onclick = () => switchPanel('components');
+    
+    // Bouton pour le panel de styles
+    const stylesBtn = document.createElement('button');
+    stylesBtn.className = 'solumind-panel-nav-btn';
+    stylesBtn.innerHTML = '<i class="fas fa-paint-brush"></i> Styles';
+    stylesBtn.onclick = () => switchPanel('styles');
+    
+    // Bouton pour fermer les panels
+    const hideBtn = document.createElement('button');
+    hideBtn.className = 'solumind-panel-nav-btn';
+    hideBtn.innerHTML = '<i class="fas fa-eye"></i> Visualisation';
+    hideBtn.onclick = () => switchPanel('none');
+    
+    // Ajouter les boutons à la barre de navigation
+    panelsNav.appendChild(componentsBtn);
+    panelsNav.appendChild(stylesBtn);
+    panelsNav.appendChild(hideBtn);
     
     codeEditorPanel = document.createElement('div');
     codeEditorPanel.className = 'solumind-code-editor';
@@ -465,18 +550,16 @@ export function createEditor(config: SolumindEditorConfig): SolumindEditor {
     
     // Append elements to their containers
     leftSidebar.appendChild(blocksContainer);
+    leftSidebar.appendChild(stylesPanel);
     
     canvas.appendChild(canvasFrame);
     
-    rightSidebar.appendChild(stylesPanel);
-    
     topBar.appendChild(toolbarPanel);
+    topBar.appendChild(panelsNav);
     
     mainContent.appendChild(leftSidebar);
     mainContent.appendChild(canvas);
-    mainContent.appendChild(rightSidebar);
-    
-    editorContainer.appendChild(topBar);
+      editorContainer.appendChild(topBar);
     editorContainer.appendChild(mainContent);
     editorContainer.appendChild(codeEditorPanel);
     
