@@ -84,14 +84,6 @@ export default function EditBlogContentPage() {
                   {saving ? "Sauvegarde..." : "Sauvegarder"}
                 </button>
               </div>
-              <div>
-                <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow"
-                  onClick={() => router.push(`/admin/blogs/${blog.id}/edit-content-solumind`)}
-                >
-                  Essayer le nouvel éditeur Solumind
-                </button>
-              </div>
             </div>
             <GrapesJSEditor
               value={editorContent || { html: '', css: '' }}

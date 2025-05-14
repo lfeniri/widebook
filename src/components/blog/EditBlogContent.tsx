@@ -26,12 +26,6 @@ export default function EditBlogContent({ blog: initialBlog }: EditBlogContentPr
           >
             Ouvrir l'éditeur visuel (GrapesJS)
           </button>
-          <button
-            onClick={() => router.push(`/admin/blogs/${localBlog.id}/edit-content-solumind`)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow"
-          >
-            Nouvel éditeur Solumind
-          </button>
         </div>
       </div>
       <BlogForm blog={localBlog} />
