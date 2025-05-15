@@ -4,7 +4,6 @@ import React, { useEffect, useRef } from "react";
 import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
 import grapesjsCustomCode from "grapesjs-custom-code";
-import pluginAdvanceComponents from 'grapesjs-advance-components';
 import presetWebpage from 'grapesjs-preset-webpage';
 import pluginForms from 'grapesjs-plugin-forms';
 
@@ -49,7 +48,7 @@ const GrapesJSEditor: React.FC<GrapesJSEditorProps> = ({ value, onChange, height
             }
             ]
         },
-        plugins: [grapesjsCustomCode, pluginAdvanceComponents, presetWebpage, pluginForms, 'grapesjs-component-code-editor'],
+        plugins: [grapesjsCustomCode, presetWebpage, pluginForms, 'grapesjs-component-code-editor'],
         pluginsOpts: {
           grapesjsCustomCode: {}
         },
