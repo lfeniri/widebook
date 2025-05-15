@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
 import { useRouter } from 'next/navigation';
 import { Html } from "next/document";
+import { API_PATHS } from '@/lib/constants';
 
 
 export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; blog?: Blog | null }) {
@@ -24,8 +25,7 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
 
   useEffect(() => {
     const fetchCategories = async () => {
-      try {
-        const res = await fetch("/admin/api/categories");
+      try {        const res = await fetch(API_PATHS.ADMIN.CATEGORIES);
         if (!res.ok) {
           throw new Error("Failed to fetch categories");
         }
@@ -73,17 +73,14 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
       let imageUrl = image;
       if (imageFile) {
         const formData = new FormData();
-        formData.append('file', imageFile);
-        const uploadRes = await fetch('/admin/api/upload-image', {
+        formData.append('file', imageFile);        const uploadRes = await fetch(API_PATHS.ADMIN.UPLOAD_IMAGE, {
           method: 'POST',
           body: formData
         });
         const uploadData = await uploadRes.json();
         if (!uploadRes.ok) throw new Error(uploadData.error || 'Erreur upload image');
         imageUrl = uploadData.url;
-      }
-
-      const res = await fetchWithAuth(`/admin/api/blogs${blog ? `/${blog.id}` : ""}`, {
+      }      const res = await fetchWithAuth(`${API_PATHS.ADMIN.BLOGS.BASE}${blog ? `/${blog.id}` : ""}`, {
         method: blog ? "PUT" : "POST",
         headers: {
           'Content-Type': 'application/json'
