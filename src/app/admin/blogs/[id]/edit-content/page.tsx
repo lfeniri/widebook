@@ -15,7 +15,7 @@ export default function EditBlogContentPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);  const [editorContent, setEditorContent] = useState<{ html: string; css: string }>({ html: '', css: '' });
   const [chatbotExpanded, setChatbotExpanded] = useState(false);
-  const [chatbotUnreadCount, setChatbotUnreadCount] = useState(0);
+  const [, setChatbotUnreadCount] = useState(0);
 
   useEffect(() => {
     if (!id) return;

@@ -1,9 +1,7 @@
 "use client";
 import React from "react";
 import { useAuth } from "@/components/AuthContext";
-import AdminLogoutButton from "@/components/AdminLogoutButton";
-import ProfileMenu from "@/components/ProfileMenu";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 
 export default function Header() {
   const { user, loading } = useAuth();
@@ -14,9 +12,6 @@ export default function Header() {
   // Ensure consistent aria-labels and class names
   const navAriaLabel = "Navigation principale";
   const loginAriaLabel = "Se connecter";
-
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   return (
     <header className="sticky-header animate-fadeInUp">

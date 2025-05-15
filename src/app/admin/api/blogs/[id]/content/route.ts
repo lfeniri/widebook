@@ -16,6 +16,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     });
     return NextResponse.json(updated);
   } catch (e) {
+    console.log('Error updating blog content:', e);
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   }
 }
