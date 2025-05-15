@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Blog } from "@/types/blog";
 import GrapesJSEditor from "@/components/GrapesJSEditor";
 import BlogContentChatbot from "@/components/BlogContentChatbot";
+import { API_PATHS } from '@/lib/constants';
 
 export default function EditBlogContentPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function EditBlogContentPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/admin/api/blogs/${id}`);
+        const res = await fetch(API_PATHS.ADMIN.BLOGS.DETAIL(id));
         if (!res.ok) throw new Error("Blog introuvable");
         const data = await res.json();
         setBlog(data);
@@ -45,7 +46,7 @@ export default function EditBlogContentPage() {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(`/admin/api/blogs/${blog.id}/content`, {
+      const res = await fetch(API_PATHS.ADMIN.BLOGS.CONTENT(blog.id), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: data }),

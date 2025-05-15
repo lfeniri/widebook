@@ -5,6 +5,7 @@ import { Blog } from '@/types/blog';
 import EditBlogContent from '@/components/blog/EditBlogContent';
 import { notFound } from 'next/navigation';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import { API_PATHS } from '@/lib/constants';
 
 export default function BlogEditPageClient({ id }: { id: string }) {
   const [blog, setBlog] = useState<Blog | null>(null);
@@ -13,7 +14,7 @@ export default function BlogEditPageClient({ id }: { id: string }) {
   useEffect(() => {
     async function fetchBlog() {
       try {
-        const res = await fetchWithAuth(`/admin/api/blogs/${id}`);
+        const res = await fetchWithAuth(API_PATHS.ADMIN.BLOGS.DETAIL(id));
         if (!res.ok) {
           if (res.status === 404) {
             return notFound();

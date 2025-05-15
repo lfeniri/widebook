@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Blog } from '@/types/blog';
 import BlogForm from '@/components/BlogForm';
+import { API_PATHS } from '@/lib/constants';
 
 export default function EditBlogContent({ id }: { id: string }) {
   const [blog, setBlog] = useState<Blog | null>(null);
@@ -13,7 +14,7 @@ export default function EditBlogContent({ id }: { id: string }) {
     if (!id) return;
     
     async function fetchBlog() {
-      const response = await fetch(`/admin/api/blogs/${id}`);
+      const response = await fetch(API_PATHS.ADMIN.BLOGS.DETAIL(id));
       if (response.ok) {
         const data = await response.json();
         setBlog(data);

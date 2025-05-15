@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_PATHS } from '@/lib/constants';
 
 export default function ContentMigrationTool() {
   const [migrating, setMigrating] = useState(false);
@@ -17,10 +18,9 @@ export default function ContentMigrationTool() {
     
     try {
       addLog('Starting migration...');
-      
-      // First, get all blogs
+        // First, get all blogs
       addLog('Fetching all blogs...');
-      const blogsRes = await fetch('/admin/api/blogs');
+      const blogsRes = await fetch(API_PATHS.ADMIN.BLOGS.BASE);
       if (!blogsRes.ok) throw new Error('Failed to fetch blogs');
       const blogs = await blogsRes.json();
       addLog(`Found ${blogs.length} blogs`);
@@ -37,9 +37,8 @@ export default function ContentMigrationTool() {
               ...blog.content,
               js: ''
             };
-            
-            // Update the blog
-            const updateRes = await fetch(`/admin/api/blogs/${blog.id}/content`, {
+              // Update the blog
+            const updateRes = await fetch(API_PATHS.ADMIN.BLOGS.CONTENT(blog.id), {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ content: updatedContent }),
