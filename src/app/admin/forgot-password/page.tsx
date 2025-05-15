@@ -1,6 +1,6 @@
 "use client";
 
-import { supabase } from '@/lib/supabaseClient';
+import userAuthService from '@/services/userAuthService';
 import React, { useState } from 'react';
 
 export default function ForgotPasswordPage() {
@@ -14,9 +14,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setError(null);
     setMessage('');
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/admin/login`,
-    });
+    const { error } = await userAuthService.resetPassword(email);
     if (error) setError(error.message);
     else setMessage('Un email de réinitialisation a été envoyé. Merci de valider le lien dans votre boîte email.');
     setLoading(false);

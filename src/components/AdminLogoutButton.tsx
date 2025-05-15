@@ -1,6 +1,6 @@
 "use client";
 
-import { supabase } from '@/lib/supabaseClient';
+import userAuthService from '@/services/userAuthService';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
@@ -8,7 +8,7 @@ export default function AdminLogoutButton() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await userAuthService.signOut();
     router.push('/'); // Redirige vers la page d'accueil après déconnexion
   };
 

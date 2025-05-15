@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import userAuthService from '@/services/userAuthService';
 
 /**
  * Effectue un fetch en injectant automatiquement le token Supabase si l'utilisateur est connecté.
@@ -6,7 +6,7 @@ import { supabase } from './supabaseClient';
  * @param init options fetch
  */
 export async function fetchWithAuth(input: RequestInfo | URL, init: RequestInit = {}) {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { session } = await userAuthService.getSession();
   const accessToken = session?.access_token;
   const headers = new Headers(init.headers || {});
   if (accessToken) {

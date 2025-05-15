@@ -2,19 +2,19 @@
 import React, { useState, useEffect } from "react";
 import CommentForm from '@/components/CommentForm';
 import { Comment } from '@/types/blog';
-import { supabase } from '@/lib/supabaseClient';
 import { commentService } from '@/services';
+import userAuthService from '@/services/userAuthService';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function BlogComments({ blogId, comments: initialComments }: { blogId: string, comments: Comment[] }) {
   const [comments, setComments] = useState(initialComments);
   const [refresh, setRefresh] = useState(0);
-
   useEffect(() => {
     async function fetchUser() {
-      const { data: { session } } = await supabase.auth.getSession();
+      await userAuthService.getUserProfile();
     }
     fetchUser();
-    const { data: listener } = supabase.auth.onAuthStateChange(() => fetchUser());
+    const { data: listener } = userAuthService.onAuthStateChange(() => fetchUser());
     return () => { listener?.subscription.unsubscribe(); };
   }, []);
 

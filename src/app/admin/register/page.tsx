@@ -1,6 +1,6 @@
 "use client";
 
-import { supabase } from '@/lib/supabaseClient';
+import userAuthService from '@/services/userAuthService';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -17,7 +17,7 @@ export default function AdminRegisterPage() {
     setLoading(true);
     setError(null);
     setSuccess("");
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await userAuthService.signUp(email, password);
     if (error) setError(error.message);
     else setSuccess("Un email de confirmation a été envoyé. Merci de valider le lien dans votre boîte email.");
     setLoading(false);
@@ -26,7 +26,7 @@ export default function AdminRegisterPage() {
   const handleOAuth = async (provider: 'google' | 'facebook') => {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithOAuth({ provider });
+    const { error } = await userAuthService.signInWithOAuth(provider);
     if (error) setError(error.message);
     setLoading(false);
   };

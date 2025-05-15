@@ -1,5 +1,6 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import userAuthService from "@/services/userAuthService";
 import { supabase } from "@/lib/supabaseClient";
 
 export interface AuthUser {
@@ -24,18 +25,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchUser = async () => {
     setLoading(true);
     try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error("Error fetching session:", error);
-        setUser(null);
-      } else if (session?.user) {
-        const { first_name, last_name } = session.user.user_metadata || {};
-        const name = `${first_name || ""} ${last_name || ""}`.trim();
+      const profile = await userAuthService.getUserProfile();
+      if (profile) {
         setUser({
-          id: session.user.id,
-          name: name || session.user.email,
-          email: session.user.email ?? "",
-          role: session.user.role || undefined,
+          id: profile.userId || "",
+          name: profile.name,
+          email: profile.email,
+          role: profile.role,
         });
       } else {
         setUser(null);
@@ -47,11 +43,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     let isMounted = true;
     if (isMounted) fetchUser();
-    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+    const { data: listener } = userAuthService.onAuthStateChange(() => {
       if (isMounted) fetchUser();
     });
     return () => {

@@ -1,5 +1,6 @@
 "use client";
 
+import userAuthService from '@/services/userAuthService';
 import { supabase } from '@/lib/supabaseClient';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -25,7 +26,7 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError(null);
     setSuccess(null);
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await userAuthService.signInWithPassword(email, password);
     if (error) {
       setError(error.message);
     } else if (data?.user || data?.session) {
@@ -42,12 +43,7 @@ export default function AdminLoginPage() {
   const handleOAuth = async (provider: 'google' | 'facebook') => {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: typeof window !== 'undefined' ? window.location.origin + '/admin/login' : undefined,
-      },
-    });
+    const { error } = await userAuthService.signInWithOAuth(provider);
     if (error) setError(error.message);
     setLoading(false);
     await refreshUser();
@@ -58,20 +54,14 @@ export default function AdminLoginPage() {
     let timeoutId: NodeJS.Timeout;
 
     async function handleOAuthCallback() {
-      try {
-        // 1. Si on a un hash OAuth, on le traite
+      try {        // 1. Si on a un hash OAuth, on le traite
         if (typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
-          // @ts-ignore: _saveSession est interne mais nécessaire ici
-          await supabase.auth._saveSession(window.location.hash);
+          await userAuthService.saveOAuthSession(window.location.hash);
           window.location.replace(window.location.pathname); // recharge sans le hash
           return;
-        }
-        // 2. Sinon, on vérifie la session
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error('Erreur récupération session Supabase:', error);
-        }
-        console.log('Session Supabase:', session);
+        }// 2. Sinon, on vérifie la session
+        const { session } = await userAuthService.getSession();
+        console.log('Session:', session);
         if (!ignore) {
           if (session) {
             router.replace('/client');
@@ -83,11 +73,9 @@ export default function AdminLoginPage() {
         console.error('Erreur dans handleOAuthCallback:', e);
         setCheckingSession(false);
       }
-    }
-
-    handleOAuthCallback();
+    }    handleOAuthCallback();
     // On écoute les changements d'auth
-    const { data: listener } = supabase.auth.onAuthStateChange(() => handleOAuthCallback());
+    const { data: listener } = userAuthService.onAuthStateChange(() => handleOAuthCallback());
     // Timeout de secours pour ne pas rester bloqué
     timeoutId = setTimeout(() => {
       if (!ignore) setCheckingSession(false);

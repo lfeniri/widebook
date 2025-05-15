@@ -1,14 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-
-interface UserProfile {
-  email: string;
-  role: string;
-  name?: string;
-  phone?: string;
-}
+import userAuthService, { UserProfile } from "@/services/userAuthService";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -18,29 +11,21 @@ export default function ProfilePage() {
   useEffect(() => {
     async function fetchProfile() {
       setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
+      const profile = await userAuthService.getUserProfile();
+      
+      if (!profile) {
         router.replace("/admin/login");
         return;
       }
-      // Fetch additional profile info from a custom table if needed
-      let name = `${session.user?.user_metadata?.first_name} ${session.user?.user_metadata?.last_name}` || "";
-      let phone = session.user.phone || "";
-      let role = session.user.role || "";
-      setUser({
-        email: session.user.email ?? "",
-        role,
-        name,
-        phone,
-      });
+
+      setUser(profile);
       setLoading(false);
     }
     fetchProfile();
   }, [router]);
-
   const handleLogout = async () => {
     console.log("Début de la déconnexion...");
-    await supabase.auth.signOut();
+    await userAuthService.signOut();
     console.log("Déconnexion réussie");
     router.replace("/");
   };
