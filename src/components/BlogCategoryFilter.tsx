@@ -1,15 +1,23 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Category } from '@/types/blog';
+import { categoryService } from '@/services';
 
 export default function BlogCategoryFilter({ onChange }: { onChange: (categoryId: string) => void }) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selected, setSelected] = useState("");
 
   useEffect(() => {
-    fetch("/client/api/categories")
-      .then(res => res.json())
-      .then(data => setCategories(data));
+    const fetchCategories = async () => {
+      try {
+        const data = await categoryService.getClientCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    
+    fetchCategories();
   }, []);
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Category } from '@/types/blog';
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { categoryService } from "@/services";
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -11,9 +11,12 @@ export default function AdminCategoriesPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchCategories = async () => {
-    const res = await fetch("/admin/api/categories");
-    const data = await res.json();
-    setCategories(data);
+    try {
+      const data = await categoryService.getCategories();
+      setCategories(data);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
   };
 
   useEffect(() => {
@@ -24,18 +27,14 @@ export default function AdminCategoriesPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const res = await fetchWithAuth("/admin/api/categories", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, description }),
-    });
-    if (res.ok) {
+    try {
+      await categoryService.createCategory({ name, description });
       setName("");
       setDescription("");
       fetchCategories();
-    } else {
-      const data = await res.json();
-      setError(data.error || "Erreur lors de l'ajout.");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Erreur lors de l'ajout.";
+      setError(errorMessage);
     }
     setLoading(false);
   };
@@ -75,7 +74,7 @@ export default function AdminCategoriesPage() {
               <div className="font-semibold text-lg">{cat.name}</div>
               <div className="text-gray-500 text-sm">{cat.description}</div>
             </div>
-            <span className="text-xs text-gray-400">{cat.blogs.length} blogs</span>
+            <span className="text-xs text-gray-400">{cat.blogs?.length || 0} blogs</span>
           </li>
         ))}
       </ul>

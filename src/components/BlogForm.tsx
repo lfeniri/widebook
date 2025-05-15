@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { Category, Blog } from '@/types/blog';
 import { supabase } from '@/lib/supabaseClient';
-import { fetchWithAuth } from '@/lib/fetchWithAuth';
 import { useRouter } from 'next/navigation';
 import { Html } from "next/document";
 import { API_PATHS } from '@/lib/constants';
+import { blogService, categoryService, uploadService } from '@/services';
 
 
 export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; blog?: Blog | null }) {
@@ -25,11 +25,8 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
 
   useEffect(() => {
     const fetchCategories = async () => {
-      try {        const res = await fetch(API_PATHS.ADMIN.CATEGORIES);
-        if (!res.ok) {
-          throw new Error("Failed to fetch categories");
-        }
-        const data = await res.json();
+      try {
+        const data = await categoryService.getCategories();
         setCategories(data);
       } catch (err) {
         console.error("Error fetching categories:", err);
@@ -72,32 +69,27 @@ export default function BlogForm({ onCreated, blog }: { onCreated?: () => void; 
     try {
       let imageUrl = image;
       if (imageFile) {
-        const formData = new FormData();
-        formData.append('file', imageFile);        const uploadRes = await fetch(API_PATHS.ADMIN.UPLOAD_IMAGE, {
-          method: 'POST',
-          body: formData
-        });
-        const uploadData = await uploadRes.json();
-        if (!uploadRes.ok) throw new Error(uploadData.error || 'Erreur upload image');
-        imageUrl = uploadData.url;
-      }      const res = await fetchWithAuth(`${API_PATHS.ADMIN.BLOGS.BASE}${blog ? `/${blog.id}` : ""}`, {
-        method: blog ? "PUT" : "POST",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          title,
-          slug,
-          categoryId,
-          seoTitle,
-          seoDesc,
-          image: imageUrl,
-          content
-        })
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to save blog");
+        try {
+          imageUrl = await uploadService.uploadImage(imageFile);
+        } catch (uploadErr) {
+          throw new Error((uploadErr as Error).message || 'Erreur upload image');
+        }
+      }
+      
+      const blogData = {
+        title,
+        slug,
+        categoryId,
+        seoTitle,
+        seoDesc,
+        image: imageUrl,
+        content
+      };
+      
+      if (blog) {
+        await blogService.updateBlog(blog.id, blogData);
+      } else {
+        await blogService.createBlog(blogData);
       }
       
       setSuccess("Blog enregistré avec succès !");

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import BlogTable from '@/components/BlogTable';
 import { Blog } from '@/types/blog';
-import { API_PATHS } from '@/lib/constants';
+import { blogService } from '@/services';
 
 const PAGE_SIZE = 10;
 
@@ -15,12 +15,15 @@ export default function AdminBlogsPage() {
 
   const fetchBlogs = async (page = 1, search = "") => {
     setLoading(true);
-    const params = new URLSearchParams({ page: String(page), pageSize: String(PAGE_SIZE), search });
-    const res = await fetch(`${API_PATHS.ADMIN.BLOGS.BASE}?${params.toString()}`);
-    const data = await res.json();
-    setBlogs(data.blogs);
-    setPageCount(data.pageCount);
-    setLoading(false);
+    try {
+      const data = await blogService.getAdminBlogsPaginated(page, PAGE_SIZE, search);
+      setBlogs(data.blogs);
+      setPageCount(data.pageCount);
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

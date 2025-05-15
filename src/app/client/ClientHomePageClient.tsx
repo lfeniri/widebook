@@ -7,6 +7,7 @@ import { Blog } from '@/types/blog';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from 'next/navigation';
+import { blogService } from '@/services';
 
 
 export default function ClientHomePageClient() {
@@ -18,12 +19,14 @@ export default function ClientHomePageClient() {
 
   const fetchBlogs = async (catId = "") => {
     setLoading(true);
-    let url = '/client/api/blogs';
-    if (catId) url += `?categoryId=${catId}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    setBlogs(data);
-    setLoading(false);
+    try {
+      const data = await blogService.getClientBlogs(catId);
+      setBlogs(data);
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

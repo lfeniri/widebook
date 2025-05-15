@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Blog } from "@/types/blog";
 import GrapesJSEditor from "@/components/GrapesJSEditor";
 import BlogContentChatbot from "@/components/BlogContentChatbot";
-import { API_PATHS } from '@/lib/constants';
+import { blogService } from '@/services';
 
 export default function EditBlogContentPage() {
   const router = useRouter();
@@ -16,45 +16,40 @@ export default function EditBlogContentPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);  const [editorContent, setEditorContent] = useState<{ html: string; css: string }>({ html: '', css: '' });
   const [chatbotExpanded, setChatbotExpanded] = useState(false);
-  const [, setChatbotUnreadCount] = useState(0);
-
-  useEffect(() => {
+  const [, setChatbotUnreadCount] = useState(0);  useEffect(() => {
     if (!id) return;
     async function fetchBlog() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(API_PATHS.ADMIN.BLOGS.DETAIL(id));
-        if (!res.ok) throw new Error("Blog introuvable");
-        const data = await res.json();
+        const data = await blogService.getAdminBlogById(id);
         setBlog(data);
         // Initialiser le contenu de l'éditeur avec celui du blog
         if (data.content) {
-          setEditorContent(data.content);
+          // Assurer que l'objet content a les propriétés html et css (nécessaires pour le type)
+          const content = {
+            html: data.content.html || '',
+            css: data.content.css || ''
+          };
+          setEditorContent(content);
         }
       } catch (e: any) {
-        setError(e.message);
+        setError(e.message || "Blog introuvable");
       } finally {
         setLoading(false);
       }
     }
     fetchBlog();
   }, [id]);
-
   const handleSave = async (data: { html: string; css: string }) => {
     if (!blog) return;
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(API_PATHS.ADMIN.BLOGS.CONTENT(blog.id), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: data }),
-      });
-      if (!res.ok) throw new Error("Erreur lors de la sauvegarde");
+      await blogService.updateBlogContent(blog.id, data);
       router.refresh();
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message || "Erreur lors de la sauvegarde");
     } finally {
       setSaving(false);
     }

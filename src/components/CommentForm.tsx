@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { commentService } from "@/services";
 
 export default function CommentForm({ blogId, onCommented }: { blogId: string, onCommented: () => void }) {
   const [content, setContent] = useState("");
@@ -23,18 +23,9 @@ export default function CommentForm({ blogId, onCommented }: { blogId: string, o
     setLoading(true);
     setError(null);
     try {
-      const res = await fetchWithAuth("/client/api/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content, blogId }),
-      });
-      if (res.ok) {
-        setContent("");
-        onCommented();
-      } else {
-        const data = await res.json();
-        setError(data.error || "Erreur lors de l'envoi du commentaire.");
-      }
+      await commentService.addComment(blogId, content);
+      setContent("");
+      onCommented();
     } catch (err: any) {
       setError(err?.message || "Erreur inattendue lors de l'envoi du commentaire.");
     }

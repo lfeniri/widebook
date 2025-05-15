@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import FloatingChatbot from "./FloatingChatbot";
+import { chatMessageService } from "@/services";
 
 interface Message {
   id: string;
@@ -76,19 +77,14 @@ export default function BlogContentChatbot({
       setUnreadCount(0);
     }
   }, [initialExpanded]);
-
   const fetchMessages = async () => {
     try {
-      const response = await fetch(`/api/blogs/${blogId}/messages`);
-      if (response.ok) {
-        const data = await response.json();
-        setMessages(data.messages || []);
-      }
+      const messages = await chatMessageService.getBlogMessages(blogId);
+      setMessages(messages);
     } catch (error) {
       console.error("Erreur lors de la récupération des messages:", error);
     }
   };
-
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -106,23 +102,7 @@ export default function BlogContentChatbot({
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/openrouter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: newMessage,
-          blogId,
-          currentContent,
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Erreur réseau');
-      }
-      
-      const data = await response.json();
+      const data = await chatMessageService.sendMessage(newMessage, blogId, currentContent);
         // Gestion des réponses selon leur type
       console.log("Réponse de l'API:", data);
         if (data.isJsonContent && data.content) {

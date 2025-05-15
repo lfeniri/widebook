@@ -3,9 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Blog } from '@/types/blog';
 import { notFound, useRouter } from 'next/navigation';
-import { fetchWithAuth } from '@/lib/fetchWithAuth';
 import EditBlogContent from '@/components/blog/EditBlogContent';
-import { API_PATHS } from '@/lib/constants';
+import { blogService } from '@/services';
 
 export default function EditBlogPageClient({ id }: { id: string }) {
   const [blog, setBlog] = useState<Blog | null>(null);
@@ -15,17 +14,13 @@ export default function EditBlogPageClient({ id }: { id: string }) {
   useEffect(() => {
     async function fetchBlog() {
       try {
-        const res = await fetchWithAuth(API_PATHS.ADMIN.BLOGS.DETAIL(id));
-        if (!res.ok) {
-          if (res.status === 404) {
-            return notFound();
-          }
-          throw new Error('Failed to fetch blog');
-        }
-        const data = await res.json();
+        const data = await blogService.getAdminBlogById(id);
         setBlog(data);
       } catch (error) {
         console.error('Error loading blog:', error);
+        if ((error as Error).message === 'Blog not found') {
+          return notFound();
+        }
         router.push('/admin/blogs');
       } finally {
         setLoading(false);

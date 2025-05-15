@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import CommentForm from '@/components/CommentForm';
 import { Comment } from '@/types/blog';
 import { supabase } from '@/lib/supabaseClient';
+import { commentService } from '@/services';
 
 export default function BlogComments({ blogId, comments: initialComments }: { blogId: string, comments: Comment[] }) {
   const [comments, setComments] = useState(initialComments);
@@ -18,10 +19,11 @@ export default function BlogComments({ blogId, comments: initialComments }: { bl
   }, []);
 
   const fetchComments = async () => {
-    const res = await fetch(`/client/api/comments?blogId=${blogId}`);
-    if (res.ok) {
-      const data = await res.json();
+    try {
+      const data = await commentService.getBlogComments(blogId);
       setComments(data);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
     }
   };
 
