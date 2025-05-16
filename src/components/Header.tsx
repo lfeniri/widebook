@@ -138,8 +138,9 @@ export default function Header() {
                 <span className="sr-only">Profil</span>
               </motion.div>
             </>          ) : (
+            /*
             <motion.a
-              href="/login"
+              href="/admin/login"
               className="p-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full shadow-md flex items-center justify-center h-10 w-10 hover:shadow-lg"
               aria-label={loginAriaLabel}
               whileHover={{ 
@@ -154,6 +155,8 @@ export default function Header() {
               <UserCircleIcon className="h-6 w-6" />
               <span className="sr-only">Connexion</span>
             </motion.a>
+            */
+           <div></div>
           )}
         </motion.div>
       </div>

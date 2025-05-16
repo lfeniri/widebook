@@ -78,8 +78,11 @@ export default function ClientHomePageClient() {
                 size="lg"
                 variant="outline"
                 className="border-blue-600 text-blue-600 hover:bg-blue-50 rounded-full px-8"
+                onClick={() => {
+                  document.getElementById('newsletter')?.scrollIntoView({ behavior: 'smooth' });
+                }}
               >
-                <span>Comment ça marche</span>
+                <span>Restez informé</span>
               </Button>
             </div>
 
@@ -278,7 +281,7 @@ export default function ClientHomePageClient() {
       </section>
 
       {/* Section newsletter */}
-      <section className="max-w-5xl mx-auto px-4 mb-16">
+      <section id="newsletter" className="max-w-5xl mx-auto px-4 mb-16">
         <div className="relative bg-gradient-to-r from-blue-600 to-teal-500 rounded-2xl p-10 overflow-hidden shadow-xl">
           {/* Formes décoratives */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3" />
