@@ -7,7 +7,7 @@ export default function Home() {
       <section className="w-full flex flex-col md:flex-row items-center gap-10 mb-16 animate-fadeInUp">
         <div className="flex-1 flex flex-col gap-5">
           <h1 className="text-5xl md:text-6xl font-extrabold text-primary mb-2 leading-tight drop-shadow-sm">
-            Solumind&nbsp;: Le blog qui inspire et fait progresser
+            widebook&nbsp;: Le blog qui inspire et fait progresser
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-4 max-w-xl">
             Plateforme collaborative de partage d’articles, conseils et retours d’expérience pour tous les passionnés d’apprentissage et de développement personnel.
@@ -19,7 +19,7 @@ export default function Home() {
         </div>
       </section>
       <section className="w-full flex flex-col items-center gap-6 animate-fadeInUp">
-        <h2 className="text-2xl font-bold mb-2">Pourquoi Solumind&nbsp;?</h2>
+        <h2 className="text-2xl font-bold mb-2">Pourquoi widebook&nbsp;?</h2>
         <ul className="grid md:grid-cols-3 gap-8 w-full">
           <li className="card flex flex-col items-center gap-2 p-6 animate-fadeInUp">
             <Image src="/file.svg" alt="Qualité" width={48} height={48} />

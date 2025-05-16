@@ -99,15 +99,15 @@ export default function AdminLoginPage() {
     <>
       {/* SEO: Titre de la page */}
       <Head>
-        <title>Connexion Admin | Solumind</title>
-        <meta name="description" content="Connexion à l'espace administrateur du blog Solumind." />
+        <title>Connexion Admin | widebook</title>
+        <meta name="description" content="Connexion à l'espace administrateur du blog widebook." />
       </Head>
       <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2]">
         <div className="w-full max-w-md bg-white/90 rounded-2xl shadow-2xl p-8 flex flex-col gap-6 border border-slate-100">
           <div className="flex flex-col items-center gap-2">
             <Image 
               src="/logo.svg" 
-              alt="Logo Solumind" 
+              alt="Logo widebook" 
               width={48} 
               height={48} 
               priority 

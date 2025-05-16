@@ -43,7 +43,7 @@ export default function ClientHomePageClient() {
       <section className="relative w-full flex flex-col md:flex-row items-center gap-12 mb-16 px-4 pt-16 md:pt-24 animate-fadeInUp">
         <div className="flex-1 flex flex-col gap-6 z-10">
           <h1 className="text-5xl md:text-6xl font-black text-primary drop-shadow-xl leading-tight mb-4">
-            Bienvenue sur <span className="text-[#ff385c]">SoluMind</span><br />
+            Bienvenue sur <span className="text-[#ff385c]">widebook</span><br />
             <span className="text-gray-800">Le blog qui inspire et connecte</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mb-6">

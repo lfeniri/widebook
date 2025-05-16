@@ -1,9 +1,9 @@
 /**
- * SolumindEditor CSS
+ * widebookEditor CSS
  */
 
 /* Base editor styles */
-.solumind-editor {
+.widebook-editor {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   color: #333;
   background-color: #f8f9fa;
@@ -17,7 +17,7 @@
 }
 
 /* Fullscreen mode */
-.solumind-editor.solumind-fullscreen {
+.widebook-editor.widebook-fullscreen {
   position: fixed;
   top: 0;
   left: 0;
@@ -29,7 +29,7 @@
 }
 
 /* Editor layout */
-.solumind-editor-topbar {
+.widebook-editor-topbar {
   background-color: #fff;
   border-bottom: 1px solid #e5e7eb;
   padding: 8px 16px;
@@ -40,7 +40,7 @@
   z-index: 10;
 }
 
-.solumind-editor-content {
+.widebook-editor-content {
   display: flex;
   flex: 1;
   overflow: hidden;
@@ -48,14 +48,14 @@
 }
 
 /* Tab system */
-.solumind-tabs {
+.widebook-tabs {
   display: flex;
   align-items: center;
   gap: 2px;
   height: 100%;
 }
 
-.solumind-tab {
+.widebook-tab {
   background: none;
   border: none;
   cursor: pointer;
@@ -67,23 +67,23 @@
   transition: all 0.2s ease;
 }
 
-.solumind-tab:hover {
+.widebook-tab:hover {
   background-color: #f3f4f6;
 }
 
-.solumind-tab.active {
+.widebook-tab.active {
   background-color: #edf2f7;
   color: #0066cc;
 }
 
 /* Action buttons */
-.solumind-actions {
+.widebook-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.solumind-button {
+.widebook-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -99,26 +99,26 @@
   transition: all 0.2s ease;
 }
 
-.solumind-button svg {
+.widebook-button svg {
   width: 16px;
   height: 16px;
 }
 
-.solumind-button:hover {
+.widebook-button:hover {
   background-color: #e5e7eb;
 }
 
-.solumind-button.primary {
+.widebook-button.primary {
   background-color: #0066cc;
   color: white;
 }
 
-.solumind-button.primary:hover {
+.widebook-button.primary:hover {
   background-color: #0052a3;
 }
 
 /* Content panels */
-.solumind-panel {
+.widebook-panel {
   position: absolute;
   top: 0;
   left: 0;
@@ -129,12 +129,12 @@
   background-color: #fff;
 }
 
-.solumind-panel.active {
+.widebook-panel.active {
   display: block;
 }
 
 /* Code editors */
-.solumind-code-editor {
+.widebook-code-editor {
   width: 100%;
   height: 100%;
   padding: 16px;
@@ -152,7 +152,7 @@
 }
 
 /* Preview container */
-.solumind-preview-container {
+.widebook-preview-container {
   width: 100%;
   height: 100%;
   padding: 0;
@@ -160,7 +160,7 @@
   overflow: auto;
 }
 
-.solumind-preview-iframe {
+.widebook-preview-iframe {
   width: 100%;
   height: 100%;
   border: none;
@@ -168,7 +168,7 @@
 }
 
 /* Notifications */
-.solumind-notification {
+.widebook-notification {
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -180,21 +180,21 @@
   transition: opacity 300ms ease-out;
 }
 
-.solumind-notification-success {
+.widebook-notification-success {
   background-color: #4CAF50;
   color: white;
 }
 
-.solumind-notification-warning {
+.widebook-notification-warning {
   background-color: #FF9800;
   color: white;
 }
 
-.solumind-notification-error {
+.widebook-notification-error {
   background-color: #F44336;
   color: white;
 }
 
-.solumind-notification-hide {
+.widebook-notification-hide {
   opacity: 0;
 }
