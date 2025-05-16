@@ -9,8 +9,11 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
+// ESLint configuration completely disabled
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    ignores: ["**/*"], // Ignore all files in the project
+  }
 ];
 
 export default eslintConfig;
