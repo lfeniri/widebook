@@ -1,6 +1,6 @@
-// Cette page remplace l'ancienne page /client
-import ClientHomePageClient from '../client/ClientHomePageClient';
+// Page de redirection vers la page d'accueil
+import { redirect } from 'next/navigation';
 
 export default function BlogsPage() {
-  return <ClientHomePageClient />;
+  redirect('/');
 }

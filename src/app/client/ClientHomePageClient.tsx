@@ -47,7 +47,7 @@ export default function ClientHomePageClient() {
             <span className="text-gray-800">Le blog qui inspire et connecte</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mb-6">
-            Explorez des articles exclusifs, conseils d’experts et retours d’expérience pour progresser chaque jour.
+            Explorez des articles exclusifs, conseils d'experts et retours d'expérience pour progresser chaque jour.
           </p>
           <Button
             size="lg"

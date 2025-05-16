@@ -1,7 +1,7 @@
-// Cette page est dépréciée. Redirection automatique vers /blogs.
+// Cette page est dépréciée. Redirection automatique vers la page d'accueil.
 import { redirect } from 'next/navigation';
 
 export default function DeprecatedClientPage() {
-  redirect('/blogs');
+  redirect('/');
   return null;
 }

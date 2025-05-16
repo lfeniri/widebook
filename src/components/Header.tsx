@@ -26,11 +26,9 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
   // Navigation items for reuse
   const navItems = [
     { href: "/", label: "Accueil", ariaLabel: "Aller à l'accueil" },
-    { href: "/blogs", label: "Recherche", ariaLabel: "Rechercher des blogs" },
     ...(isAuth ? [{ href: "/admin/blogs", label: "Blogs", ariaLabel: "Afficher la liste des blogs administratifs" }] : [])
   ];
   
