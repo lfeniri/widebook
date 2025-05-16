@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
-import BlogPageClient from './BlogPageClient';
+import BlogPageServer from './BlogPageServer';
+import BlogInteractivity from './BlogInteractivity';
 import { prisma } from '@/lib/prisma';
+import { serializeFromPrisma } from './blogUtils';
 
 export default async function BlogPage({
   params,
@@ -10,15 +11,9 @@ export default async function BlogPage({
 }) {
   const { slug } = await params;
   if (!slug) notFound();
-
-  return (
-    <Suspense fallback={<div>Chargement...</div>}>
-      <BlogContent slug={slug} />
-    </Suspense>
-  );
-}
-
-async function BlogContent({ slug }: { slug: string }) {
+  
+  // Récupération des données du blog directement dans la page principale
+  // pour éviter un affichage "Chargement..." inutile
   const blog = await prisma.blog.findUnique({
     where: { slug },
     include: { 
@@ -33,6 +28,29 @@ async function BlogContent({ slug }: { slug: string }) {
   });
 
   if (!blog) notFound();
+  
+  // Sérialiser le blog pour un typage sûr
+  const serializedBlog = serializeFromPrisma(blog);
+  
+  // Récupérer le contenu du blog pour vérifier s'il y a du JavaScript
+  const blogContent = blog.content;
+  const hasJavaScript = typeof blogContent === 'object' && blogContent && 'js' in blogContent && 
+                      typeof blogContent.js === 'string' && blogContent.js.trim().length > 0;
 
-  return <BlogPageClient blog={JSON.parse(JSON.stringify(blog))} />;
+  return (
+    <>
+      {/* Rendu côté serveur du contenu principal du blog */}
+      <BlogPageServer blog={serializedBlog} />
+      
+      {/* Composant client uniquement pour le code JavaScript du blog */}
+      {hasJavaScript && blogContent.js && (
+        <BlogInteractivity 
+          js={blogContent.js} 
+          blogId={serializedBlog.id} 
+        />
+      )}
+    </>
+  );
 }
+
+
