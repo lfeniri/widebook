@@ -1,46 +1,32 @@
 // eslint-disable
 "use client";
 import React, { useEffect, useState } from "react";
-import BlogCategoryFilter from '@/components/BlogCategoryFilter';
-import Link from 'next/link';
-import { Blog } from '@/types/blog';
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useRouter } from 'next/navigation';
 import { blogService } from '@/services';
+import BlogsSection from '@/components/BlogsSection';
+import { Blog } from '@/types/blog';
 
 export default function ClientHomePageClient() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [categoryId, setCategoryId] = useState("");
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const [loadingBlogId, setLoadingBlogId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const fetchBlogs = async (catId = "") => {
-    setLoading(true);
-    try {
-      const data = await blogService.getClientBlogs(catId);
-      setBlogs(data);
-    } catch (error) {
-      console.error("Error fetching blogs:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchBlogs(categoryId);
-  }, [categoryId]);
-
-  useEffect(() => {
-    setLoadingBlogId(null); // Reset loading state on component mount
-  }, [router]);
-  // Filtrage des blogs en fonction de la recherche
-  const filteredBlogs = blogs.filter(blog => 
-    blog.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    (blog.content?.html && blog.content.html.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+    const fetchBlogs = async () => {
+      setLoading(true);
+      try {
+        const data = await blogService.getClientBlogs("");
+        setBlogs(data);
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchBlogs();
+  }, []);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-24">
@@ -113,7 +99,9 @@ export default function ClientHomePageClient() {
             </div>
           </div>
         </div>
-      </section>      {/* Section caractéristiques */}
+      </section>
+      
+      {/* Section caractéristiques */}
       <section className="w-full px-4 mb-24">
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-16">Comment <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">widebook</span> vous accompagne</h2>
         
@@ -140,151 +128,21 @@ export default function ClientHomePageClient() {
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-3">Bonnes affaires</h3>
             <p className="text-gray-600">Découvrez les meilleures offres et opportunités dans différents secteurs d'activité.</p>
-          </div>      </div>
-      </section>
-
-      {/* Section Blogs avec cartes redessinées */}
-      <section className="w-full px-4 mb-20" id="blogs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-12">
-          <h2 className="text-4xl font-bold text-gray-900">
-            Explorez nos <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">articles</span>
-          </h2>
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
-            {/* Barre de recherche */}
-            <div className="relative">
-              <input 
-                type="text" 
-                placeholder="Rechercher un article..." 
-                className="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <BlogCategoryFilter onChange={setCategoryId} />
-          </div>
+          </div>      
         </div>
+      </section>      {/* Section Blogs avec cartes redessinées - remplacée par le composant BlogsSection */}
+      <BlogsSection initialBlogs={loading ? [] : blogs} />
 
-        {loading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="h-48 bg-gray-200 animate-pulse" />
-                <div className="p-6 space-y-4">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                  <div className="h-8 bg-gray-200 rounded animate-pulse" />
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                    <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : filteredBlogs.length === 0 ? (
-          <div className="text-center py-16">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 className="text-xl font-medium text-gray-700 mb-2">Aucun blog trouvé</h3>
-            <p className="text-gray-500">Essayez de modifier vos critères de recherche ou de navigation.</p>
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredBlogs.map((blog, i) => (
-              <div
-                key={blog.id}
-                className="group bg-white rounded-xl shadow-lg overflow-hidden border border-transparent hover:border-blue-400 transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
-                style={{ animationDelay: `${i * 100}ms` }}
-              >                <Link href={`/client/blog/${blog.slug}`} className="block h-48 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  {blog.image ? (
-                    <img
-                      src={blog.image}
-                      alt={blog.title}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                      </svg>
-                    </div>
-                  )}
-                </Link>
-                <div className="flex-1 flex flex-col p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    {blog.category?.name && (
-                      <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium px-3 py-1 rounded-full">
-                        {blog.category.name}
-                      </Badge>
-                    )}
-                    <span className="text-xs text-gray-400 ml-auto" suppressHydrationWarning>
-                      {new Date(blog.createdAt).toLocaleDateString("fr-FR", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric"
-                      })}
-                    </span>
-                  </div>
-                    <Link href={`/client/blog/${blog.slug}`}
-                    className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-3 line-clamp-2">
-                    {blog.title}
-                  </Link>
-  
-                  
-                  <div className="mt-auto pt-4 flex items-center">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold text-sm">
-                        {blog.author?.email ? blog.author.email.charAt(0).toUpperCase() : 'A'}
-                      </div>
-                      <span className="text-sm text-gray-600 ml-2 line-clamp-1">
-                        {blog.author?.email?.split('@')[0] || 'Auteur inconnu'}
-                      </span>
-                    </div>
-                    
-                    <Button
-                      size="sm"
-                      className="ml-auto rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow min-w-[100px]"
-                      disabled={loadingBlogId === blog.id}
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        setLoadingBlogId(blog.id);
-                        router.push(`/client/blog/${blog.slug}`);
-                      }}
-                    >
-                      {loadingBlogId === blog.id ? (
-                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                        </svg>
-                      ) : (
-                        <>
-                          <span>Lire l'article</span>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Section newsletter */}      <section id="newsletter" className="w-full px-4 mb-16">
+      {/* Section newsletter */}      
+      <section id="newsletter" className="w-full px-4 mb-16">
         <div className="relative bg-gradient-to-r from-blue-600 to-teal-500 rounded-2xl p-10 overflow-hidden shadow-xl">
           {/* Formes décoratives */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3" />
           
           <div className="relative z-10 text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Restez informé</h2>            <p className="text-blue-50 mb-8 w-full">
+            <h2 className="text-3xl font-bold text-white mb-4">Restez informé</h2>            
+            <p className="text-blue-50 mb-8 w-full">
               Recevez nos derniers articles et conseils directement dans votre boîte mail. 
               Inscrivez-vous à notre newsletter pour ne rien manquer !
             </p>
@@ -308,23 +166,6 @@ export default function ClientHomePageClient() {
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-16">Ce que disent nos lecteurs</h2>
         
         <div className="grid md:grid-cols-3 gap-8">
-          {/*
-            {
-              name: "Marie Dupont",
-              role: "Entrepreneur",
-              quote: "Widebook m'a aidé à rester à jour avec les dernières tendances dans mon domaine. Les conseils sont précieux et m'ont permis d'améliorer mon business."
-            },
-            {
-              name: "Thomas Martin",
-              role: "Expert Marketing",
-              quote: "Une source d'information fiable et des articles de qualité. Je consulte Widebook quotidiennement pour m'informer et me former continuellement."
-            },
-            {
-              name: "Sophie Legrand",
-              role: "Étudiante",
-              quote: "Les articles sont clairs et accessibles. J'ai trouvé énormément de conseils pratiques qui m'ont aidé dans mes études et mes projets personnels."
-            }
-          */}
           {Array(3).fill(0).map((_, i) => (
             <div key={i} className="bg-white p-6 rounded-xl shadow-md">
               <div className="flex items-center gap-2 mb-2">
