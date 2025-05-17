@@ -1,5 +1,7 @@
 import React from 'react';
 import { Blog } from '@/types/blog';
+import { cn } from '@/lib/utils';
+import BlogHeader from './BlogHeader';
 
 interface BlogPageServerProps {
   blog: Blog;
@@ -13,7 +15,10 @@ const BlogPageServer: React.FC<BlogPageServerProps> = ({ blog }) => {
   const contentJs = typeof content === 'object' && content.js || '';
   
   return (
-    <article className="w-full">
+    <article className="w-full relative">
+      {/* Blog Header Component */}
+      <BlogHeader blog={blog} />
+      
       {/* Contenu du blog */}
       {content && (
         <div className="blog-content-container w-full">
