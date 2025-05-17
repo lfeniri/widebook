@@ -1,0 +1,37 @@
+{
+  "name": "Widebook",
+  "short_name": "Widebook",
+  "description": "Votre plateforme de blogs et de contenu",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3498db",
+  "icons": [
+    {
+      "src": "/favicons/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicons/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "orientation": "portrait",
+  "lang": "fr-FR",
+  "categories": [
+    "books",
+    "education",
+    "news"
+  ],
+  "screenshots": [
+    {
+      "src": "/images/seo/screenshot-1.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg"
+    }
+  ]
+}
