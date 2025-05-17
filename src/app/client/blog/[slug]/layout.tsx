@@ -19,9 +19,8 @@ export default async function Layout({ children, params }: LayoutProps) {
   if (!blog) {
     notFound();
   }
-
   return (
-    <div>
+    <div className="w-full">
       {children}
     </div>
   );

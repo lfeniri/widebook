@@ -36,7 +36,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-[#f8fafc] to-[#e0e7ef] min-h-screen flex flex-col`}>
         <AuthProvider>
           <Header />
-          <main className="flex-1 w-full max-w-6xl mx-auto px-4 animate-fadeInUp">
+          <main className="flex-1 w-full px-4 animate-fadeInUp">
             {children}
           </main>
           <Footer />

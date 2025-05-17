@@ -38,9 +38,8 @@ export default function AdminCategoriesPage() {
     }
     setLoading(false);
   };
-
   return (
-    <div className="max-w-2xl mx-auto py-8 animate-fadeInUp">
+    <div className="w-full py-8 animate-fadeInUp">
       <h2 className="text-2xl font-bold mb-4">Catégories</h2>
       <form onSubmit={handleAddCategory} className="flex flex-col md:flex-row gap-2 mb-6">
         <input

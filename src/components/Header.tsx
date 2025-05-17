@@ -33,12 +33,11 @@ export default function Header() {
   ];
   
   return (
-    <header 
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+    <header      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         scrolled ? "bg-white/95 backdrop-blur-sm shadow-md py-2" : "bg-white py-4"
       }`}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6">
+      <div className="w-full flex items-center justify-between px-6">
         <motion.div 
           className="flex items-center gap-3"
           initial={{ opacity: 0, y: -10 }}

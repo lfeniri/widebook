@@ -29,9 +29,8 @@ export default function AdminBlogsPage() {
   useEffect(() => {
     fetchBlogs(page, search);
   }, [page, search]);
-
   return (
-    <div className="max-w-6xl mx-auto py-8 animate-fadeInUp">
+    <div className="w-full py-8 animate-fadeInUp">
       <h2 className="text-2xl font-bold mb-6">Gestion des blogs</h2>
       <BlogTable
         blogs={blogs}

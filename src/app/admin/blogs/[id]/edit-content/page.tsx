@@ -59,10 +59,9 @@ export default function EditBlogContentPage() {
   const handleContentUpdate = (newContent: { html: string; css: string }) => {
     setEditorContent(newContent);
   };
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-5xl mx-auto py-8 px-4">
+      <div className="w-full py-8 px-4">
         {loading ? (
           <div>Chargement...</div>
         ) : error ? (

@@ -51,7 +51,7 @@ export default function ClientHomePageClient() {
         <div className="absolute bottom-0 right-1/3 w-[400px] h-[400px] bg-emerald-400/10 rounded-full blur-3xl" />
         <div className="absolute -top-24 -right-24 w-[300px] h-[300px] bg-purple-400/10 rounded-full blur-3xl" />
 
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 z-10 relative">
+        <div className="w-full flex flex-col md:flex-row items-center gap-12 z-10 relative">
           <div className="flex-1 flex flex-col gap-8 z-10">
             <div className="inline-flex items-center mb-4 px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
               <span className="flex h-2 w-2 mr-2 rounded-full bg-blue-600"></span> Votre guide d'actualité et de conseils
@@ -113,10 +113,8 @@ export default function ClientHomePageClient() {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Section caractéristiques */}
-      <section className="max-w-7xl mx-auto px-4 mb-24">
+      </section>      {/* Section caractéristiques */}
+      <section className="w-full px-4 mb-24">
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-16">Comment <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">widebook</span> vous accompagne</h2>
         
         <div className="grid md:grid-cols-3 gap-8">
@@ -142,12 +140,11 @@ export default function ClientHomePageClient() {
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-3">Bonnes affaires</h3>
             <p className="text-gray-600">Découvrez les meilleures offres et opportunités dans différents secteurs d'activité.</p>
-          </div>
-        </div>
+          </div>      </div>
       </section>
 
       {/* Section Blogs avec cartes redessinées */}
-      <section className="max-w-7xl mx-auto px-4 mb-20" id="blogs">
+      <section className="w-full px-4 mb-20" id="blogs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-12">
           <h2 className="text-4xl font-bold text-gray-900">
             Explorez nos <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">articles</span>
@@ -280,21 +277,19 @@ export default function ClientHomePageClient() {
         )}
       </section>
 
-      {/* Section newsletter */}
-      <section id="newsletter" className="max-w-5xl mx-auto px-4 mb-16">
+      {/* Section newsletter */}      <section id="newsletter" className="w-full px-4 mb-16">
         <div className="relative bg-gradient-to-r from-blue-600 to-teal-500 rounded-2xl p-10 overflow-hidden shadow-xl">
           {/* Formes décoratives */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3" />
           
           <div className="relative z-10 text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Restez informé</h2>
-            <p className="text-blue-50 mb-8 max-w-xl mx-auto">
+            <h2 className="text-3xl font-bold text-white mb-4">Restez informé</h2>            <p className="text-blue-50 mb-8 w-full">
               Recevez nos derniers articles et conseils directement dans votre boîte mail. 
               Inscrivez-vous à notre newsletter pour ne rien manquer !
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
               <input
                 type="email"
                 placeholder="Votre adresse email"
@@ -309,7 +304,7 @@ export default function ClientHomePageClient() {
       </section>
 
       {/* Section témoignages clients */}
-      <section className="max-w-7xl mx-auto px-4 mb-24">
+      <section className="w-full px-4 mb-24">
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-16">Ce que disent nos lecteurs</h2>
         
         <div className="grid md:grid-cols-3 gap-8">

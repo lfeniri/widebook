@@ -19,9 +19,8 @@ const BlogPageServer: React.FC<BlogPageServerProps> = ({ blog }) => {
         year: 'numeric'
       })
     : '';
-  
-  return (
-    <article className="max-w-4xl mx-auto px-4 py-8">
+    return (
+    <article className="w-full px-4 py-8">
       {/* En-tête du blog */}
       <header className="mb-8">
         <h1 className="text-3xl font-bold mb-3">{blog.title}</h1>
@@ -54,13 +53,12 @@ const BlogPageServer: React.FC<BlogPageServerProps> = ({ blog }) => {
           </div>
         )}
       </header>
-      
-      {/* Contenu du blog */}
+        {/* Contenu du blog */}
       {content && (
-        <div className="blog-content-container prose prose-lg max-w-none">
+        <div className="blog-content-container w-full">
           {/* Rendre le HTML du blog directement */}
           <div 
-            className="blog-content" 
+            className="blog-content w-full" 
             dangerouslySetInnerHTML={{ __html: contentHtml }} 
           />
           
