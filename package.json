@@ -5,7 +5,14 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "echo \"ESLint disabled\" && exit 0"
+    "lint": "echo \"ESLint disabled\" && exit 0",
+    "sitemap:check": "curl -s http://localhost:3000/sitemap.xml | xmllint --format -",
+    "sitemap:validate": "npm run sitemap:check -- --schema http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd",
+    "generate:og-image": "node scripts/generate-og-image.js",
+    "generate:favicon": "node scripts/generate-favicon.js",
+    "generate:webmanifest": "node scripts/generate-webmanifest.js",
+    "generate:seo-assets": "npm run generate:og-image && npm run generate:favicon && npm run generate:webmanifest",
+    "prebuild": "npm run generate:seo-assets"
   },
   "dependencies": {
     "@auth/supabase-adapter": "^1.8.0",

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthContext";
+import { generateSeoMetadata } from "@/lib/seo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,14 +17,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Widebook",
-  description: "Votre plateforme de blogs et de contenu",
-  icons: {
-    icon: '/logo.svg',
-    apple: '/logo.svg',
-  },
-};
+export const metadata: Metadata = generateSeoMetadata({
+  title: "Accueil",
+  description: "Widebook - Votre plateforme de blogs et de contenu avec une expérience utilisateur inspirée d'Airbnb",
+  canonical: "/",
+  ogImage: "/og-image-home.jpg",
+});
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
   return (

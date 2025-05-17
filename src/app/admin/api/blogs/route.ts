@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse, NextRequest } from 'next/server';
 import { getUserFromRequest } from '@/lib/utils';
+import { revalidatePath } from 'next/cache';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -51,7 +52,15 @@ export async function POST(request: Request) {
         seoTitle,
         seoDesc,
       },
-    });
+    });    // Revalider le sitemap pour inclure le nouveau blog
+    try {
+      revalidatePath('/sitemap.xml');
+      console.log('Sitemap revalidé après création de blog');
+    } catch (revalidateError) {
+      console.error('Erreur lors de la revalidation du sitemap:', revalidateError);
+      // Ne pas bloquer la réponse en cas d'erreur de revalidation
+    }
+    
     return NextResponse.json(blog);
   } catch (err) {
     console.error("Erreur lors de la création du blog:", err);

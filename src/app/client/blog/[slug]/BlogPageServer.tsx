@@ -1,7 +1,7 @@
 import React from 'react';
 import { Blog } from '@/types/blog';
-import { cn } from '@/lib/utils';
 import BlogHeader from './BlogHeader';
+import SEOComponent from '@/components/seo/SEOComponent';
 
 interface BlogPageServerProps {
   blog: Blog;
@@ -38,7 +38,18 @@ const BlogPageServer: React.FC<BlogPageServerProps> = ({ blog }) => {
             <script dangerouslySetInnerHTML={{ __html: contentJs }} />
           )}
         </div>
-      )}
+      )}      {/* SEO et données structurées avancées */}
+      <SEOComponent 
+        pageType="blog"
+        blog={blog} 
+        url={`/client/blog/${blog.slug}`}
+        breadcrumbItems={[
+          { name: 'Accueil', item: '/' },
+          { name: 'Blogs', item: '/blogs' },
+          { name: blog.category?.name || 'Catégorie', item: `/blogs?category=${blog.categoryId}` },
+          { name: blog.title, item: `/client/blog/${blog.slug}` }
+        ]}
+      />
     </article>
   );
 };
