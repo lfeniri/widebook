@@ -26,7 +26,7 @@ export async function generateMetadata({
 }: { 
   params: { slug: string } 
 }): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   
   // Récupérer les données du blog pour les métadonnées
   const blog = await prisma.blog.findUnique({
