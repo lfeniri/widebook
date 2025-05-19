@@ -30,6 +30,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="fr">
       <head>
         <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
+        <link rel="icon" href="/favicons/favicon-32x32.png" type="image/png" sizes="32x32" />
+        <link rel="icon" href="/favicons/favicon-16x16.png" type="image/png" sizes="16x16" />
+        <link rel="apple-touch-icon" href="/favicons/favicon-128x128.png" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.webmanifest" />
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 
       </head>

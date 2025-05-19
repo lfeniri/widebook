@@ -14,17 +14,16 @@ function generateWebManifest() {
       "start_url": "/",
       "display": "standalone",
       "background_color": "#ffffff",
-      "theme_color": "#3498db",
-      "icons": [
+      "theme_color": "#3498db",      "icons": [
         {
-          "src": "/favicons/favicon-192x192.png",
-          "sizes": "192x192",
+          "src": "/favicons/favicon-128x128.png",
+          "sizes": "128x128",
           "type": "image/png",
           "purpose": "any maskable"
         },
         {
-          "src": "/favicons/favicon-512x512.png",
-          "sizes": "512x512",
+          "src": "/favicons/favicon-256x256.png",
+          "sizes": "256x256",
           "type": "image/png",
           "purpose": "any maskable"
         }
