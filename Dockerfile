@@ -32,8 +32,8 @@ RUN npm ci
 COPY . .
 
 #tmp fot the first time
-RUN npx prisma generate && npx prisma migrate deploy
-
+RUN npx prisma migrate deploy
+RUN npx prisma generate
 
 # Build application
 RUN npm run build
@@ -42,4 +42,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Set up the entrypoint to run migrations and start app
-CMD npx prisma migrate deploy && npm start
+CMD npx prisma migrate deploy && npx prisma generate && npm start
