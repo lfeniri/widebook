@@ -31,19 +31,34 @@ const getCategoryName = (category: any): string => {
 
 // Fonction pour extraire le nom de l'auteur en toute sécurité
 const getAuthorName = (author: any): string => {
-  if (!author) return 'Auteur anonyme';
-  if (typeof author === 'string') return author;
-  if (typeof author === 'object') {
-    // Convertir explicitement en chaîne pour éviter les erreurs de rendu
-    const authorName = author.name || 
-                      author.full_name || 
-                      author.first_name || 
-                      author.email;
-    
-    // S'assurer que la valeur est une chaîne
-    return typeof authorName === 'string' ? authorName : 'Auteur anonyme';
+  try {
+    if (!author) return 'Auteur anonyme';
+    if (typeof author === 'string') return author;
+    if (typeof author === 'object') {
+      // Si name est un objet (format firstname/lastname)
+      if (author.name && typeof author.name === 'object' && author.name !== null) {
+        const firstName = author.name.firstname || author.name.first_name || '';
+        const lastName = author.name.lastname || author.name.last_name || '';
+        if (firstName || lastName) {
+          return `${firstName} ${lastName}`.trim();
+        }
+      }
+      // Si name est une chaîne
+      else if (author.name && typeof author.name === 'string') {
+        return author.name;
+      }
+        // Autres propriétés possibles
+      const authorName = author.full_name || 
+                        author.first_name;
+      
+      // S'assurer que la valeur est une chaîne et ne jamais afficher l'email
+      return typeof authorName === 'string' && authorName ? authorName : 'Auteur anonyme';
+    }
+    return 'Auteur anonyme';
+  } catch (error) {
+    console.error('Error getting author name:', error);
+    return 'Auteur anonyme';
   }
-  return 'Auteur anonyme';
 };
 
 const BlogHeader: React.FC<BlogHeaderProps> = ({ blog }) => {

@@ -10,6 +10,38 @@ interface BlogsSectionProps {
   initialBlogs?: Blog[];
 }
 
+// Helper to safely get author display name with more robust error handling
+const getAuthorDisplayName = (author: any): string => {
+  try {
+    if (!author) return 'Auteur inconnu';
+    
+    if (author.name) {
+      // Handle case where name is an object with firstname/lastname
+      if (typeof author.name === 'object' && author.name !== null) {
+        try {
+          const firstName = author.name.firstname || author.name.first_name || '';
+          const lastName = author.name.lastname || author.name.last_name || '';
+          if (firstName || lastName) {
+            return `${firstName} ${lastName}`.trim();
+          }
+        } catch (e) {
+          console.log('Error parsing name object:', e);
+          // Fall through to next options
+        }
+      } 
+      // Handle case where name is a string
+      else if (typeof author.name === 'string') {
+        return author.name;
+      }
+    }
+      // Ne pas utiliser l'email pour des raisons de confidentialité
+    return 'Auteur inconnu';
+  } catch (error) {
+    console.error('Error getting author name:', error);
+    return 'Auteur inconnu';
+  }
+};
+
 export default function BlogsSection({ initialBlogs }: BlogsSectionProps) {
   // Définir loading à true si initialBlogs est undefined ou vide
   const hasInitialBlogs = initialBlogs && initialBlogs.length > 0;
@@ -154,15 +186,21 @@ export default function BlogsSection({ initialBlogs }: BlogsSectionProps) {
                 <Link href={`/client/blog/${blog.slug}`}
                   className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-3 line-clamp-2">
                   {blog.title}
-                </Link>
-
-                <div className="mt-auto pt-4 flex items-center">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold text-sm">
-                      {blog.author?.email ? blog.author.email.charAt(0).toUpperCase() : 'A'}
+                </Link>                <div className="mt-auto pt-4 flex items-center">                  <div className="flex items-center">                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold text-sm">
+                      {(() => {
+                        // Obtenir la première lettre du nom d'auteur pour l'avatar
+                        try {
+                          const authorName = getAuthorDisplayName(blog.author);
+                          return authorName && authorName !== 'Auteur inconnu' 
+                            ? authorName.charAt(0).toUpperCase() 
+                            : 'A';
+                        } catch (error) {
+                          return 'A';
+                        }
+                      })()}
                     </div>
                     <span className="text-sm text-gray-600 ml-2 line-clamp-1">
-                      {blog.author?.email?.split('@')[0] || 'Auteur inconnu'}
+                      {getAuthorDisplayName(blog.author)}
                     </span>
                   </div>
                   
