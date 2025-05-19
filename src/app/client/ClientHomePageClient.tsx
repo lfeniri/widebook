@@ -13,4 +13,3 @@ export default function ClientHomePageClient() {
 
   return <HomePage clientSideFetching={true} />;
 }
-}
