@@ -14,12 +14,12 @@ RUN apk add --no-cache \
   pixman-dev \
   pangomm-dev \
   bash
+RUN apk add --no-cache librsvg
+# Install system dependencies
+RUN apk add --no-cache libc6-compat
 
 # Set working directory
 WORKDIR /app
-
-# Install system dependencies
-RUN apk add --no-cache libc6-compat
 
 # Copy package.json and package-lock.json files
 COPY package.json package-lock.json* ./
@@ -30,6 +30,10 @@ RUN npm ci
 
 # Copy the rest of the application
 COPY . .
+
+#tmp fot the first time
+RUN npx prisma migrate deploy
+
 
 # Build application
 RUN npm run build
