@@ -1,6 +1,20 @@
 # Use Node.js 20 as base image
 FROM node:20-alpine
 
+# Dépendances système nécessaires pour canvas + node-gyp
+RUN apk add --no-cache \
+  libc6-compat \
+  python3 \
+  make \
+  g++ \
+  cairo-dev \
+  jpeg-dev \
+  pango-dev \
+  giflib-dev \
+  pixman-dev \
+  pangomm-dev \
+  bash
+
 # Set working directory
 WORKDIR /app
 
