@@ -111,13 +111,15 @@ export class UserAuthService {
       data: Object.keys(metadata).length > 0 ? metadata : undefined
     });
   }
-
   /**
    * Réinitialisation du mot de passe
    */
   async resetPassword(email: string) {
-    return await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const redirectUrl = `${origin}/reset-password`;
+    console.log("URL de redirection pour réinitialisation:", redirectUrl);
+      return await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl
     });
   }
   /**
@@ -134,14 +136,38 @@ export class UserAuthService {
   onAuthStateChange(callback: () => void) {
     return supabase.auth.onAuthStateChange(() => callback());
   }
-
   /**
-   * Sauvegarde une session à partir d'un hash OAuth
-   * @param hash Le hash contenant les informations de session
+   * Sauvegarde une session à partir d'un hash ou de l'URL complète
+   * @param hashOrUrl Le hash ou l'URL complète contenant les informations de session
    */
-  async saveOAuthSession(hash: string) {
-    // @ts-ignore: _saveSession est interne mais nécessaire ici
-    return await supabase.auth._saveSession(hash);
+  async saveOAuthSession(hashOrUrl: string) {
+    try {
+      // Suppabase v2 a changé la façon dont les sessions sont gérées      // Cette partie n'est plus nécessaire car l'API interne a changé
+      // Nous nous appuyons uniquement sur l'analyse manuelle des tokens
+      
+      // Sinon, on analyse manuellement l'URL pour extraire les tokens
+      const url = new URL(hashOrUrl.startsWith('http') ? hashOrUrl : `http://example.com${hashOrUrl}`);
+      const params = new URLSearchParams(url.hash.substring(1) || url.search);
+      
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+      const expiresIn = params.get('expires_in');
+      
+      if (accessToken) {
+        console.log("Tokens trouvés manuellement dans l'URL, tentative de connexion directe");
+        // Si on a un access_token, on peut essayer de l'utiliser directement
+        await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken || ''
+        });
+        return { error: null, data: { session: true } };
+      }
+      
+      return { error: { message: "Impossible de sauvegarder la session" }, data: null };
+    } catch (err) {
+      console.error("Erreur lors de la sauvegarde de session:", err);
+      return { error: err, data: null };
+    }
   }
 }
 
