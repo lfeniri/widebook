@@ -32,7 +32,7 @@ RUN npm ci
 COPY . .
 
 #tmp fot the first time
-RUN npx prisma migrate deploy
+RUN npx prisma generate && npx prisma migrate deploy
 
 
 # Build application
