@@ -15,15 +15,15 @@ datasource db {
 }
 
 model User {
-  id                          String            @id @db.Uuid
-  role                        String?           @db.VarChar(255)
-  email                       String?           @map("email") @db.VarChar(255)
-  name                        Json?             @map("raw_user_meta_data")
-  is_super_admin              Boolean?
-  phone                       String?           @unique
+  id             String   @id @db.Uuid
+  role           String?  @db.VarChar(255)
+  email          String?  @map("email") @db.VarChar(255)
+  name           Json?    @map("raw_user_meta_data")
+  is_super_admin Boolean?
+  phone          String?  @unique
 
-  blogs                       Blog[]            @relation("UserBlogs")
-  comments                    Comment[]         @relation("UserToComments")
+  blogs    Blog[]    @relation("UserBlogs")
+  comments Comment[] @relation("UserToComments")
 }
 
 model Category {
@@ -34,20 +34,20 @@ model Category {
 }
 
 model Blog {
-  id          String    @id @default(uuid())
-  title       String
-  content Json?    // HTML+CSS content (GrapesJS)
-  slug        String    @unique
-  image       String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  seoTitle    String?
-  seoDesc     String?
-  authorId    String   @db.Uuid 
-  author      User     @relation("UserBlogs", fields: [authorId], references: [id])
-  categoryId  String
-  category    Category  @relation(fields: [categoryId], references: [id])
-  comments    Comment[]
+  id               String            @id @default(uuid())
+  title            String
+  content          Json? // HTML+CSS content (GrapesJS)
+  slug             String            @unique
+  image            String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  seoTitle         String?
+  seoDesc          String?
+  authorId         String            @db.Uuid
+  author           User              @relation("UserBlogs", fields: [authorId], references: [id])
+  categoryId       String
+  category         Category          @relation(fields: [categoryId], references: [id])
+  comments         Comment[]
   blogChatMessages BlogChatMessage[]
 }
 
@@ -55,7 +55,7 @@ model Comment {
   id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
-  authorId  String   @db.Uuid  
+  authorId  String   @db.Uuid
   author    User     @relation("UserToComments", fields: [authorId], references: [id])
   blogId    String
   blog      Blog     @relation(fields: [blogId], references: [id])
@@ -65,7 +65,7 @@ model BlogChatMessage {
   id            String   @id @default(uuid())
   blogId        String
   blog          Blog     @relation(fields: [blogId], references: [id])
-  role          String   // 'user' ou 'assistant'
+  role          String // 'user' ou 'assistant'
   content       String
   isJsonContent Boolean  @default(false) @map("is_json_content")
   createdAt     DateTime @default(now())

@@ -7,6 +7,7 @@ import "./globals.css";
 import { AuthProvider } from "@/components/AuthContext";
 import { generateSeoMetadata } from "@/lib/seo";
 
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

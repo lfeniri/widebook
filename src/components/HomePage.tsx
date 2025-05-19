@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import BlogsSection from '@/components/BlogsSection';
+import NewsletterSection from '@/components/NewsletterSection';
 import { Blog } from '@/types/blog';
 import { blogService } from '@/services';
 
@@ -143,37 +144,11 @@ export default function HomePage({ initialBlogs = [], clientSideFetching = false
           </div>      
         </div>
       </section>
-      
-      {/* Section Blogs - utilise le composant BlogsSection avec les blogs */}
+        {/* Section Blogs - utilise le composant BlogsSection avec les blogs */}
       <BlogsSection initialBlogs={loading ? [] : blogs} />
 
       {/* Section newsletter */}      
-      <section id="newsletter" className="w-full px-4 mb-16">
-        <div className="relative bg-gradient-to-r from-blue-600 to-teal-500 rounded-2xl p-10 overflow-hidden shadow-xl">
-          {/* Formes décoratives */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3" />
-          
-          <div className="relative z-10 text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Restez informé</h2>            
-            <p className="text-blue-50 mb-8 w-full">
-              Recevez nos derniers articles et conseils directement dans votre boîte mail. 
-              Inscrivez-vous à notre newsletter pour ne rien manquer !
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 w-full">
-              <input
-                type="email"
-                placeholder="Votre adresse email"
-                className="flex-1 px-5 py-3 rounded-full focus:outline-none"
-              />
-              <Button className="bg-white text-blue-600 hover:bg-blue-50 rounded-full px-6">
-                S'abonner
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <NewsletterSection />
     </main>
   );
 }
