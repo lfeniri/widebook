@@ -137,10 +137,13 @@ export default function AdminLoginPage() {
               disabled={loading}
               aria-label="Mot de passe"
               autoComplete="current-password"
-            />
-            {error && <div className="text-red-500 text-sm text-center font-medium" role="alert">{error}</div>}
+            />            {error && <div className="text-red-500 text-sm text-center font-medium" role="alert">{error}</div>}
             {success && <div className="text-green-600 text-sm text-center font-medium" role="status">{success}</div>}
-            <Button type="submit" className="w-full mt-2" disabled={loading}>
+            <Button 
+              type="submit" 
+              className="w-full mt-2 bg-blue-600 text-white hover:bg-blue-700 font-semibold py-2" 
+              disabled={loading}
+            >
               {loading ? 'Connexion...' : 'Se connecter'}
             </Button>
           </form>

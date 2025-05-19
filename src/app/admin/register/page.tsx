@@ -52,27 +52,24 @@ export default function AdminRegisterPage() {
           required
         />
         {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-        {success && <div className="text-green-600 text-sm text-center">{success}</div>}
-        <button
+        {success && <div className="text-green-600 text-sm text-center">{success}</div>}        <button
           type="submit"
-          className="bg-primary text-white rounded px-4 py-2 font-semibold hover:bg-primary/90 transition-colors w-full"
+          className="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition-colors w-full"
           disabled={loading}
         >
           {loading ? 'Inscription...' : "S'inscrire"}
         </button>
-        <div className="flex flex-col gap-2 mt-2">
-          <button
+        <div className="flex flex-col gap-2 mt-2">          <button
             type="button"
             onClick={() => handleOAuth('google')}
-            className="bg-white border border-gray-300 rounded px-4 py-2 font-semibold flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
+            className="bg-white border border-gray-300 rounded px-4 py-2 font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors text-gray-700"
             disabled={loading}
           >
             <img src="/google.svg" alt="Google" className="h-5 w-5" /> S'inscrire avec Google
-          </button>
-          <button
+          </button>          <button
             type="button"
             onClick={() => handleOAuth('facebook')}
-            className="bg-white border border-gray-300 rounded px-4 py-2 font-semibold flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
+            className="bg-white border border-gray-300 rounded px-4 py-2 font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors text-gray-700"
             disabled={loading}
           >
             <img src="/facebook.svg" alt="Facebook" className="h-5 w-5" /> S'inscrire avec Facebook

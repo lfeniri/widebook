@@ -139,10 +139,9 @@ export default function ResetPasswordPage() {
     return (      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-300">
         <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md flex flex-col gap-4">
           <h1 className="text-2xl font-bold mb-2 text-center">Lien invalide ou expiré</h1>
-          <p className="text-center">{error || "Le lien de réinitialisation est invalide ou a expiré."}</p>
-          <Button 
+          <p className="text-center">{error || "Le lien de réinitialisation est invalide ou a expiré."}</p>          <Button 
             onClick={() => router.push('/admin/forgot-password')}
-            className="mt-4"
+            className="mt-4 bg-blue-600 text-white hover:bg-blue-700 w-full font-semibold py-2"
           >
             Demander un nouveau lien
           </Button>
@@ -192,10 +191,9 @@ export default function ResetPasswordPage() {
         
         {error && <div className="text-red-500 text-sm text-center">{error}</div>}
         {message && <div className="text-green-600 text-sm text-center">{message}</div>}
-        
-        <Button
+          <Button
           type="submit"
-          className="w-full mt-4"
+          className="w-full mt-4 bg-blue-600 text-white hover:bg-blue-700 font-semibold py-2"
           disabled={loading}
         >
           {loading ? 'Mise à jour...' : 'Mettre à jour le mot de passe'}

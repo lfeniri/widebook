@@ -33,10 +33,9 @@ export default function ForgotPasswordPage() {
           required
         />
         {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-        {message && <div className="text-green-600 text-sm text-center">{message}</div>}
-        <button
+        {message && <div className="text-green-600 text-sm text-center">{message}</div>}        <button
           type="submit"
-          className="bg-primary text-white rounded px-4 py-2 font-semibold hover:bg-primary/90 transition-colors w-full"
+          className="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition-colors w-full"
           disabled={loading}
         >
           {loading ? 'Envoi...' : 'Envoyer le lien de réinitialisation'}
