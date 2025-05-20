@@ -9,10 +9,10 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const user = await getUserFromRequest(request);
+    /*const user = await getUserFromRequest(request);
     if (!user) {
       return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
-    }
+    }*/
 
     const body = await request.json();
     const { title, slug, categoryId, seoTitle, seoDesc, content } = body;

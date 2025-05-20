@@ -15,10 +15,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await getUserFromRequest(request);
+  /*const user = await getUserFromRequest(request);
   if (!user) {
     return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
-  }
+  }*/
   const body = await request.json();
   const { name, description } = body;
   if (!name) {
