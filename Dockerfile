@@ -13,35 +13,31 @@ RUN apk add --no-cache \
   giflib-dev \
   pixman-dev \
   pangomm-dev \
+  librsvg \
   bash
-RUN apk add --no-cache librsvg
-# Install system dependencies
-RUN apk add --no-cache libc6-compat
 
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json files
+# Étape 1 : Installer les dépendances
 COPY package.json package-lock.json* ./
-COPY prisma ./prisma/
-
-# Install dependencies using npm
 RUN npm ci
 
+# Étape 2 : Copier les fichiers nécessaires à Prisma
+COPY prisma ./prisma/
+COPY .env ./
+
+# Étape 3 : Générer le client Prisma (AVANT le build)
 RUN npx prisma generate
 
-# Copy the rest of the application
+# Étape 4 : Copier le reste du code
 COPY . .
 
-#tmp fot the first time
-RUN npx prisma migrate deploy
-
-
-# Build application
+# Étape 5 : Build de l'application
 RUN npm run build
 
-# Expose the port the app runs on
+# Exposer le port
 EXPOSE 3000
 
-# Set up the entrypoint to run migrations and start app
-CMD npx prisma migrate deploy && npx prisma generate && npm start
+# CMD final (déploiement migration + lancement app)
+CMD npx prisma migrate deploy && npm start
