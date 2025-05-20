@@ -19,25 +19,23 @@ RUN apk add --no-cache \
 # Set working directory
 WORKDIR /app
 
-# Étape 1 : Installer les dépendances
+# Étape 1 : Installer les deps (rapide grâce au cache Docker)
 COPY package.json package-lock.json* ./
 RUN npm ci
 
-# Étape 2 : Copier les fichiers nécessaires à Prisma
+# Étape 2 : Copier le schéma Prisma et générer le client
 COPY prisma ./prisma/
 COPY .env ./
-
-# Étape 3 : Générer le client Prisma (AVANT le build)
 RUN npx prisma generate
 
-# Étape 4 : Copier le reste du code
+# Étape 3 : Copier le reste de l'application
 COPY . .
 
-# Étape 5 : Build de l'application
+# Étape 4 : Build de l'application
 RUN npm run build
 
 # Exposer le port
 EXPOSE 3000
 
-# CMD final (déploiement migration + lancement app)
+# Commande finale
 CMD npx prisma migrate deploy && npm start
