@@ -34,3 +34,52 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Docker Deployment
+
+This project can be deployed using Docker and Docker Compose.
+
+### Prerequisites
+
+- Docker and Docker Compose installed on your system
+- Environment variables configured (copy `.env.example` to `.env` and fill in your values)
+
+### Running with Docker Compose
+
+To build and start the application using Docker Compose:
+
+```bash
+# Build and start the container
+docker-compose up -d
+
+# Check the container logs
+docker-compose logs -f
+
+# Stop the container
+docker-compose down
+```
+
+The application will be available at http://localhost:3000.
+
+### Network Configuration
+
+The Docker Compose configuration includes:
+
+- Bridge network for internet connectivity (HTTPS)
+- Properly configured environment variables
+- Health check endpoint to monitor container health
+
+### Troubleshooting
+
+If you encounter connectivity issues:
+
+```bash
+# Check container status
+docker-compose ps
+
+# Check container network
+docker network inspect widebook-network
+
+# View container logs
+docker-compose logs -f
+```

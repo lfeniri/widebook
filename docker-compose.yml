@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  widebook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: widebook-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      # Add any other environment variables your app needs here
+    networks:
+      - widebook-network
+    # Make sure the container keeps running
+    restart: unless-stopped
+
+networks:
+  widebook-network:
+    # Using bridge driver ensures containers can access the internet
+    driver: bridge
+    # Optional: Additional network configuration
+    driver_opts:
+      com.docker.network.bridge.name: widebook-bridge
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"  # Ensures outbound internet connectivity
