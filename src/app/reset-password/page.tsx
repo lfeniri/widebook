@@ -1,13 +1,14 @@
 "use client";
 
 import userAuthService from '@/services/userAuthService';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import UrlDebugger from '@/components/UrlDebugger';
 
-export default function ResetPasswordPage() {
+// Component that uses useSearchParams must be wrapped in Suspense
+function ResetPasswordForm() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
@@ -205,6 +206,19 @@ export default function ResetPasswordPage() {
           </a>
         </div>
       </form>
-    </div>
+    </div>  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-300">
+        <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md text-center">
+          <p>Chargement...</p>
+        </div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
