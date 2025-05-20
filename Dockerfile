@@ -28,12 +28,14 @@ COPY prisma ./prisma/
 # Install dependencies using npm
 RUN npm ci
 
+RUN npx prisma generate
+
 # Copy the rest of the application
 COPY . .
 
 #tmp fot the first time
 RUN npx prisma migrate deploy
-RUN npx prisma generate
+
 
 # Build application
 RUN npm run build
