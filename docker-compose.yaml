@@ -18,11 +18,11 @@ services:
     restart: unless-stopped
 
 networks:
-  widebook-network:
+  coolify:
     # Using bridge driver ensures containers can access the internet
     driver: bridge
     # Optional: Additional network configuration
     driver_opts:
-      com.docker.network.bridge.name: widebook-bridge
+      com.docker.network.bridge.name: coolify
       com.docker.network.bridge.enable_icc: "true"
       com.docker.network.bridge.enable_ip_masquerade: "true"  # Ensures outbound internet connectivity
