@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const runtime = 'nodejs';
 
-const S3_ENDPOINT = 'https://hkcpvwbfeybfbdwyjkgd.supabase.co/storage/v1/s3';
+const S3_ENDPOINT = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/s3`;
 const S3_BUCKET = 'blog-images';
 const S3_REGION = 'eu-west-3'; // Supabase S3 compatible endpoint, region can be anything
 const S3_ACCESS_KEY_ID = 'ead9ddf190e340c8b2ab0f7e74142769';
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   const key = `${uuidv4()}.${ext}`;
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  try {
+  try {    
     await s3.send(new PutObjectCommand({
       Bucket: S3_BUCKET,
       Key: key,
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       ACL: 'public-read',
     }));
     // const publicUrl = `${S3_ENDPOINT}/${S3_BUCKET}/${key}`;
-    const publicUrl = `https://hkcpvwbfeybfbdwyjkgd.supabase.co/storage/v1/object/public/blog-images/${key}`;
+    const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/blog-images/${key}`;
     return NextResponse.json({ url: publicUrl });
   } catch (err) {
     return NextResponse.json({ error: 'Erreur upload S3', details: err }, { status: 500 });
