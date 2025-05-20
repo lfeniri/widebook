@@ -13,7 +13,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       # Add any other environment variables your app needs here
     networks:
-      - widebook-network
+      - coolify
     # Make sure the container keeps running
     restart: unless-stopped
 
