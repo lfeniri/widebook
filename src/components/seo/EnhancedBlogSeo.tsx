@@ -48,10 +48,11 @@ const EnhancedBlogSeo: React.FC<EnhancedBlogSeoProps> = ({
             '@type': 'Article',
             headline: blog.title,
             description: blog.seoDesc || textContent,
-            image: blog.image,
+            image: blog.image,            
             author: {
               '@type': 'Person',
               name: blog.author?.name || 'Widebook',
+              url: blog.author?.id ? `${process.env.NEXT_PUBLIC_BASE_URL || 'https://widebook.fr'}/profile/${blog.author.id}` : `${process.env.NEXT_PUBLIC_BASE_URL || 'https://widebook.fr'}/profile`,
             },
             publisher: {
               '@type': 'Organization',
