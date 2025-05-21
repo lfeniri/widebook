@@ -30,14 +30,14 @@ export async function PUT(
         categoryId,
         seoTitle,
         seoDesc,
-      },    });
-    
-    // Revalider le sitemap lorsqu'un blog est mis à jour
+      },    });    // Revalider le sitemap, la page d'accueil et la page du blog lorsqu'un blog est mis à jour
     try {
       revalidatePath('/sitemap.xml');
-      console.log(`Sitemap revalidé après mise à jour du blog ID: ${id}`);
+      revalidatePath(`/client/blog/${slug}`);
+      revalidatePath('/'); // Revalider la page d'accueil qui affiche la liste des blogs
+      console.log(`Sitemap, page d'accueil et page du blog ${slug} revalidés après mise à jour du blog ID: ${id}`);
     } catch (revalidateError) {
-      console.error('Erreur lors de la revalidation du sitemap:', revalidateError);
+      console.error('Erreur lors de la revalidation:', revalidateError);
       // Ne pas bloquer la réponse en cas d'erreur de revalidation
     }
 
@@ -71,22 +71,35 @@ export async function GET(
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
-) {
-  try {
+) {  try {
     const { id } = await params;
     const user = await getUserFromRequest(request);
     if (!user) {
       return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
-    }    await prisma.blog.delete({
+    }    
+    // Récupérer le blog avant de le supprimer pour obtenir le slug
+    const blogToDelete = await prisma.blog.findUnique({
       where: { id },
+      select: { slug: true }
     });
     
-    // Revalider le sitemap après la suppression d'un blog
+    // Supprimer le blog
+    await prisma.blog.delete({
+      where: { id },
+    });    // Revalider le sitemap et la page d'accueil après la suppression d'un blog
     try {
-      revalidatePath('/sitemap.xml');
-      console.log(`Sitemap revalidé après suppression du blog ID: ${id}`);
+      if (blogToDelete && blogToDelete.slug) {
+        revalidatePath('/sitemap.xml');
+        revalidatePath(`/client/blog/${blogToDelete.slug}`);
+        revalidatePath('/'); // Revalider la page d'accueil
+        console.log(`Sitemap, page d'accueil et page du blog ${blogToDelete.slug} revalidés après suppression du blog ID: ${id}`);
+      } else {
+        revalidatePath('/sitemap.xml');
+        revalidatePath('/'); // Revalider la page d'accueil même si le blog n'existe pas
+        console.log(`Sitemap et page d'accueil revalidés après suppression du blog ID: ${id}`);
+      }
     } catch (revalidateError) {
-      console.error('Erreur lors de la revalidation du sitemap:', revalidateError);
+      console.error('Erreur lors de la revalidation:', revalidateError);
       // Ne pas bloquer la réponse en cas d'erreur de revalidation
     }
     

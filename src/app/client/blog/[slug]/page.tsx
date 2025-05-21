@@ -6,6 +6,9 @@ import { serializeFromPrisma } from './blogUtils';
 import { Metadata } from 'next';
 import { generateSeoMetadata } from '@/lib/seo';
 
+// Revalidation périodique des pages de blog (toutes les 3 heures)
+export const revalidate = 10800;
+
 // Fonction pour pré-générer les chemins statiques pour les blogs
 export async function generateStaticParams() {
   // Récupérer tous les blogs pour pré-générer leurs pages

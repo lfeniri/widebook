@@ -52,12 +52,14 @@ export async function POST(request: Request) {
         seoTitle,
         seoDesc,
       },
-    });    // Revalider le sitemap pour inclure le nouveau blog
+    });    // Revalider le sitemap, la page d'accueil et la page du blog pour inclure le nouveau blog
     try {
       revalidatePath('/sitemap.xml');
-      console.log('Sitemap revalidé après création de blog');
+      revalidatePath(`/client/blog/${slug}`);
+      revalidatePath('/'); // Revalider la page d'accueil qui affiche la liste des blogs
+      console.log(`Sitemap, page d'accueil et page du blog ${slug} revalidés après création de blog`);
     } catch (revalidateError) {
-      console.error('Erreur lors de la revalidation du sitemap:', revalidateError);
+      console.error('Erreur lors de la revalidation:', revalidateError);
       // Ne pas bloquer la réponse en cas d'erreur de revalidation
     }
     
