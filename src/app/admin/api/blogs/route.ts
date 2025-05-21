@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         slug,
         image,
         categoryId,
-        authorId: user.id,
+        authorId: '2a7decf3-2dc3-46ca-b0a1-4cec0abc5544',
         seoTitle,
         seoDesc,
       },
