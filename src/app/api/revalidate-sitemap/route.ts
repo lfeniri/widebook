@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     }
     
     // Forcer la revalidation du sitemap
-    revalidatePath('/sitemap.xml');
+    revalidatePath('/sitemap');
     
     return NextResponse.json({
       revalidated: true,

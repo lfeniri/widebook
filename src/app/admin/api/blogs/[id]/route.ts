@@ -32,7 +32,7 @@ export async function PUT(
         seoDesc,
       },    });    // Revalider le sitemap, la page d'accueil et la page du blog lorsqu'un blog est mis à jour
     try {
-      revalidatePath('/sitemap.xml');
+      revalidatePath('/sitemap');
       revalidatePath(`/client/blog/${slug}`);
       revalidatePath('/'); // Revalider la page d'accueil qui affiche la liste des blogs
       console.log(`Sitemap, page d'accueil et page du blog ${slug} revalidés après mise à jour du blog ID: ${id}`);
@@ -89,12 +89,12 @@ export async function DELETE(
     });    // Revalider le sitemap et la page d'accueil après la suppression d'un blog
     try {
       if (blogToDelete && blogToDelete.slug) {
-        revalidatePath('/sitemap.xml');
+        revalidatePath('/sitemap');
         revalidatePath(`/client/blog/${blogToDelete.slug}`);
         revalidatePath('/'); // Revalider la page d'accueil
         console.log(`Sitemap, page d'accueil et page du blog ${blogToDelete.slug} revalidés après suppression du blog ID: ${id}`);
       } else {
-        revalidatePath('/sitemap.xml');
+        revalidatePath('/sitemap');
         revalidatePath('/'); // Revalider la page d'accueil même si le blog n'existe pas
         console.log(`Sitemap et page d'accueil revalidés après suppression du blog ID: ${id}`);
       }

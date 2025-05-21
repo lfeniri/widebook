@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       },
     });    // Revalider le sitemap, la page d'accueil et la page du blog pour inclure le nouveau blog
     try {
-      revalidatePath('/sitemap.xml');
+      revalidatePath('/sitemap');
       revalidatePath(`/client/blog/${slug}`);
       revalidatePath('/'); // Revalider la page d'accueil qui affiche la liste des blogs
       console.log(`Sitemap, page d'accueil et page du blog ${slug} revalidés après création de blog`);
