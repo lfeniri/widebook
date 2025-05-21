@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse, NextRequest } from 'next/server';
 import { getUserFromRequest } from '@/lib/utils';
-import { revalidatePath } from 'next/cache';
+import { revalidateBlogRoutes } from '@/lib/revalidateSitemap';
 
 export async function PUT(
   request: NextRequest,
@@ -31,16 +31,7 @@ export async function PUT(
         seoTitle,
         seoDesc,
       },    });    // Revalider le sitemap, la page d'accueil et la page du blog lorsqu'un blog est mis à jour
-    try {
-      revalidatePath('/sitemap');
-      revalidatePath(`/client/book-page/${slug}`);
-      revalidatePath(`/client/blog/${slug}`); // Pour compatibilité avec l'ancien chemin
-      revalidatePath('/'); // Revalider la page d'accueil qui affiche la liste des blogs
-      console.log(`Sitemap, page d'accueil et page du blog ${slug} revalidés après mise à jour du blog ID: ${id}`);
-    } catch (revalidateError) {
-      console.error('Erreur lors de la revalidation:', revalidateError);
-      // Ne pas bloquer la réponse en cas d'erreur de revalidation
-    }
+    await revalidateBlogRoutes(slug, 'update', id);
 
     return NextResponse.json(blog);
   } catch (err) {
@@ -88,24 +79,8 @@ export async function DELETE(
     await prisma.blog.delete({
       where: { id },
     });    
-    
-    // Revalider le sitemap et la page d'accueil après la suppression d'un blog    
-    try {
-      if (blogToDelete && blogToDelete.slug) {
-        revalidatePath('/sitemap');
-        revalidatePath(`/client/book-page/${blogToDelete.slug}`);
-        revalidatePath(`/client/blog/${blogToDelete.slug}`); // Pour compatibilité avec l'ancien chemin
-        revalidatePath('/'); // Revalider la page d'accueil
-        console.log(`Sitemap, page d'accueil et page du blog ${blogToDelete.slug} revalidés après suppression du blog ID: ${id}`);
-      } else {
-        revalidatePath('/sitemap');
-        revalidatePath('/'); // Revalider la page d'accueil même si le blog n'existe pas
-        console.log(`Sitemap et page d'accueil revalidés après suppression du blog ID: ${id}`);
-      }
-    } catch (revalidateError) {
-      console.error('Erreur lors de la revalidation:', revalidateError);
-      // Ne pas bloquer la réponse en cas d'erreur de revalidation
-    }
+      // Revalider le sitemap et la page d'accueil après la suppression d'un blog    
+    await revalidateBlogRoutes(blogToDelete?.slug, 'delete', id);
     
     return NextResponse.json({ message: 'Blog supprimé avec succès.' });
   } catch (err) {

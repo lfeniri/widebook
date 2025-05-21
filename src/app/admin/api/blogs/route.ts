@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse, NextRequest } from 'next/server';
 import { getUserFromRequest } from '@/lib/utils';
-import { revalidatePath } from 'next/cache';
+import { revalidateBlogRoutes } from '@/lib/revalidateSitemap';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -51,18 +51,8 @@ export async function POST(request: Request) {
         authorId: '2a7decf3-2dc3-46ca-b0a1-4cec0abc5544',
         seoTitle,
         seoDesc,
-      },
-    });    // Revalider le sitemap, la page d'accueil et la page du blog pour inclure le nouveau blog
-    try {
-      revalidatePath('/sitemap');
-      revalidatePath(`/client/book-page/${slug}`);
-      revalidatePath(`/client/blog/${slug}`); // Pour compatibilité avec l'ancien chemin
-      revalidatePath('/'); // Revalider la page d'accueil qui affiche la liste des blogs
-      console.log(`Sitemap, page d'accueil et page du blog ${slug} revalidés après création de blog`);
-    } catch (revalidateError) {
-      console.error('Erreur lors de la revalidation:', revalidateError);
-      // Ne pas bloquer la réponse en cas d'erreur de revalidation
-    }
+      },    });    // Revalider le sitemap, la page d'accueil et la page du blog pour inclure le nouveau blog
+    await revalidateBlogRoutes(slug, 'create');
     
     return NextResponse.json(blog);
   } catch (err) {

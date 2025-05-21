@@ -1,7 +1,7 @@
 // API route for updating only the content of a blog (GrapesJS)
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
+import { revalidateBlogRoutes } from '@/lib/revalidateSitemap';
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = await params;
@@ -15,24 +15,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       where: { id },
       data: { content: content },
     });
-    
-    // Récupérer le slug pour revalider la page spécifique
+      // Récupérer le slug pour revalider la page spécifique
     const blog = await prisma.blog.findUnique({
       where: { id },
       select: { slug: true }
     });
-      // Revalider la page d'accueil et la page du blog
-    try {
-      if (blog && blog.slug) {
-        revalidatePath(`/client/book-page/${blog.slug}`);
-        revalidatePath(`/client/blog/${blog.slug}`); // Pour compatibilité avec l'ancien chemin
-        revalidatePath('/'); // Revalider aussi la page d'accueil qui pourrait afficher un extrait du contenu
-        console.log(`Page du blog ${blog.slug} et page d'accueil revalidées après mise à jour du contenu`);
-      }
-    } catch (revalidateError) {
-      console.error('Erreur lors de la revalidation:', revalidateError);
-      // Ne pas bloquer la réponse en cas d'erreur de revalidation
-    }
+    
+    // Revalider la page d'accueil et la page du blog
+    await revalidateBlogRoutes(blog?.slug, 'update', id);
     
     return NextResponse.json(updated);
   } catch (e) {
