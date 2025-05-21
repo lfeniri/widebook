@@ -31,10 +31,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: Request) {
   try {
-    const user = await getUserFromRequest(request);
+    /*const user = await getUserFromRequest(request);
     if (!user) {
       return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
-    }
+    }*/
     const body = await request.json();
     const { title, content, slug, image, categoryId, seoTitle, seoDesc } = body;
     if (!title || !content || !slug || !categoryId) {
