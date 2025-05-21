@@ -1,10 +1,12 @@
 import { notFound } from 'next/navigation';
 import BlogPageServer from './BlogPageServer';
 import BlogInteractivity from './BlogInteractivity';
+import BlogClientSeo from './BlogClientSeo';
 import { prisma } from '@/lib/prisma';
 import { serializeFromPrisma } from './blogUtils';
 import { Metadata } from 'next';
 import { generateSeoMetadata } from '@/lib/seo';
+import { extractContentText, getHtmlContent } from '@/lib/extractContentText';
 
 // Revalidation périodique des pages de blog (toutes les 3 heures)
 export const revalidate = 10800;
@@ -39,8 +41,7 @@ export async function generateMetadata({
       author: true 
     }
   });
-  
-  // Si le blog n'existe pas, retourner les métadonnées par défaut
+    // Si le blog n'existe pas, retourner les métadonnées par défaut
   if (!blog) {
     return generateSeoMetadata({
       title: 'Blog non trouvé',
@@ -48,18 +49,34 @@ export async function generateMetadata({
       noIndex: true
     });
   }
-    // Extraire les informations utiles du blog
-  const { title, seoDesc, seoTitle, image, category } = blog;
+  
+  // Extraire les informations utiles du blog
+  const { title, seoDesc, seoTitle, image, category, content, createdAt, updatedAt } = blog;
   const authorName = blog.author?.name || '';
   const categoryName = category?.name || '';
+  
+  // Extraire le texte du contenu pour une meilleure description
+  const htmlContent = getHtmlContent(content);
+  const contentText = htmlContent ? extractContentText(htmlContent, 200) : '';
+  
+  // Construire les mots-clés
+  const keywordsText = `${title}, ${categoryName}, blog, article, ${authorName}`;
   
   // Générer les métadonnées SEO
   return generateSeoMetadata({
     title: seoTitle || title,
-    description: seoDesc || `Article de ${authorName} dans la catégorie ${categoryName}`,
+    description: seoDesc || contentText || `Article de ${authorName} dans la catégorie ${categoryName}`,
     canonical: `/client/blog/${slug}`,
     ogImage: image || undefined,
-    ogType: 'article'
+    ogType: 'article' as 'article',
+    keywords: keywordsText,
+    additionalOgParams: {
+      authors: authorName ? [authorName] : undefined,
+      publishedTime: createdAt ? new Date(String(createdAt)).toISOString() : undefined,
+      modifiedTime: updatedAt ? new Date(String(updatedAt)).toISOString() : undefined,
+      section: categoryName,
+      tags: [categoryName, 'blog', 'article'],
+    }
   });
 }
 
@@ -94,13 +111,15 @@ export default async function BlogPage({
   // Récupérer le contenu du blog pour vérifier s'il y a du JavaScript
   const blogContent = blog.content;
   const hasJavaScript = typeof blogContent === 'object' && blogContent && 'js' in blogContent && 
-                      typeof blogContent.js === 'string' && blogContent.js.trim().length > 0;
-
-  return (
+                      typeof blogContent.js === 'string' && blogContent.js.trim().length > 0;  return (
     <>
       {/* Rendu côté serveur du contenu principal du blog */}
       <BlogPageServer blog={serializedBlog} />
-        {/* Composant client uniquement pour le code JavaScript du blog */}
+      
+      {/* Composant client pour SEO supplémentaire */}
+      <BlogClientSeo blog={serializedBlog} />
+      
+      {/* Composant client uniquement pour le code JavaScript du blog */}
       {hasJavaScript && blogContent.js && (
         <BlogInteractivity 
           js={String(blogContent.js)} 

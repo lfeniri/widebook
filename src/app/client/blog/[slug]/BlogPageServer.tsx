@@ -2,6 +2,8 @@ import React from 'react';
 import { Blog } from '@/types/blog';
 import BlogHeader from './BlogHeader';
 import SEOComponent from '@/components/seo/SEOComponent';
+import EnhancedBlogSeo from '@/components/seo/EnhancedBlogSeo';
+import ArticleStructuredData from '@/components/seo/ArticleStructuredData';
 
 interface BlogPageServerProps {
   blog: Blog;
@@ -38,7 +40,7 @@ const BlogPageServer: React.FC<BlogPageServerProps> = ({ blog }) => {
             <script dangerouslySetInnerHTML={{ __html: contentJs }} />
           )}
         </div>
-      )}      {/* SEO et données structurées avancées */}
+      )}      {/* SEO de base et données structurées */}
       <SEOComponent 
         pageType="blog"
         blog={blog} 
@@ -49,6 +51,23 @@ const BlogPageServer: React.FC<BlogPageServerProps> = ({ blog }) => {
           { name: blog.category?.name || 'Catégorie', item: `/blogs?category=${blog.categoryId}` },
           { name: blog.title, item: `/client/blog/${blog.slug}` }
         ]}
+      />
+      
+      {/* SEO avancé spécifique aux blogs */}
+      <EnhancedBlogSeo
+        blog={blog}
+        url={`/client/blog/${blog.slug}`}
+        breadcrumbItems={[
+          { name: 'Accueil', item: '/' },
+          { name: 'Blogs', item: '/blogs' },
+          { name: blog.category?.name || 'Catégorie', item: `/blogs?category=${blog.categoryId}` },
+          { name: blog.title, item: `/client/blog/${blog.slug}` }
+        ]}
+      />
+        {/* Données structurées spécifiques pour articles */}
+      <ArticleStructuredData 
+        blog={blog} 
+        url={`/client/blog/${blog.slug}`} 
       />
     </article>
   );

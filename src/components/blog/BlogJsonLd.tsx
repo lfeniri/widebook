@@ -1,5 +1,6 @@
 import React from 'react';
 import { Blog } from '@/types/blog';
+import { extractContentText, getHtmlContent } from '@/lib/extractContentText';
 
 // Propriétés pour le composant BlogJsonLd
 interface BlogJsonLdProps {
@@ -29,15 +30,33 @@ const BlogJsonLd: React.FC<BlogJsonLdProps> = ({ blog, url }) => {
     return `${process.env.NEXT_PUBLIC_BASE_URL || 'https://widebook.fr'}/og-image.jpg`;
   };
 
+  // Extraire une description du contenu
+  const getDescription = () => {
+    if (blog.seoDesc) return blog.seoDesc;
+    
+    // Tenter d'extraire du texte du contenu HTML
+    const htmlContent = getHtmlContent(blog.content);
+    if (htmlContent) {
+      return extractContentText(htmlContent, 200);
+    }
+    
+    return `Article de ${getAuthorName()} sur Widebook`;
+  };
+
+  // Formatage des dates de publication et modification
+  const publishDate = blog.createdAt ? new Date(blog.createdAt).toISOString() : new Date().toISOString();
+  const modifiedDate = blog.updatedAt ? new Date(blog.updatedAt).toISOString() : publishDate;
+
   // Créer les données structurées au format JSON-LD
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     'headline': blog.title,
-    'description': blog.seoDesc || '',
+    'name': blog.title,
+    'description': getDescription(),
     'image': getBlogImage(),
-    'datePublished': blog.createdAt,
-    'dateModified': blog.updatedAt,
+    'datePublished': publishDate,
+    'dateModified': modifiedDate,
     'author': {
       '@type': 'Person',
       'name': getAuthorName()
@@ -53,7 +72,13 @@ const BlogJsonLd: React.FC<BlogJsonLdProps> = ({ blog, url }) => {
     'mainEntityOfPage': {
       '@type': 'WebPage',
       '@id': url
-    }
+    },
+    'inLanguage': 'fr-FR',
+    'wordCount': blog.content && typeof blog.content === 'object' && blog.content.html ? 
+                 blog.content.html.split(/\s+/).length : 0,
+    'articleSection': blog.category?.name || 'Blog',
+    'url': url,
+    'isAccessibleForFree': true
   };
 
   return (
