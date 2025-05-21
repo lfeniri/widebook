@@ -10,11 +10,10 @@ interface BlogClientSeoProps {
 /**
  * Composant client pour injecter des balises SEO côté client
  */
-const BlogClientSeo = ({ blog }: BlogClientSeoProps) => {
-  return (
+const BlogClientSeo = ({ blog }: BlogClientSeoProps) => {  return (
     <SeoTagsInjector
       blog={blog}
-      url={`/client/blog/${blog.slug}`}
+      url={`/client/book-page/${blog.slug}`}
     />
   );
 };

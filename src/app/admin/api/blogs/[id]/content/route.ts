@@ -21,11 +21,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       where: { id },
       select: { slug: true }
     });
-    
-    // Revalider la page d'accueil et la page du blog
+      // Revalider la page d'accueil et la page du blog
     try {
       if (blog && blog.slug) {
-        revalidatePath(`/client/blog/${blog.slug}`);
+        revalidatePath(`/client/book-page/${blog.slug}`);
+        revalidatePath(`/client/blog/${blog.slug}`); // Pour compatibilité avec l'ancien chemin
         revalidatePath('/'); // Revalider aussi la page d'accueil qui pourrait afficher un extrait du contenu
         console.log(`Page du blog ${blog.slug} et page d'accueil revalidées après mise à jour du contenu`);
       }

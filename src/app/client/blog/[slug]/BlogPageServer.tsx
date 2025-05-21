@@ -40,34 +40,31 @@ const BlogPageServer: React.FC<BlogPageServerProps> = ({ blog }) => {
             <script dangerouslySetInnerHTML={{ __html: contentJs }} />
           )}
         </div>
-      )}      {/* SEO de base et données structurées */}
-      <SEOComponent 
+      )}      {/* SEO de base et données structurées */}      <SEOComponent 
         pageType="blog"
         blog={blog} 
-        url={`/client/blog/${blog.slug}`}
+        url={`/client/book-page/${blog.slug}`}
         breadcrumbItems={[
           { name: 'Accueil', item: '/' },
           { name: 'Blogs', item: '/blogs' },
           { name: blog.category?.name || 'Catégorie', item: `/blogs?category=${blog.categoryId}` },
-          { name: blog.title, item: `/client/blog/${blog.slug}` }
+          { name: blog.title, item: `/client/book-page/${blog.slug}` }
         ]}
       />
       
-      {/* SEO avancé spécifique aux blogs */}
-      <EnhancedBlogSeo
+      {/* SEO avancé spécifique aux blogs */}      <EnhancedBlogSeo
         blog={blog}
-        url={`/client/blog/${blog.slug}`}
+        url={`/client/book-page/${blog.slug}`}
         breadcrumbItems={[
           { name: 'Accueil', item: '/' },
           { name: 'Blogs', item: '/blogs' },
           { name: blog.category?.name || 'Catégorie', item: `/blogs?category=${blog.categoryId}` },
-          { name: blog.title, item: `/client/blog/${blog.slug}` }
+          { name: blog.title, item: `/client/book-page/${blog.slug}` }
         ]}
-      />
-        {/* Données structurées spécifiques pour articles */}
+      />        {/* Données structurées spécifiques pour articles */}
       <ArticleStructuredData 
         blog={blog} 
-        url={`/client/blog/${blog.slug}`} 
+        url={`/client/book-page/${blog.slug}`} 
       />
     </article>
   );

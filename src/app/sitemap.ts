@@ -36,10 +36,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const, // Pages de profil moins fréquemment mises à jour
       priority: 0.5,
     },
-  ];
-  // URLs des blogs avec date de modification dynamique
+  ];  // URLs des blogs avec date de modification dynamique
   const blogUrls = blogs.map((blog) => ({
-    url: `${baseUrl}/client/blog/${blog.slug}`,
+    url: `${baseUrl}/client/book-page/${blog.slug}`,
     lastModified: new Date(blog.updatedAt || blog.createdAt),
     changeFrequency: 'weekly' as const,
     priority: 0.7,

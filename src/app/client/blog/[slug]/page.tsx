@@ -58,15 +58,14 @@ export async function generateMetadata({
   // Extraire le texte du contenu pour une meilleure description
   const htmlContent = getHtmlContent(content);
   const contentText = htmlContent ? extractContentText(htmlContent, 200) : '';
-  
-  // Construire les mots-clés
+    // Construire les mots-clés
   const keywordsText = `${title}, ${categoryName}, blog, article, ${authorName}`;
   
   // Générer les métadonnées SEO
   return generateSeoMetadata({
     title: seoTitle || title,
     description: seoDesc || contentText || `Article de ${authorName} dans la catégorie ${categoryName}`,
-    canonical: `/client/blog/${slug}`,
+    canonical: `/client/book-page/${slug}`,
     ogImage: image || undefined,
     ogType: 'article' as 'article',
     keywords: keywordsText,

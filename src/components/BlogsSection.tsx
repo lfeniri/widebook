@@ -181,9 +181,8 @@ export default function BlogsSection({ initialBlogs }: BlogsSectionProps) {
                       month: "short",
                       year: "numeric"
                     })}
-                  </span>
-                </div>
-                <Link href={`/client/blog/${blog.slug}`}
+                  </span>                </div>
+                <Link href={`/client/book-page/${blog.slug}`}
                   className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-3 line-clamp-2">
                   {blog.title}
                 </Link>                <div className="mt-auto pt-4 flex items-center">                  <div className="flex items-center">                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold text-sm">
@@ -201,11 +200,10 @@ export default function BlogsSection({ initialBlogs }: BlogsSectionProps) {
                     </div>
                     <span className="text-sm text-gray-600 ml-2 line-clamp-1">
                       {getAuthorDisplayName(blog.author)}
-                    </span>
-                  </div>
+                    </span>                  </div>
                   
                   <Link
-                    href={`/client/blog/${blog.slug}`}
+                    href={`/client/book-page/${blog.slug}`}
                     className="ml-auto rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow min-w-[100px] px-4 py-1 text-sm flex items-center justify-center"
                   >
                     <span>Detail</span>

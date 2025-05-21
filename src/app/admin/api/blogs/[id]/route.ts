@@ -33,7 +33,8 @@ export async function PUT(
       },    });    // Revalider le sitemap, la page d'accueil et la page du blog lorsqu'un blog est mis à jour
     try {
       revalidatePath('/sitemap');
-      revalidatePath(`/client/blog/${slug}`);
+      revalidatePath(`/client/book-page/${slug}`);
+      revalidatePath(`/client/blog/${slug}`); // Pour compatibilité avec l'ancien chemin
       revalidatePath('/'); // Revalider la page d'accueil qui affiche la liste des blogs
       console.log(`Sitemap, page d'accueil et page du blog ${slug} revalidés après mise à jour du blog ID: ${id}`);
     } catch (revalidateError) {
@@ -86,11 +87,14 @@ export async function DELETE(
     // Supprimer le blog
     await prisma.blog.delete({
       where: { id },
-    });    // Revalider le sitemap et la page d'accueil après la suppression d'un blog
+    });    
+    
+    // Revalider le sitemap et la page d'accueil après la suppression d'un blog    
     try {
       if (blogToDelete && blogToDelete.slug) {
         revalidatePath('/sitemap');
-        revalidatePath(`/client/blog/${blogToDelete.slug}`);
+        revalidatePath(`/client/book-page/${blogToDelete.slug}`);
+        revalidatePath(`/client/blog/${blogToDelete.slug}`); // Pour compatibilité avec l'ancien chemin
         revalidatePath('/'); // Revalider la page d'accueil
         console.log(`Sitemap, page d'accueil et page du blog ${blogToDelete.slug} revalidés après suppression du blog ID: ${id}`);
       } else {
