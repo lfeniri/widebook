@@ -45,7 +45,7 @@ const ArticleStructuredData: React.FC<ArticleStructuredDataProps> = ({ blog, url
     'description': description,    'author': {
       '@type': 'Person',
       'name': blog.author?.name || 'Widebook',
-      'url': blog.author?.id ? `${baseUrl}/profile/${blog.author.id}` : `${baseUrl}/profile`
+      'url': `${process.env.NEXT_PUBLIC_BASE_URL || 'https://widebook.fr'}/authors`
     },
     'publisher': {
       '@type': 'Organization',

@@ -52,7 +52,7 @@ const EnhancedBlogSeo: React.FC<EnhancedBlogSeoProps> = ({
             author: {
               '@type': 'Person',
               name: blog.author?.name || 'Widebook',
-              url: blog.author?.id ? `${process.env.NEXT_PUBLIC_BASE_URL || 'https://widebook.fr'}/profile/${blog.author.id}` : `${process.env.NEXT_PUBLIC_BASE_URL || 'https://widebook.fr'}/profile`,
+              url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://widebook.fr'}/authors`,
             },
             publisher: {
               '@type': 'Organization',

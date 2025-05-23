@@ -59,7 +59,7 @@ const BlogJsonLd: React.FC<BlogJsonLdProps> = ({ blog, url }) => {
     'dateModified': modifiedDate,    'author': {
       '@type': 'Person',
       'name': getAuthorName(),
-      'url': blog.author?.id ? `${process.env.NEXT_PUBLIC_BASE_URL || 'https://widebook.fr'}/profile/${blog.author.id}` : `${process.env.NEXT_PUBLIC_BASE_URL || 'https://widebook.fr'}/profile`
+      'url': `${process.env.NEXT_PUBLIC_BASE_URL || 'https://widebook.fr'}/authors`
     },
     'publisher': {
       '@type': 'Organization',
